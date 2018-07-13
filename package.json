@@ -1,0 +1,28 @@
+{
+	"name": "arangojs-revisions",
+	"version": "1.0.0",
+	"license": "MIT",
+	"description": "A time-sliced revision history of tracked collections allowing permanent time travel in ArangoDB",
+	"keywords": [
+		"arangodb",
+		"arangojs",
+		"revision",
+		"time",
+		"history",
+		"slicing",
+		"graph"
+	],
+	"bugs": {
+		"email": "support@kevinsekin.de"
+	},
+	"author": {
+		"name": "Kevin Sekin",
+		"email": "business@kevinsekin.de",
+		"url": "https://kevinsekin.de"
+	},
+	"main": "index.js",
+	"files": [
+		"src/*",
+		"src/**/*"
+	]
+}
