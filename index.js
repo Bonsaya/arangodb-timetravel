@@ -6,8 +6,8 @@
  * ===========================
  */
 
-let arangoRevisions = require('./src/revisions');
+const arangoDBRevisions = require('./src/revisions');
 
-module.exports = function injectRevisions(arangoDB) {
-	Object.assign(arangoDB, {revisions: arangoRevisions});
+module.exports = function(db) {
+	return arangoDBRevisions(db);
 }

@@ -6,128 +6,128 @@
  * ===========================
  */
 
-const db = require('@arangodb').db;
-
-module.exports = revision => {
-	return {
-		revisionCollectionName: (name) => {
+module.exports = function(db) {
+	return new function() {
+		this.db = db;
+		this.revisionCollectionName = (name) => {
 			return module.context.collectionName(name);
-		},
-		revisionCollectionHistoryName: (name) => {
+		};
+		this.revisionCollectionHistoryName = (name) => {
 			return module.context.collectionName(name + '__internal__history');
-		},
-		revisionCollectionEdgeName: (name) => {
+		};
+		this.revisionCollectionEdgeName = (name) => {
 			return module.context.collectionName(name + '__internal__history__edges');
-		},
-		create: (name) => {
+		};
+		this.create = (name) => {
 			const collectionName = this.revisionCollectionName(name);
 			const collectionHistoryName = this.revisionCollectionHistoryName(name);
 			const collectionEdgeName = this.revisionCollectionEdgeName(name);
 			
-			if (db._collection(collectionName) ||
-				db._collection(collectionHistoryName) ||
-				db._collection(collectionEdgeName)) {
+			if (this.db._collection(collectionName) ||
+				this.db._collection(collectionHistoryName) ||
+				this.db._collection(collectionEdgeName)) {
 				throw new Error('The revision already exists');
 			} else {
-				db._createDocumentCollection(collectionHistoryName);
-				db._createEdgeCollection(collectionEdgeName);
-				return db._createDocumentCollection(collectionName);
+				this.db._createDocumentCollection(collectionHistoryName);
+				this.db._createEdgeCollection(collectionEdgeName);
+				return this.db._createDocumentCollection(collectionName);
 			}
-		},
-		revisionCollection: (name) => {
-			let collection = db.collection(this.revisionCollectionName(name));
-			let revisionCollection = {
-				all: () => {
+			return true;
+		};
+		this.revisionCollection = (name) => {
+			let collection = this.db.collection(this.revisionCollectionName(name));
+			let revisionCollection = new function() {
+				this.all = () => {
 					return this.collection.all();
-				},
-				byExample: (example) => {
+				};
+				this.byExample = (example) => {
 					return this.collection.byExample(example);
-				},
-				firstExample: (example) => {
+				};
+				this.firstExample = (example) => {
 					return this.collection.firstExample(example);
-				},
-				range: (attribute, left, right) => {
+				};
+				this.range = (attribute, left, right) => {
 					return this.collection.range(attribute, left, right);
-				},
-				closedRange: (attribute, left, right) => {
+				};
+				this.closedRange = (attribute, left, right) => {
 					return this.collection.closedRange(attribute, left, right);
-				},
-				any: () => {
+				};
+				this.any = () => {
 					return this.collection.any();
-				},
-				count: () => {
+				};
+				this.count = () => {
 					return this.collection.count();
-				},
-				toArray: () => {
+				};
+				this.toArray = () => {
 					return this.collection.toArray();
-				},
-				document: (handle) => {
+				};
+				this.document = (handle) => {
 					return this.collection.document(handle);
-				},
-				documents: (handles) => {
+				};
+				this.documents = (handles) => {
 					return this.collection.documents(handles);
-				},
-				type: () => {
+				};
+				this.type = () => {
 					return this.collection.type();
-				},
-				iterate: (iterator, options) => {
+				};
+				this.iterate = (iterator, options) => {
 					return this.collection.iterate(iterator, options);
-				},
-				exists: (handle) => {
+				};
+				this.exists = (handle) => {
 					return this.collection.exists(handle);
-				},
-				insert: (object, options = {}) => {
+				};
+				this.insert = (object, options = {}) => {
 				
-				},
-				replace: (handle, object, options = {}) => {
+				};
+				this.replace = (handle, object, options = {}) => {
 				
-				},
-				update: (handle, object, options = {}) => {
+				};
+				this.update = (handle, object, options = {}) => {
 				
-				},
-				remove: (handle, options) => {
+				};
+				this.remove = (handle, options) => {
 				
-				},
-				removeByKeys: (handles) => {
+				};
+				this.removeByKeys = (handles) => {
 				
-				},
-				removeByExample: (example) => {
+				};
+				this.removeByExample = (example) => {
 				
-				},
-				replaceByExample: (example, object) => {
+				};
+				this.replaceByExample = (example, object) => {
 				
-				},
-				updateByExample: (example, object) => {
+				};
+				this.updateByExample = (example, object) => {
 				
-				},
-				revisions: (handle) => {
+				};
+				this.revisions = (handle) => {
 				
-				},
-				previous: (handle, revision) => {
+				};
+				this.previous = (handle, revision) => {
 				
-				},
-				next: (handle, revision) => {
+				};
+				this.next = (handle, revision) => {
 				
-				},
-				revisionByDate: (dateOfInterest) => {
+				};
+				this.revisionByDate = (dateOfInterest) => {
 				
-				},
-				revisionByDateRange: (dateRangeMin, dateRangeMax) => {
+				};
+				this.revisionByDateRange = (dateRangeMin, dateRangeMax) => {
 				
 				}
 			};
 			return Object.assign(revisionCollection, {collection: collection});
-		},
-		revisionEdgeCollection: (name) => {
-			let edgeCollection = db.collection(this.revisionCollectionName(name));
-			let edgeRevisionCollection = {
-				edges: (handle) => {
+		};
+		this.revisionEdgeCollection = (name) => {
+			let edgeCollection = this.db.collection(this.revisionCollectionName(name));
+			let edgeRevisionCollection = new function() {
+				this.edges = (handle) => {
 					return this.collection.edges(handle);
-				},
-				inEdges: (handle) => {
+				};
+				this.inEdges = (handle) => {
 					return this.collection.inEdges(handle);
-				},
-				outEdges: (handle) => {
+				};
+				this.outEdges = (handle) => {
 					return this.collection.outEdges(handle);
 				}
 			};
