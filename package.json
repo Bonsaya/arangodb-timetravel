@@ -24,5 +24,8 @@
 	"files": [
 		"src/*",
 		"src/**/*"
-	]
+	],
+	"dependencies": {
+		"lodash": "^4.17.10"
+	}
 }
