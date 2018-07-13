@@ -9,5 +9,5 @@
 let arangoRevisions = require('./src/revisions');
 
 module.exports = function injectRevisions(arangoDB) {
-	Object.assign(arangoDB, {arangoRevisions});
+	Object.assign(arangoDB, {revisions: arangoRevisions});
 }
