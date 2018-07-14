@@ -7,9 +7,10 @@
  */
 
 class GenericCollection {
-	constructor(db, name) {
+	constructor(db, name, settings) {
 		this.db = db;
 		this.collection = db._collection(name);
+		this.settings = settings;
 	}
 	all () {
 		return this.collection.all();

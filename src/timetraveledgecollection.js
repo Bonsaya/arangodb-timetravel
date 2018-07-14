@@ -9,8 +9,8 @@
 import {GenericCollection} from 'genericcollection';
 
 class TimeTravelEdgeCollection extends GenericCollection {
-	constructor(db, name) {
-		super(db, name);
+	constructor(db, name, settings) {
+		super(db, name, settings);
 	}
 	insert(object, options = {}) {
 	

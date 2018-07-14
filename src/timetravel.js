@@ -38,7 +38,7 @@ class TimeTravel {
 			this.db._createEdgeCollection(edgeCollectionName);
 			this.db._createDocumentCollection(outdatedCollectionName);
 			this.db._createEdgeCollection(outdatedEdgeCollectionName);
-			return new TimeTravelCollection(this.db, name);
+			return new TimeTravelCollection(this.db, collectionName, this.settings);
 		}
 	}
 	createEdgeCollection(name) {
@@ -50,14 +50,14 @@ class TimeTravel {
 		} else {
 			this.db._createEdgeCollection(edgeCollectionName);
 			this.db._createEdgeCollection(outdatedEdgeCollectionName);
-			return new TimeTravelEdgeCollection(this.db, name);
+			return new TimeTravelEdgeCollection(this.db, edgeCollectionName, this.settings);
 		}
 	}
 	documentCollection(name) {
-		return new TimeTravelCollection(name);
+		return new TimeTravelCollection(this.db, name+internalTimeTravelPresentName(), this.settings);
 	}
 	edgeCollection(name) {
-		return new TimeTravelEdgeCollection(name);
+		return new TimeTravelEdgeCollection(this.db, name+internalTimeTravelPresentName(), this.settings);
 	}
 }
 
