@@ -6,8 +6,8 @@
  * ===========================
  */
 
-const arangoDBRevisions = require('./src/revisions');
+const arangoDBTimeTravel = require('./src/timetravel');
 
-module.exports = function(db) {
-	return arangoDBRevisions(db);
+module.exports = function(db, settings) {
+	return arangoDBTimeTravel(db, settings);
 }
