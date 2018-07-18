@@ -9,24 +9,16 @@
 import {TimeTravelCollection} from 'timetravelcollection';
 import {TimeTravelEdgeCollection} from 'timetraveledgecollection';
 
-function internalTimeTravelPresentName () {
-	return '__timetravel__present';
-}
-
-function internalTimeTravelPastName () {
-	return '__timetravel__past';
-}
-
 class TimeTravel {
 	constructor(db, settings) {
 		this.db = db;
 		this.settings = settings;
 	}
 	createDocumentCollection (name) {
-		const collectionName = name+internalTimeTravelPresentName();
-		const outdatedCollectionName = name+internalTimeTravelPastName();
-		const edgeCollectionName = name+internalTimeTravelPresentName()+'__relations';
-		const outdatedEdgeCollectionName = name+internalTimeTravelPastName()+'__relations';
+		const collectionName = name+this.settings.timeTravelPresentAppendix;
+		const outdatedCollectionName = name+this.settings.timeTravelPastAppendix;
+		const edgeCollectionName = name+this.settings.timeTravelPresentAppendix+this.settings.edgeAppendix;
+		const outdatedEdgeCollectionName = name+this.settings.timeTravelPastAppendix+this.settings.edgeAppendix;
 		
 		if (this.db._collection(collectionName) ||
 			this.db._collection(edgeCollectionName) ||
@@ -42,8 +34,8 @@ class TimeTravel {
 		}
 	}
 	createEdgeCollection(name) {
-		const edgeCollectionName = name+internalTimeTravelPresentName();
-		const outdatedEdgeCollectionName = name+internalTimeTravelPastName();
+		const edgeCollectionName = name+this.settings.timeTravelPresentAppendix();
+		const outdatedEdgeCollectionName = name+this.settings.timeTravelPastAppendix();
 		if (this.db._collection(edgeCollectionName) ||
 			this.db._collection(outdatedEdgeCollectionName)) {
 			throw new Error('[TimeTravel] The edge collection already exists');
@@ -54,10 +46,10 @@ class TimeTravel {
 		}
 	}
 	documentCollection(name) {
-		return new TimeTravelCollection(this.db, name+internalTimeTravelPresentName(), this.settings);
+		return new TimeTravelCollection(this.db, name+this.settings.timeTravelPresentAppendix, this.settings);
 	}
 	edgeCollection(name) {
-		return new TimeTravelEdgeCollection(this.db, name+internalTimeTravelPresentName(), this.settings);
+		return new TimeTravelEdgeCollection(this.db, name+this.settings.timeTravelPresentAppendix, this.settings);
 	}
 }
 
