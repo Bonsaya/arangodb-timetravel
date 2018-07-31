@@ -19,6 +19,10 @@ class TimeTravelCollection extends GenericCollection {
 			object.id = object._key;
 			delete object._key;
 		}
+		if (typeof object._id === 'string') {
+			object.id = object._id.split('/')[1];
+			delete object._id;
+		}
 		if (typeof object.id !== 'string') {
 			throw new Error('[TimeTravel] Attempted to insert document without id or _key value');
 		}
