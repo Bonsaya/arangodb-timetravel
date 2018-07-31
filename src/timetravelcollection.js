@@ -14,6 +14,13 @@ class TimeTravelCollection extends GenericCollection{
 		super(db, name, settings);
 	}
 	insert(object, options = {}) {
+		if(typeof object._key === 'string') {
+			object.id = object._key;
+			delete object._key;
+		}
+		if(typeof object.id !== 'string') {
+			throw new Error('[TimeTravel] Attempted to insert document without id or _key value');
+		}
 		this.db._executeTransaction({
 			collections: {
 				write: [this.name, this.name+this.settings.edgeAppendix]
