@@ -186,7 +186,7 @@ class TimeTravelCollection extends GenericTimeCollection {
 		/**
 		 * Begin of actual method
 		 */
-		// First, we must fetch all the documents that match the example
+			// First, we must fetch all the documents that match the example
 		let documents = this.byExample(example).toArray();
 		// Then we need to replace each one with the new object!
 		documents.forEach((document) => {
@@ -224,6 +224,51 @@ class TimeTravelCollection extends GenericTimeCollection {
 	
 	documentByDateRange(dateRangeMin, dateRangeMax) {
 	
+	}
+	
+	document(handle) {
+		/**
+		 * Section that validates parameters
+		 */
+		if (typeof handle !== 'string') {
+			throw new Error('[TimeTravel] document received non-string as first parameter (handle)');
+		}
+		/**
+		 * Begin of actual method
+		 */
+		// We use the Inbound Proxy, as that key remains unique and the same for each document and thus is predictable
+		return this.collection.document(handle + '_INBOUNDPROXY');
+	}
+	
+	documents(handles) {
+		/**
+		 * Section that validates parameters
+		 */
+		if (handles.constructor !== Array) {
+			throw new Error('[TimeTravel] documents received non-array as first parameter (handles)');
+		}
+		/**
+		 * Begin of actual method
+		 */
+		let documents = [];
+		handles.forEach((handle) => {
+			documents.push(this.document(handle));
+		});
+		return documents;
+	}
+	
+	exists(handle) {
+		/**
+		 * Section that validates parameters
+		 */
+		if (typeof handle !== 'string') {
+			throw new Error('[TimeTravel] exists received non-string as first parameter (handle)');
+		}
+		/**
+		 * Begin of actual method
+		 */
+		// We use the Inbound Proxy, as that key remains unique and the same for each document and thus is predictable
+		return this.collection.exists(handle + '_INBOUNDPROXY');
 	}
 }
 
