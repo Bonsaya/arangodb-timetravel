@@ -133,7 +133,76 @@ class TimeTravelCollection extends GenericTimeCollection {
 	}
 	
 	update(handle, object, options = {}) {
-	
+		/**
+		 * Section that validates parameters
+		 */
+		if (typeof handle !== 'string') {
+			throw new Error('[TimeTravel] update received non-string as first parameter (handle)');
+		}
+		if (object !== Object(object)) {
+			throw new Error('[TimeTravel] update received non-object as second parameter (object)');
+		}
+		if (options !== Object(options)) {
+			throw new Error('[TimeTravel] update received non-object as third parameter (options)');
+		}
+		/**
+		 * Begin of actual method
+		 */
+		// Let us first check if the handle exists!
+		if (this.exists(handle)) {
+			this.db._executeTransaction({
+				collections: {
+					write: [this.name, this.name + this.settings.edgeAppendix]
+				},
+				action: function({doc, edge, object, options}) {
+					// Import arangoDB database driver
+					const db = require('@arangodb').db;
+					// Open up the collections to be inserted into
+					let documentCollection = db._collection(doc);
+					let edgeCollection = db._collection(edge);
+					// Generate the Inbound Proxy Key
+					let inboundProxyKey = edge + '/' + object.id + '_INBOUNDPROXY';
+					// Generate the Outbound Proxy Key
+					let outboundProxyKey = edge + '/' + object.id + '_OUTBOUNDPROXY';
+					// Fetch the recent unexpired version of vertex and edge if any
+					let oldDocumentsAndEdges = db._query(aqlQuery`
+							FOR vertex, edge IN OUTBOUND ${inboundProxyKey} ${edge}
+							FILTER edge.expiresAt == 8640000000000000
+							RETURN { 'document': vertex, 'edge': edge }
+						`).toArray();
+					// Establish current Date
+					let dateNow = Date.now();
+					// Let us build the current version of the document
+					let document = {};
+					// Expire the old edges and documents
+					oldDocumentsAndEdges.forEach((documentAndEdge) => {
+						document = Object.assign(document, documentAndEdge['document']);
+						documentCollection.update(documentAndEdge['document']._key, {expiresAt: dateNow});
+						edgeCollection.update(documentAndEdge['edge']._key, {expiresAt: dateNow});
+					});
+					// Insert the updated document
+					let newDocument = documentCollection.insert(Object.assign(document, object, {
+						createdAt: dateNow,
+						expiresAt: 8640000000000000
+					}), options);
+					// We have previous documents and edges, meaning the inbound proxy already exists
+					// So we simply insert the new edge!
+					edgeCollection.insert(inboundProxyKey, newDocument._id, {
+						createdAt: dateNow,
+						expiresAt: 8640000000000000
+					}, options);
+				},
+				params: {
+					doc: this.name,
+					edge: this.name + this.settings.edgeAppendix,
+					object: object,
+					options: options
+				}
+			});
+		} else {
+			// Because if it does not exist, we simply redirect to the insert method
+			this.insert(Object.assign(object, {id: handle}), options);
+		}
 	}
 	
 	remove(handle, options = {}) {
@@ -307,11 +376,51 @@ class TimeTravelCollection extends GenericTimeCollection {
 	}
 	
 	updateByKeys(handles, object, options = {}) {
-	
+		/**
+		 * Section that validates parameters
+		 */
+		if (handles.constructor !== Array) {
+			throw new Error('[TimeTravel] updateByKeys received non-array as first parameter (handles)');
+		}
+		if (object !== Object(object)) {
+			throw new Error('[TimeTravel] updateByKeys received non-object as second parameter (object)');
+		}
+		if (options !== Object(options)) {
+			throw new Error('[TimeTravel] updateByKeys received non-object as third parameter (options)');
+		}
+		/**
+		 * Begin of actual method
+		 */
+		// We handle each handle seperately so we can rely on a single method for all update functionality!
+		handles.forEach((handle) => {
+			// We simply redirect to the update method
+			this.update(handle, object, options);
+		});
 	}
 	
 	updateByExample(example, object, options = {}) {
-	
+		/**
+		 * Section that validates parameters
+		 */
+		if (example !== Object(example)) {
+			throw new Error('[TimeTravel] updateByExample received non-object as first parameter (example)');
+		}
+		if (object !== Object(object)) {
+			throw new Error('[TimeTravel] updateByExample received non-object as second parameter (object)');
+		}
+		if (options !== Object(options)) {
+			throw new Error('[TimeTravel] updateByExample received non-object as third parameter (options)');
+		}
+		/**
+		 * Begin of actual method
+		 */
+			// First, we must fetch all the documents that match the example
+		let documents = this.byExample(example).toArray();
+		// Then we need to update each one with the new object!
+		documents.forEach((document) => {
+			// By redirecting to the update method
+			this.update(document.id, object, options);
+		})
 	}
 	
 	history(handle) {
