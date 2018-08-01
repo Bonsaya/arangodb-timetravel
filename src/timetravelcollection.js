@@ -6,9 +6,9 @@
  * ===========================
  */
 
-import {GenericCollection} from 'genericcollection';
+import {GenericTimeCollection} from 'src/generictimecollection';
 
-class TimeTravelCollection extends GenericCollection {
+class TimeTravelCollection extends GenericTimeCollection {
 	
 	constructor(db, name, settings) {
 		super(db, name, settings);
