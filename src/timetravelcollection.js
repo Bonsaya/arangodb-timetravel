@@ -15,6 +15,15 @@ class TimeTravelCollection extends GenericCollection {
 	}
 	
 	insert(object, options = {}) {
+		/**
+		 * Section that validates parameters
+		 */
+		if (object !== Object(object)) {
+			throw new Error('[TimeTravel] insert received non-object as first parameter (object)');
+		}
+		if (options !== Object(options)) {
+			throw new Error('[TimeTravel] insert received non-object as second parameter (options)');
+		}
 		if (typeof object._key === 'string') {
 			object.id = object._key;
 			delete object._key;
@@ -24,8 +33,11 @@ class TimeTravelCollection extends GenericCollection {
 			delete object._id;
 		}
 		if (typeof object.id !== 'string') {
-			throw new Error('[TimeTravel] Attempted to insert document without id or _key value');
+			throw new Error('[TimeTravel] Attempted to insert document without id, _id or _key value');
 		}
+		/**
+		 * Begin of actual method
+		 */
 		this.db._executeTransaction({
 			collections: {
 				write: [this.name, this.name + this.settings.edgeAppendix]
@@ -100,7 +112,23 @@ class TimeTravelCollection extends GenericCollection {
 	}
 	
 	replace(handle, object, options = {}) {
-	
+		/**
+		 * Section that validates parameters
+		 */
+		if (typeof handle !== 'string') {
+			throw new Error('[TimeTravel] replace received non-string as first parameter (handle)');
+		}
+		if (object !== Object(object)) {
+			throw new Error('[TimeTravel] replace received non-object as second parameter (object)');
+		}
+		if (options !== Object(options)) {
+			throw new Error('[TimeTravel] replace received non-object as third parameter (options)');
+		}
+		/**
+		 * Begin of actual method
+		 */
+		// We simply redirect to the insert method, as this will expire old entries if they exist and thus "replace" it.
+		this.insert(Object.assign(object, {id: handle}), options);
 	}
 	
 	update(handle, object, options = {}) {
@@ -119,8 +147,59 @@ class TimeTravelCollection extends GenericCollection {
 	
 	}
 	
-	replaceByExample(example, object) {
+	replaceByKeys(handles, object, options) {
+		/**
+		 * Section that validates parameters
+		 */
+		if (handles.constructor !== Array) {
+			throw new Error('[TimeTravel] replaceByKeys received non-array as first parameter (handles)');
+		}
+		if (object !== Object(object)) {
+			throw new Error('[TimeTravel] replaceByKeys received non-object as second parameter (object)');
+		}
+		if (options !== Object(options)) {
+			throw new Error('[TimeTravel] replaceByKeys received non-object as third parameter (options)');
+		}
+		/**
+		 * Begin of actual method
+		 */
+		// We handle each handle seperately so we can rely on a single method for all replace functionality!
+		handles.forEach((handle) => {
+			// We simply redirect to the insert method, as this will expire old entries if they exist and thus "replace" it.
+			this.insert(Object.assign(object, {id: handle}), options);
+		});
+	}
 	
+	replaceByExample(example, object, options) {
+		/**
+		 * Section that validates parameters
+		 */
+		if (example !== Object(example)) {
+			throw new Error('[TimeTravel] replaceByExample received non-object as first parameter (example)');
+		}
+		if (object !== Object(object)) {
+			throw new Error('[TimeTravel] replaceByExample received non-object as second parameter (object)');
+		}
+		if (options !== Object(options)) {
+			throw new Error('[TimeTravel] replaceByExample received non-object as third parameter (options)');
+		}
+		/**
+		 * Begin of actual method
+		 */
+		// First, we must fetch all the documents that match the example
+		let documents = this.byExample(example).toArray();
+		// Then we need to replace each one with the new object!
+		documents.forEach((document) => {
+			// We delete all the internal keys of ArangoDB, as we do not use them as indexes
+			// And the insert method would use them to replace the "id" field, which we use as our real index
+			delete document._key;
+			delete document._rev;
+			delete document._id;
+			// Then we can redirect to the insert method, which expires old entries if they exist and thus "replaces"
+			// our document in question. For efficiency's sake, we will only submit the "id" to the new object despite
+			// having deleted all the internal ArangoDB indexes(which would not be passed anyway)
+			this.insert(Object.assign(object, {id: document.id}), options);
+		})
 	}
 	
 	updateByExample(example, object) {
