@@ -322,11 +322,11 @@ class TimeTravelCollection extends GenericTimeCollection {
 	
 	}
 	
-	documentByDate(dateOfInterest) {
+	documentsByDate(dateOfInterest) {
 	
 	}
 	
-	documentByDateRange(dateRangeMin, dateRangeMax) {
+	documentsByDateRange(dateRangeMin, dateRangeMax) {
 	
 	}
 	
