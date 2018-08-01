@@ -211,7 +211,7 @@ class TimeTravelCollection extends GenericTimeCollection {
 		});
 	}
 	
-	removeByKeys(handles, options) {
+	removeByKeys(handles, options = {}) {
 		/**
 		 * Section that validates parameters
 		 */
@@ -230,7 +230,7 @@ class TimeTravelCollection extends GenericTimeCollection {
 		})
 	}
 	
-	removeByExample(example, options) {
+	removeByExample(example, options = {}) {
 		/**
 		 * Section that validates parameters
 		 */
@@ -251,7 +251,7 @@ class TimeTravelCollection extends GenericTimeCollection {
 		})
 	}
 	
-	replaceByKeys(handles, object, options) {
+	replaceByKeys(handles, object, options = {}) {
 		/**
 		 * Section that validates parameters
 		 */
@@ -274,7 +274,7 @@ class TimeTravelCollection extends GenericTimeCollection {
 		});
 	}
 	
-	replaceByExample(example, object, options) {
+	replaceByExample(example, object, options = {}) {
 		/**
 		 * Section that validates parameters
 		 */
@@ -306,7 +306,11 @@ class TimeTravelCollection extends GenericTimeCollection {
 		})
 	}
 	
-	updateByExample(example, object) {
+	updateByKeys(handles, object, options = {}) {
+	
+	}
+	
+	updateByExample(example, object, options = {}) {
 	
 	}
 	
