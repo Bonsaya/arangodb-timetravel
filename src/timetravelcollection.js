@@ -440,7 +440,7 @@ class TimeTravelCollection extends GenericTimeCollection {
 			// Generate the Inbound Proxy Key
 			let inboundProxyKey = this.name + this.settings.edgeAppendix + '/' + handle + '_INBOUNDPROXY';
 			// Return all edges and vertices related to that inboundProxy
-			return db._query(aqlQuery`
+			return this.db._query(aqlQuery`
 				FOR vertex, edge IN OUTBOUND ${inboundProxyKey} ${edgeCollection}
 				RETURN { 'document': vertex, 'edge': edge }
 			`).toArray();
@@ -469,7 +469,7 @@ class TimeTravelCollection extends GenericTimeCollection {
 			// Generate the Inbound Proxy Key
 			let inboundProxyKey = this.name + this.settings.edgeAppendix + '/' + handle + '_INBOUNDPROXY';
 			// Fetch the vertex that expired when the new one was created to get the previous document
-			return db._query(aqlQuery`
+			return this.db._query(aqlQuery`
 				FOR vertex IN OUTBOUND ${inboundProxyKey} ${edgeCollection}
 				FILTER expiresAt == ${revision.createdAt}
 				RETURN vertex
@@ -499,7 +499,7 @@ class TimeTravelCollection extends GenericTimeCollection {
 			// Generate the Inbound Proxy Key
 			let inboundProxyKey = this.name + this.settings.edgeAppendix + '/' + handle + '_INBOUNDPROXY';
 			// Fetch the vertex that was created when the new one was expired to get the next document
-			return db._query(aqlQuery`
+			return this.db._query(aqlQuery`
 				FOR vertex IN OUTBOUND ${inboundProxyKey} ${edgeCollection}
 				FILTER createdAt == ${revision.expiresAt}
 				RETURN vertex
@@ -530,7 +530,7 @@ class TimeTravelCollection extends GenericTimeCollection {
 		if (excludeCurrent) {
 			// If not, we populate the documents with all documents that were valid until the dateOfInterest but not beyond
 			// TODO: These queries dont make sense yet.. what is the use-case? Need to think about them again
-			documents = db._query(aqlQuery`
+			documents = this.db._query(aqlQuery`
 				FOR vertex IN ${edgeCollection}
 				FILTER expiresAt >= ${dateOfInterest} && expiresAt != 8640000000000000
 				RETURN vertex
@@ -538,7 +538,7 @@ class TimeTravelCollection extends GenericTimeCollection {
 		} else {
 			// Otherwise we populate the documents with all documents, even still valid ones beyond the date of interest
 			// TODO: These queries dont make sense yet.. what is the use-case? Need to think about them again
-			documents = db._query(aqlQuery`
+			documents = this.db._query(aqlQuery`
 				FOR vertex IN ${edgeCollection}
 				FILTER expiresAt >= ${dateOfInterest}
 				RETURN vertex
@@ -584,7 +584,7 @@ class TimeTravelCollection extends GenericTimeCollection {
 		let edgeCollection = this.db._collection(this.name + this.settings.edgeAppendix);
 		// Let us fetch and store all documents that are found for cleanup later
 		// TODO: These queries dont make sense yet.. what is the use-case? Need to think about them again
-		let documents = db._query(aqlQuery`
+		let documents = this.db._query(aqlQuery`
 				FOR vertex IN ${edgeCollection}
 				FILTER expiresAt >= ${dateRangeMin} && expiresAt <= ${dateRangeMax}
 				RETURN vertex
