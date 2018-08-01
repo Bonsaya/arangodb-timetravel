@@ -438,7 +438,7 @@ class TimeTravelCollection extends GenericTimeCollection {
 			// Open the edge collection
 			let edgeCollection = this.db._collection(this.name + this.settings.edgeAppendix);
 			// Generate the Inbound Proxy Key
-			let inboundProxyKey = edge + '/' + handle + '_INBOUNDPROXY';
+			let inboundProxyKey = this.name + this.settings.edgeAppendix + '/' + handle + '_INBOUNDPROXY';
 			// Return all edges and vertices related to that inboundProxy
 			return db._query(aqlQuery`
 				FOR vertex, edge IN OUTBOUND ${inboundProxyKey} ${edgeCollection}
@@ -467,7 +467,7 @@ class TimeTravelCollection extends GenericTimeCollection {
 			// Open the edge collection
 			let edgeCollection = this.db._collection(this.name + this.settings.edgeAppendix);
 			// Generate the Inbound Proxy Key
-			let inboundProxyKey = edge + '/' + handle + '_INBOUNDPROXY';
+			let inboundProxyKey = this.name + this.settings.edgeAppendix + '/' + handle + '_INBOUNDPROXY';
 			// Fetch the vertex that expired when the new one was created to get the previous document
 			return db._query(aqlQuery`
 				FOR vertex IN OUTBOUND ${inboundProxyKey} ${edgeCollection}
@@ -497,7 +497,7 @@ class TimeTravelCollection extends GenericTimeCollection {
 			// Open the edge collection
 			let edgeCollection = this.db._collection(this.name + this.settings.edgeAppendix);
 			// Generate the Inbound Proxy Key
-			let inboundProxyKey = edge + '/' + handle + '_INBOUNDPROXY';
+			let inboundProxyKey = this.name + this.settings.edgeAppendix + '/' + handle + '_INBOUNDPROXY';
 			// Fetch the vertex that was created when the new one was expired to get the next document
 			return db._query(aqlQuery`
 				FOR vertex IN OUTBOUND ${inboundProxyKey} ${edgeCollection}
