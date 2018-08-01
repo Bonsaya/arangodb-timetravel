@@ -62,8 +62,8 @@ class TimeTravelCollection extends GenericTimeCollection {
 				let dateNow = Date.now();
 				// Expire the old edges and documents
 				oldDocumentsAndEdges.forEach((documentAndEdge) => {
-					documentCollection.update(documentAndEdge['document'].key, {expiresAt: dateNow});
-					edgeCollection.update(documentAndEdge['edge'].key, {expiresAt: dateNow});
+					documentCollection.update(documentAndEdge['document']._key, {expiresAt: dateNow});
+					edgeCollection.update(documentAndEdge['edge']._key, {expiresAt: dateNow});
 				});
 				// Insert new document
 				let newDocument = documentCollection.insert(Object.assign(object, {
@@ -104,8 +104,8 @@ class TimeTravelCollection extends GenericTimeCollection {
 				}
 			},
 			params: {
-				doc: name,
-				edge: name + this.settings.edgeAppendix,
+				doc: this.name,
+				edge: this.name + this.settings.edgeAppendix,
 				object: object,
 				options: options
 			}
@@ -137,15 +137,118 @@ class TimeTravelCollection extends GenericTimeCollection {
 	}
 	
 	remove(handle, options = {}) {
-	
+		/**
+		 * Section that validates parameters
+		 */
+		if (typeof handle !== 'string') {
+			throw new Error('[TimeTravel] remove received non-string as first parameter (handle)');
+		}
+		if (options !== Object(options)) {
+			throw new Error('[TimeTravel] remove received non-object as second parameter (options)');
+		}
+		/**
+		 * Begin of actual method
+		 */
+		this.db._executeTransaction({
+			collections: {
+				write: [this.name, this.name + this.settings.edgeAppendix]
+			},
+			action: function({doc, edge, handle, options}) {
+				// Import arangoDB database driver
+				const db = require('@arangodb').db;
+				// Open up the collections to be inserted into
+				let documentCollection = db._collection(doc);
+				let edgeCollection = db._collection(edge);
+				// Generate the Inbound Proxy Key
+				let inboundProxyKey = edge + '/' + handle + '_INBOUNDPROXY';
+				// Generate the Outbound Proxy Key
+				let outboundProxyKey = edge + '/' + handle + '_OUTBOUNDPROXY';
+				// Fetch the recent unexpired vertex and the edge to it
+				let oldDocumentsAndEdges = db._query(aqlQuery`
+					FOR vertex, edge IN OUTBOUND ${inboundProxyKey} ${edge}
+					FILTER edge.expiresAt == 8640000000000000
+					RETURN { 'document': vertex, 'edge': edge }
+				`).toArray();
+				// Establish current Date
+				let dateNow = Date.now();
+				// Expire the old edges and documents
+				oldDocumentsAndEdges.forEach((documentAndEdge) => {
+					documentCollection.update(documentAndEdge['document']._key, {expiresAt: dateNow});
+					edgeCollection.update(documentAndEdge['edge']._key, {expiresAt: dateNow});
+				});
+				// TODO: Do we have to expire all edges pointing to the inbound and outbound proxy or is expiring
+				// TODO: them enough?
+				// Fetch all the edges to the inbound proxy
+				let inboundEdges = db._query(aqlQuery`
+					FOR v, edge IN INBOUND ${inboundProxyKey} ${edge}
+					FILTER edge.expiresAt == 8640000000000000
+					RETURN edge
+				`).toArray()
+				// Expire all the edges to the inbound proxy
+				inboundEdges.forEach((edge) => {
+					edgeCollection.update(edge._key, {expiresAt: dateNow});
+				});
+				// Fetch all the edges to the outbound proxy
+				let outboundEdges = db._query(aqlQuery`
+					FOR v, edge IN OUTBOUND ${outboundProxyKey} ${edge}
+					FILTER edge.expiresAt == 8640000000000000
+					RETURN edge
+				`).toArray()
+				// Expire all the edges to the outbound proxy
+				outboundEdges.forEach((edge) => {
+					edgeCollection.update(edge._key, {expiresAt: dateNow});
+				});
+				// Expire the inbound and outbound proxies
+				documentCollection.update(inboundProxyKey, {expiresAt: dateNow});
+				documentCollection.update(outboundProxyKey, {expiresAt: dateNow});
+			},
+			params: {
+				doc: this.name,
+				edge: this.name + this.settings.edgeAppendix,
+				handle: handle,
+				options: options
+			}
+		});
 	}
 	
-	removeByKeys(handles) {
-	
+	removeByKeys(handles, options) {
+		/**
+		 * Section that validates parameters
+		 */
+		if (handles.constructor !== Array) {
+			throw new Error('[TimeTravel] removeByKeys received non-array as first parameter (handles)');
+		}
+		if (options !== Object(options)) {
+			throw new Error('[TimeTravel] removeByKeys received non-object as second parameter (options)');
+		}
+		/**
+		 * Begin of actual method
+		 */
+		// We use the remove function on each individual handle to have the same source of origin for the functions
+		handles.forEach((handle) => {
+			this.remove(handle, options);
+		})
 	}
 	
-	removeByExample(example) {
-	
+	removeByExample(example, options) {
+		/**
+		 * Section that validates parameters
+		 */
+		if (example !== Object(example)) {
+			throw new Error('[TimeTravel] removeByExample received non-object as first parameter (example)');
+		}
+		if (options !== Object(options)) {
+			throw new Error('[TimeTravel] removeByExample received non-object as second parameter (options)');
+		}
+		/**
+		 * Begin of actual method
+		 */
+			// First, we must fetch all the documents that match the example
+		let documents = this.byExample(example).toArray();
+		// Then we delegate to the remove function for each of the documents
+		documents.forEach((document) => {
+			this.remove(document._key, options);
+		})
 	}
 	
 	replaceByKeys(handles, object, options) {
@@ -251,10 +354,14 @@ class TimeTravelCollection extends GenericTimeCollection {
 		/**
 		 * Begin of actual method
 		 */
+			// We create an array to collect all documents
 		let documents = [];
+		// forEach is synchronous and causes locking!
 		handles.forEach((handle) => {
+			// And fetch them one by one to have one source of origin for the function
 			documents.push(this.document(handle));
 		});
+		// Before returning the resulting array
 		return documents;
 	}
 	
