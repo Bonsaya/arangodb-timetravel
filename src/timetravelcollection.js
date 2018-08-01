@@ -450,11 +450,63 @@ class TimeTravelCollection extends GenericTimeCollection {
 	}
 	
 	previous(handle, revision) {
-	
+		/**
+		 * Section that validates parameters
+		 */
+		if (typeof handle !== 'string') {
+			throw new Error('[TimeTravel] previous received non-string as first parameter (handle)');
+		}
+		if (revision !== Object(revision)) {
+			throw new Error('[TimeTravel] previous received non-object as second parameter (revision)');
+		}
+		/**
+		 * Begin of actual method
+		 */
+		// Let us first check if the handle exists!
+		if (this.exists(handle)) {
+			// Open the edge collection
+			let edgeCollection = db._collection(this.name + this.settings.edgeAppendix);
+			// Generate the Inbound Proxy Key
+			let inboundProxyKey = edge + '/' + handle + '_INBOUNDPROXY';
+			// Fetch the vertex that expired when the new one was created to get the previous document
+			return db._query(aqlQuery`
+				FOR vertex IN OUTBOUND ${inboundProxyKey} ${edgeCollection}
+				FILTER expiresAt == ${revision.createdAt}
+				RETURN vertex
+			`).next();
+		} else {
+			throw new Error('[TimeTravel] previous received handle that was not found.');
+		}
 	}
 	
 	next(handle, revision) {
-	
+		/**
+		 * Section that validates parameters
+		 */
+		if (typeof handle !== 'string') {
+			throw new Error('[TimeTravel] previous received non-string as first parameter (handle)');
+		}
+		if (revision !== Object(revision)) {
+			throw new Error('[TimeTravel] previous received non-object as second parameter (revision)');
+		}
+		/**
+		 * Begin of actual method
+		 */
+		// Let us first check if the handle exists!
+		if (this.exists(handle)) {
+			// Open the edge collection
+			let edgeCollection = db._collection(this.name + this.settings.edgeAppendix);
+			// Generate the Inbound Proxy Key
+			let inboundProxyKey = edge + '/' + handle + '_INBOUNDPROXY';
+			// Fetch the vertex that was created when the new one was expired to get the next document
+			return db._query(aqlQuery`
+				FOR vertex IN OUTBOUND ${inboundProxyKey} ${edgeCollection}
+				FILTER createdAt == ${revision.expiresAt}
+				RETURN vertex
+			`).next();
+		} else {
+			throw new Error('[TimeTravel] previous received handle that was not found.');
+		}
 	}
 	
 	documentsByDate(dateOfInterest, excludeCurrent = false) {
