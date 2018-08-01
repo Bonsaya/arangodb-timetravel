@@ -435,8 +435,57 @@ class TimeTravelCollection extends GenericTimeCollection {
 	
 	}
 	
-	documentsByDate(dateOfInterest) {
-	
+	documentsByDate(dateOfInterest, excludeCurrent = false) {
+		/**
+		 * Section that validates parameters
+		 */
+		if (!(dateOfInterest instanceof Date && !isNaN(dateOfInterest))) {
+			throw new Error('[TimeTravel] documentsByDate received non-date as first parameter (dateOfInterest)');
+		}
+		if (typeof excludeCurrent !== typeof true) {
+			throw new Error('[TimeTravel] documentsByDate received non-boolean as second parameter (excludeCurrent)');
+		}
+		/**
+		 * Begin of actual method
+		 */
+			// Open up the edge collection
+		let edgeCollection = db._collection(this.name + this.settings.edgeAppendix);
+		// Let us store all documents that are found for cleanup later
+		let documents = [];
+		// Do we want the currently active documents?
+		if (excludeCurrent) {
+			// If not, we populate the documents with all documents that were valid until the dateOfInterest but not beyond
+			documents = db._query(aqlQuery`
+				FOR vertex IN ${edgeCollection}
+				FILTER expiresAt >= ${dateOfInterest} && expiresAt != 8640000000000000
+				RETURN vertex
+			`).toArray();
+		} else {
+			// Otherwise we populate the documents with all documents, even still valid ones beyond the date of interest
+			documents = db._query(aqlQuery`
+				FOR vertex IN ${edgeCollection}
+				FILTER expiresAt >= ${dateOfInterest}
+				RETURN vertex
+			`).toArray();
+		}
+		// And now we want to clean them up into uniqueDocuments
+		let uniqueDocuments = [];
+		// So we use the ID of the documents and compare the createdAt dates to get the latest
+		documents.forEach((document) => {
+			// Do we have the document already?
+			if (document.id in uniqueDocuments) {
+				// Then let us compare the creation dates
+				if (uniqueDocuments[document.id].createdAt < document.createdAt) {
+					// And if it is, we overwrite the document with the newer one
+					uniqueDocuments[document.id] = document;
+				}
+			} else {
+				// If we document does not exist yet, we insert it immediately
+				uniqueDocuments[document.id] = document;
+			}
+		});
+		// And finally, we return all unique documents that are the newest still valid documents of the date of interest
+		return uniqueDocuments;
 	}
 	
 	documentsByDateRange(dateRangeMin, dateRangeMax) {
