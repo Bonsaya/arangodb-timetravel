@@ -436,7 +436,7 @@ class TimeTravelCollection extends GenericTimeCollection {
 		// Let us first check if the handle exists!
 		if (this.exists(handle)) {
 			// Open the edge collection
-			let edgeCollection = db._collection(this.name + this.settings.edgeAppendix);
+			let edgeCollection = this.db._collection(this.name + this.settings.edgeAppendix);
 			// Generate the Inbound Proxy Key
 			let inboundProxyKey = edge + '/' + handle + '_INBOUNDPROXY';
 			// Return all edges and vertices related to that inboundProxy
@@ -465,7 +465,7 @@ class TimeTravelCollection extends GenericTimeCollection {
 		// Let us first check if the handle exists!
 		if (this.exists(handle)) {
 			// Open the edge collection
-			let edgeCollection = db._collection(this.name + this.settings.edgeAppendix);
+			let edgeCollection = this.db._collection(this.name + this.settings.edgeAppendix);
 			// Generate the Inbound Proxy Key
 			let inboundProxyKey = edge + '/' + handle + '_INBOUNDPROXY';
 			// Fetch the vertex that expired when the new one was created to get the previous document
@@ -495,7 +495,7 @@ class TimeTravelCollection extends GenericTimeCollection {
 		// Let us first check if the handle exists!
 		if (this.exists(handle)) {
 			// Open the edge collection
-			let edgeCollection = db._collection(this.name + this.settings.edgeAppendix);
+			let edgeCollection = this.db._collection(this.name + this.settings.edgeAppendix);
 			// Generate the Inbound Proxy Key
 			let inboundProxyKey = edge + '/' + handle + '_INBOUNDPROXY';
 			// Fetch the vertex that was created when the new one was expired to get the next document
@@ -523,7 +523,7 @@ class TimeTravelCollection extends GenericTimeCollection {
 		 * Begin of actual method
 		 */
 			// Open up the edge collection
-		let edgeCollection = db._collection(this.name + this.settings.edgeAppendix);
+		let edgeCollection = this.db._collection(this.name + this.settings.edgeAppendix);
 		// Let us store all documents that are found for cleanup later
 		let documents = [];
 		// Do we want the currently active documents?
@@ -581,7 +581,7 @@ class TimeTravelCollection extends GenericTimeCollection {
 		 * Begin of actual method
 		 */
 			// Open up the edge collection
-		let edgeCollection = db._collection(this.name + this.settings.edgeAppendix);
+		let edgeCollection = this.db._collection(this.name + this.settings.edgeAppendix);
 		// Let us fetch and store all documents that are found for cleanup later
 		// TODO: These queries dont make sense yet.. what is the use-case? Need to think about them again
 		let documents = db._query(aqlQuery`
