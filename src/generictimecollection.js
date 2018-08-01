@@ -61,7 +61,7 @@ class GenericTimeCollection {
 			FOR vertex IN ${this.collection}
 			FILTER id==${handle} && expiresAt==8640000000000000
 			RETURN vertex
-		`).toArray()[0];
+		`).next();
 	}
 	
 	documents(handles) {
