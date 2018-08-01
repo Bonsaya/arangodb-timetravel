@@ -42,7 +42,7 @@ class TimeTravelCollection extends GenericTimeCollection {
 			collections: {
 				write: [this.name, this.name + this.settings.edgeAppendix]
 			},
-			action: function({doc, edge, object}) {
+			action: function({doc, edge, object, options}) {
 				// Import arangoDB database driver
 				const db = require('@arangodb').db;
 				// Open up the collections to be inserted into
@@ -69,7 +69,7 @@ class TimeTravelCollection extends GenericTimeCollection {
 				let newDocument = documentCollection.insert(Object.assign(object, {
 					createdAt: dateNow,
 					expiresAt: 8640000000000000
-				}));
+				}), options);
 				// Check if there were previous documents and edges
 				if (oldDocumentsAndEdges.size) {
 					// We have previous documents and edges, meaning the inbound proxy already exists
@@ -78,35 +78,36 @@ class TimeTravelCollection extends GenericTimeCollection {
 					edgeCollection.insert(inboundProxyKey, newDocument._id, {
 						createdAt: dateNow,
 						expiresAt: 8640000000000000
-					});
+					}, options);
 				} else {
 					// There are no previous documents or edges, so we need to create the inbound and outbound proxies!
 					let inboundProxy = documentCollection.insert({
 						_key: inboundProxyKey,
 						createdAt: dateNow,
 						expiresAt: 8640000000000000
-					});
+					}, options);
 					let outboundProxy = documentCollection.insert({
 						_key: outboundProxyKey,
 						createdAt: dateNow,
 						expiresAt: 8640000000000000
-					});
+					}, options);
 					// And now we need to tie them together with the first document
 					// By inserting the edges from the inbound proxy to the document and from the document to the outbound proxy
 					edgeCollection.insert(inboundProxy._key, newDocument._id, {
 						createdAt: dateNow,
 						expiresAt: 8640000000000000
-					});
+					}, options);
 					edgeCollection.insert(newDocument._id, outboundProxy._id, {
 						createdAt: dateNow,
 						expiresAt: 8640000000000000
-					});
+					}, options);
 				}
 			},
 			params: {
 				doc: name,
 				edge: name + this.settings.edgeAppendix,
-				object: object
+				object: object,
+				options: options
 			}
 		});
 	}
