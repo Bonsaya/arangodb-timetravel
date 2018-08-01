@@ -54,7 +54,7 @@ class TimeTravelCollection extends GenericTimeCollection {
 				let outboundProxyKey = edge + '/' + object.id + '_OUTBOUNDPROXY';
 				// Fetch the recent unexpired version of vertex and edge if any
 				let oldDocumentsAndEdges = db._query(aqlQuery`
-					FOR vertex, edge IN OUTBOUND ${inboundProxyKey} ${edge}
+					FOR vertex, edge IN OUTBOUND ${inboundProxyKey} ${edgeCollection}
 					FILTER edge.expiresAt == 8640000000000000
 					RETURN { 'document': vertex, 'edge': edge }
 				`).toArray();
@@ -166,7 +166,7 @@ class TimeTravelCollection extends GenericTimeCollection {
 					let outboundProxyKey = edge + '/' + object.id + '_OUTBOUNDPROXY';
 					// Fetch the recent unexpired version of vertex and edge if any
 					let oldDocumentsAndEdges = db._query(aqlQuery`
-							FOR vertex, edge IN OUTBOUND ${inboundProxyKey} ${edge}
+							FOR vertex, edge IN OUTBOUND ${inboundProxyKey} ${edgeCollection}
 							FILTER edge.expiresAt == 8640000000000000
 							RETURN { 'document': vertex, 'edge': edge }
 						`).toArray();
@@ -234,7 +234,7 @@ class TimeTravelCollection extends GenericTimeCollection {
 				let outboundProxyKey = edge + '/' + handle + '_OUTBOUNDPROXY';
 				// Fetch the recent unexpired vertex and the edge to it
 				let oldDocumentsAndEdges = db._query(aqlQuery`
-					FOR vertex, edge IN OUTBOUND ${inboundProxyKey} ${edge}
+					FOR vertex, edge IN OUTBOUND ${inboundProxyKey} ${edgeCollection}
 					FILTER edge.expiresAt == 8640000000000000
 					RETURN { 'document': vertex, 'edge': edge }
 				`).toArray();
@@ -249,7 +249,7 @@ class TimeTravelCollection extends GenericTimeCollection {
 				// TODO: them enough?
 				// Fetch all the edges to the inbound proxy
 				let inboundEdges = db._query(aqlQuery`
-					FOR v, edge IN INBOUND ${inboundProxyKey} ${edge}
+					FOR v, edge IN INBOUND ${inboundProxyKey} ${edgeCollection}
 					FILTER edge.expiresAt == 8640000000000000
 					RETURN edge
 				`).toArray()
@@ -259,7 +259,7 @@ class TimeTravelCollection extends GenericTimeCollection {
 				});
 				// Fetch all the edges to the outbound proxy
 				let outboundEdges = db._query(aqlQuery`
-					FOR v, edge IN OUTBOUND ${outboundProxyKey} ${edge}
+					FOR v, edge IN OUTBOUND ${outboundProxyKey} ${edgeCollection}
 					FILTER edge.expiresAt == 8640000000000000
 					RETURN edge
 				`).toArray()
@@ -424,7 +424,29 @@ class TimeTravelCollection extends GenericTimeCollection {
 	}
 	
 	history(handle) {
-	
+		/**
+		 * Section that validates parameters
+		 */
+		if (typeof handle !== 'string') {
+			throw new Error('[TimeTravel] history received non-string as first parameter (handle)');
+		}
+		/**
+		 * Begin of actual method
+		 */
+		// Let us first check if the handle exists!
+		if (this.exists(handle)) {
+			// Open the edge collection
+			let edgeCollection = db._collection(this.name + this.settings.edgeAppendix);
+			// Generate the Inbound Proxy Key
+			let inboundProxyKey = edge + '/' + handle + '_INBOUNDPROXY';
+			// Return all edges and vertices related to that inboundProxy
+			return db._query(aqlQuery`
+				FOR vertex, edge IN OUTBOUND ${inboundProxyKey} ${edgeCollection}
+				RETURN { 'document': vertex, 'edge': edge }
+			`).toArray();
+		} else {
+			throw new Error('[TimeTravel] history received handle that was not found.');
+		}
 	}
 	
 	previous(handle, revision) {
