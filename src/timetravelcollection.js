@@ -455,6 +455,7 @@ class TimeTravelCollection extends GenericTimeCollection {
 		// Do we want the currently active documents?
 		if (excludeCurrent) {
 			// If not, we populate the documents with all documents that were valid until the dateOfInterest but not beyond
+			// TODO: These queries dont make sense yet.. what is the use-case? Need to think about them again
 			documents = db._query(aqlQuery`
 				FOR vertex IN ${edgeCollection}
 				FILTER expiresAt >= ${dateOfInterest} && expiresAt != 8640000000000000
@@ -462,6 +463,7 @@ class TimeTravelCollection extends GenericTimeCollection {
 			`).toArray();
 		} else {
 			// Otherwise we populate the documents with all documents, even still valid ones beyond the date of interest
+			// TODO: These queries dont make sense yet.. what is the use-case? Need to think about them again
 			documents = db._query(aqlQuery`
 				FOR vertex IN ${edgeCollection}
 				FILTER expiresAt >= ${dateOfInterest}
@@ -489,7 +491,48 @@ class TimeTravelCollection extends GenericTimeCollection {
 	}
 	
 	documentsByDateRange(dateRangeMin, dateRangeMax) {
-	
+		/**
+		 * Section that validates parameters
+		 */
+		if (!(dateRangeMin instanceof Date && !isNaN(dateRangeMin))) {
+			throw new Error('[TimeTravel] documentsByDateRange received non-date as first parameter (dateRangeMin)');
+		}
+		if (!(dateRangeMax instanceof Date && !isNaN(dateRangeMax))) {
+			throw new Error('[TimeTravel] documentsByDateRange received non-date as second parameter (dateRangeMax)');
+		}
+		if (dateRangeMin >= dateRangeMax) {
+			throw new Error('[TimeTravel] documentsByDateRange received a minimum date that exceeds or equals the maximum date (dateRangeMin >= dateRangeMax)');
+		}
+		/**
+		 * Begin of actual method
+		 */
+			// Open up the edge collection
+		let edgeCollection = db._collection(this.name + this.settings.edgeAppendix);
+		// Let us fetch and store all documents that are found for cleanup later
+		// TODO: These queries dont make sense yet.. what is the use-case? Need to think about them again
+		let documents = db._query(aqlQuery`
+				FOR vertex IN ${edgeCollection}
+				FILTER expiresAt >= ${dateRangeMin} && expiresAt <= ${dateRangeMax}
+				RETURN vertex
+			`).toArray();
+		// And now we want to clean them up into uniqueDocuments
+		let uniqueDocuments = [];
+		// So we use the ID of the documents and compare the createdAt dates to get the latest
+		documents.forEach((document) => {
+			// Do we have the document already?
+			if (document.id in uniqueDocuments) {
+				// Then let us compare the creation dates
+				if (uniqueDocuments[document.id].createdAt < document.createdAt) {
+					// And if it is, we overwrite the document with the newer one
+					uniqueDocuments[document.id] = document;
+				}
+			} else {
+				// If we document does not exist yet, we insert it immediately
+				uniqueDocuments[document.id] = document;
+			}
+		});
+		// And finally, we return all unique documents that are the newest still valid documents of the date of interest
+		return uniqueDocuments;
 	}
 	
 	document(handle) {
