@@ -1,6 +1,6 @@
 /*
  * ===========================
- * timetravel.js 14.07.18 14:02
+ * timetravel.js 14.07.18
  * Kevin 'Extremo' Sekin
  * Copyright (c) 2018.
  * ===========================
