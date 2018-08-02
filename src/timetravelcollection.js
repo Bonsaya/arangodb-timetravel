@@ -141,8 +141,6 @@ class TimeTravelCollection extends GenericTimeCollection {
 					let inboundProxyKey = edge + '/' + object.id + settings.proxy.inboundAppendix;
 					// Generate the Outbound Proxy Key
 					let outboundProxyKey = edge + '/' + object.id + settings.proxy.outboundAppendix;
-					// Establish current Date
-					let dateNow = Date.now();
 					// Fetch the recent unexpired version of vertex and edge if any
 					let oldDocumentsAndEdges = db._query(aqlQuery`
 						FOR vertex, edge IN OUTBOUND ${inboundProxyKey} ${edgeCollection}
