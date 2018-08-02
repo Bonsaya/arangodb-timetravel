@@ -523,6 +523,9 @@ class TimeTravelEdgeCollection extends GenericTimeCollection {
 		if (revision !== Object(revision)) {
 			throw new Error('[TimeTravel] previous received non-object as second parameter (revision)');
 		}
+		if (!revision.hasOwnProperty('createdAt') && typeof revision.createdAt !== 'number') {
+			throw new Error('[TimeTravel] previous received invalid document as second parameter (revision)');
+		}
 		/**
 		 * Begin of actual method
 		 */
@@ -560,6 +563,9 @@ class TimeTravelEdgeCollection extends GenericTimeCollection {
 		}
 		if (revision !== Object(revision)) {
 			throw new Error('[TimeTravel] next received non-object as second parameter (revision)');
+		}
+		if (!revision.hasOwnProperty('expiresAt') && typeof revision.createdAt !== 'number') {
+			throw new Error('[TimeTravel] next received invalid document as second parameter (revision)');
 		}
 		/**
 		 * Begin of actual method
