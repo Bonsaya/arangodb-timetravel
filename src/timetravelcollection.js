@@ -279,67 +279,71 @@ class TimeTravelCollection extends GenericTimeCollection {
 		/**
 		 * Begin of actual method
 		 */
-		this.db._executeTransaction({
-			collections: {
-				write: [this.name, this.name + this.settings.edgeAppendix]
-			},
-			action: function({doc, edge, handle, options, settings}) {
-				// Import arangoDB database driver
-				const db = require('@arangodb').db;
-				// Open up the collections to be inserted into
-				let documentCollection = db._collection(doc);
-				let edgeCollection = db._collection(edge);
-				// Generate the Inbound Proxy Key
-				let inboundProxyKey = edge + '/' + handle + settings.proxy.inboundAppendix;
-				// Generate the Outbound Proxy Key
-				let outboundProxyKey = edge + '/' + handle + settings.proxy.outboundAppendix;
-				// Fetch the recent unexpired vertex and the edge to it
-				let oldDocumentsAndEdges = db._query(aqlQuery`
+		if (this.exists(handle)) {
+			this.db._executeTransaction({
+				collections: {
+					write: [this.name, this.name + this.settings.edgeAppendix]
+				},
+				action: function({doc, edge, handle, options, settings}) {
+					// Import arangoDB database driver
+					const db = require('@arangodb').db;
+					// Open up the collections to be inserted into
+					let documentCollection = db._collection(doc);
+					let edgeCollection = db._collection(edge);
+					// Generate the Inbound Proxy Key
+					let inboundProxyKey = edge + '/' + handle + settings.proxy.inboundAppendix;
+					// Generate the Outbound Proxy Key
+					let outboundProxyKey = edge + '/' + handle + settings.proxy.outboundAppendix;
+					// Fetch the recent unexpired vertex and the edge to it
+					let oldDocumentsAndEdges = db._query(aqlQuery`
 					FOR vertex, edge IN OUTBOUND ${inboundProxyKey} ${edgeCollection}
 					FILTER edge.expiresAt == 8640000000000000
 					RETURN { 'document': vertex, 'edge': edge }
 				`).toArray();
-				// Establish current Date
-				let dateNow = Date.now();
-				// Expire the old edges and documents
-				oldDocumentsAndEdges.forEach((documentAndEdge) => {
-					documentCollection.update(documentAndEdge['document']._key, {expiresAt: dateNow});
-					edgeCollection.update(documentAndEdge['edge']._key, {expiresAt: dateNow});
-				});
-				// TODO: Do we have to expire all edges pointing to the inbound and outbound proxy or is expiring
-				// TODO: them enough?
-				// Fetch all the edges to the inbound proxy
-				let inboundEdges = db._query(aqlQuery`
+					// Establish current Date
+					let dateNow = Date.now();
+					// Expire the old edges and documents
+					oldDocumentsAndEdges.forEach((documentAndEdge) => {
+						documentCollection.update(documentAndEdge['document']._key, {expiresAt: dateNow});
+						edgeCollection.update(documentAndEdge['edge']._key, {expiresAt: dateNow});
+					});
+					// TODO: Do we have to expire all edges pointing to the inbound and outbound proxy or is expiring
+					// TODO: them enough?
+					// Fetch all the edges to the inbound proxy
+					let inboundEdges = db._query(aqlQuery`
 					FOR v, edge IN INBOUND ${inboundProxyKey} ${edgeCollection}
 					FILTER edge.expiresAt == 8640000000000000
 					RETURN edge
 				`).toArray()
-				// Expire all the edges to the inbound proxy
-				inboundEdges.forEach((edge) => {
-					edgeCollection.update(edge._key, {expiresAt: dateNow});
-				});
-				// Fetch all the edges to the outbound proxy
-				let outboundEdges = db._query(aqlQuery`
+					// Expire all the edges to the inbound proxy
+					inboundEdges.forEach((edge) => {
+						edgeCollection.update(edge._key, {expiresAt: dateNow});
+					});
+					// Fetch all the edges to the outbound proxy
+					let outboundEdges = db._query(aqlQuery`
 					FOR v, edge IN OUTBOUND ${outboundProxyKey} ${edgeCollection}
 					FILTER edge.expiresAt == 8640000000000000
 					RETURN edge
 				`).toArray()
-				// Expire all the edges to the outbound proxy
-				outboundEdges.forEach((edge) => {
-					edgeCollection.update(edge._key, {expiresAt: dateNow});
-				});
-				// Expire the inbound and outbound proxies
-				documentCollection.update(inboundProxyKey, {expiresAt: dateNow});
-				documentCollection.update(outboundProxyKey, {expiresAt: dateNow});
-			},
-			params: {
-				doc: this.name,
-				edge: this.name + this.settings.edgeAppendix,
-				handle: handle,
-				options: options,
-				settings: this.settings
-			}
-		});
+					// Expire all the edges to the outbound proxy
+					outboundEdges.forEach((edge) => {
+						edgeCollection.update(edge._key, {expiresAt: dateNow});
+					});
+					// Expire the inbound and outbound proxies
+					documentCollection.update(inboundProxyKey, {expiresAt: dateNow});
+					documentCollection.update(outboundProxyKey, {expiresAt: dateNow});
+				},
+				params: {
+					doc: this.name,
+					edge: this.name + this.settings.edgeAppendix,
+					handle: handle,
+					options: options,
+					settings: this.settings
+				}
+			});
+		} else {
+			throw new Error('[TimeTravel] remove received a handle that does not exist!');
+		}
 	}
 	
 	removeByKeys(handles, options = {}) {
