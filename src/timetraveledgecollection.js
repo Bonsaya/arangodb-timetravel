@@ -47,20 +47,20 @@ class TimeTravelEdgeCollection extends GenericTimeCollection {
 		/**
 		 * Begin of actual method
 		 */
-		this.db._executeTransaction({
-			collections: {
-				write: [this.name]
-			},
-			action: function({edge, from, to, object, options, settings}) {
-				// Import arangoDB database driver
-				const db = require('@arangodb').db;
-				// Open up the edge collection
-				let edgeCollection = db._collection(edge);
-				// Check if the edge already exists
-				if (this.exists(object.id)) {
-					// And redirect to update if it already does
-					this.update(from, to, object, options);
-				} else {
+		// Check if the edge already exists
+		if (this.exists(object.id)) {
+			// And redirect to update if it already does
+			this.update(from, to, object, options);
+		} else {
+			this.db._executeTransaction({
+				collections: {
+					write: [this.name]
+				},
+				action: function({edge, from, to, object, options, settings}) {
+					// Import arangoDB database driver
+					const db = require('@arangodb').db;
+					// Open up the edge collection
+					let edgeCollection = db._collection(edge);
 					// Establish the current date
 					let dateNow = Date.now();
 					// Otherwise we need to insert the new edge
@@ -69,17 +69,17 @@ class TimeTravelEdgeCollection extends GenericTimeCollection {
 						createdAt: dateNow,
 						expiresAt: 8640000000000000
 					}), options);
+				},
+				params: {
+					edge: this.name,
+					from: from,
+					to: to,
+					object: object,
+					options: options,
+					settings: this.settings
 				}
-			},
-			params: {
-				edge: this.name,
-				from: from,
-				to: to,
-				object: object,
-				options: options,
-				settings: this.settings
-			}
-		});
+			});
+		}
 	}
 	
 	replace(from, to, object, options = {}) {
@@ -112,17 +112,17 @@ class TimeTravelEdgeCollection extends GenericTimeCollection {
 		/**
 		 * Begin of actual method
 		 */
-		this.db._executeTransaction({
-			collections: {
-				write: [this.name]
-			},
-			action: function({edge, from, to, object, options, settings}) {
-				// Import arangoDB database driver
-				const db = require('@arangodb').db;
-				// Open up the edge collection
-				let edgeCollection = db._collection(edge);
-				// Check if the edge already exists
-				if (this.exists(object.id)) {
+		// Check if the edge already exists
+		if (this.exists(object.id)) {
+			this.db._executeTransaction({
+				collections: {
+					write: [this.name]
+				},
+				action: function({edge, from, to, object, options, settings}) {
+					// Import arangoDB database driver
+					const db = require('@arangodb').db;
+					// Open up the edge collection
+					let edgeCollection = db._collection(edge);
 					// Establish current date
 					let dateNow = Date.now();
 					// Expire previous edges
@@ -136,20 +136,20 @@ class TimeTravelEdgeCollection extends GenericTimeCollection {
 						createdAt: dateNow,
 						expiresAt: 8640000000000000
 					}), options);
-				} else {
-					// Cannot replace what does not exist! Forward to insert
-					this.insert(from, to, object, options);
+				},
+				params: {
+					edge: this.name,
+					from: from,
+					to: to,
+					object: object,
+					options: options,
+					settings: this.settings,
 				}
-			},
-			params: {
-				edge: this.name,
-				from: from,
-				to: to,
-				object: object,
-				options: options,
-				settings: this.settings,
-			}
-		});
+			});
+		} else {
+			// Cannot replace what does not exist! Forward to insert
+			this.insert(from, to, object, options);
+		}
 	}
 	
 	replaceByKeys(handles, object, options = {}) {
@@ -230,17 +230,17 @@ class TimeTravelEdgeCollection extends GenericTimeCollection {
 		/**
 		 * Begin of actual method
 		 */
-		this.db._executeTransaction({
-			collections: {
-				write: [this.name]
-			},
-			action: function({edge, from, to, object, options, settings}) {
-				// Import arangoDB database driver
-				const db = require('@arangodb').db;
-				// Open up the edge collection
-				let edgeCollection = db._collection(edge);
-				// Check if the edge already exists
-				if (this.exists(object.id)) {
+		// Check if the edge already exists
+		if (this.exists(object.id)) {
+			this.db._executeTransaction({
+				collections: {
+					write: [this.name]
+				},
+				action: function({edge, from, to, object, options, settings}) {
+					// Import arangoDB database driver
+					const db = require('@arangodb').db;
+					// Open up the edge collection
+					let edgeCollection = db._collection(edge);
 					// Establish current date
 					let dateNow = Date.now();
 					// Build the current version of the edge
@@ -261,20 +261,20 @@ class TimeTravelEdgeCollection extends GenericTimeCollection {
 						createdAt: dateNow,
 						expiresAt: 8640000000000000
 					}), options);
-				} else {
-					// Cannot replace what does not exist! Forward to insert
-					this.insert(from, to, object, options);
+				},
+				params: {
+					edge: this.name,
+					from: from,
+					to: to,
+					object: object,
+					options: options,
+					settings: this.settings
 				}
-			},
-			params: {
-				edge: this.name,
-				from: from,
-				to: to,
-				object: object,
-				options: options,
-				settings: this.settings
-			}
-		});
+			});
+		} else {
+			// Cannot replace what does not exist! Forward to insert
+			this.insert(from, to, object, options);
+		}
 	}
 	
 	updateByKeys(handles, object, options = {}) {
@@ -341,17 +341,17 @@ class TimeTravelEdgeCollection extends GenericTimeCollection {
 		/**
 		 * Begin of actual method
 		 */
-		this.db._executeTransaction({
-			collections: {
-				write: [this.name]
-			},
-			action: function({edge, handle, options}) {
-				// Import arangoDB database driver
-				const db = require('@arangodb').db;
-				// Open up the edge collection
-				let edgeCollection = db._collection(edge);
-				// Check if the edge already exists
-				if (this.exists(handle)) {
+		// Check if the edge already exists
+		if (this.exists(handle)) {
+			this.db._executeTransaction({
+				collections: {
+					write: [this.name]
+				},
+				action: function({edge, handle, options}) {
+					// Import arangoDB database driver
+					const db = require('@arangodb').db;
+					// Open up the edge collection
+					let edgeCollection = db._collection(edge);
 					// Establish current date
 					let dateNow = Date.now();
 					// Expire all edges
@@ -359,18 +359,17 @@ class TimeTravelEdgeCollection extends GenericTimeCollection {
 					currentEdges.forEach((edge) => {
 						edgeCollection.update(edge._key, {expiresAt: dateNow});
 					});
-				} else {
-					// Cannot remove what doesn't exist!
-					throw new Error('[TimeTravel] Attempted to remove an edge that does not exist!');
+				},
+				params: {
+					edge: this.name,
+					handle: handle,
+					options: options
 				}
-			},
-			params: {
-				edge: this.name,
-				handle: handle,
-				options: options
-			}
-		});
-		
+			});
+		} else {
+			// Cannot remove what doesn't exist!
+			throw new Error('[TimeTravel] Attempted to remove an edge that does not exist!');
+		}
 	}
 	
 	removeByKeys(handles, options = {}) {
