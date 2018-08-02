@@ -1,6 +1,6 @@
 /*
  * ===========================
- * genericcollection.js 14.07.18 14:13
+ * genericcollection.js 14.07.18
  * Kevin 'Extremo' Sekin
  * Copyright (c) 2018.
  * ===========================
@@ -57,11 +57,16 @@ class GenericTimeCollection {
 		/**
 		 * Begin of actual method
 		 */
-		return db._query(aqlQuery`
-			FOR vertex IN ${this.collection}
-			FILTER id==${handle} && expiresAt==8640000000000000
-			RETURN vertex
-		`).next();
+		try {
+			// TODO: Check if the return is still caught by the try catch block if the document cant be fetched
+			return db._query(aqlQuery`
+				FOR vertex IN ${this.collection}
+				FILTER id==${handle} && expiresAt==8640000000000000
+				RETURN vertex
+			`).next();
+		} catch (e) {
+			return {};
+		}
 	}
 	
 	documents(handles) {
