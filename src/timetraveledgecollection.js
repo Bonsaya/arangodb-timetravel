@@ -6,9 +6,6 @@
  * ===========================
  */
 
-// TODO: Ensure that the internal functions you use in the transactions are somehow imported from the node_module since
-// TODO: you must code the transactions in isolation or they wont work.
-
 import {GenericTimeCollection} from 'src/generictimecollection';
 
 class TimeTravelEdgeCollection extends GenericTimeCollection {
