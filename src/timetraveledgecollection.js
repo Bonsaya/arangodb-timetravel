@@ -1,6 +1,6 @@
 /*
  * ===========================
- * timetraveledgecollection.js 02.08.18 15:53
+ * timetraveledgecollection.js 02.08.18 17:33
  * Kevin 'Extremo' Sekin
  * Copyright (c) 2018
  * ===========================
@@ -10,10 +10,23 @@ import {GenericTimeCollection} from 'src/generictimecollection';
 
 class TimeTravelEdgeCollection extends GenericTimeCollection {
 	
+	/**
+	 * Establishes the TimeTravelEdgeCollection
+	 * @param {ArangoDatabase} db The arangoDB db constant to access arangoDB
+	 * @param {string} name The name of the collection
+	 * @param {Object} settings The settings related to the timetravel collection
+	 */
 	constructor(db, name, settings) {
 		super(db, name, settings);
 	}
 	
+	/**
+	 * Inserts a new edge into the timetraveledge collection
+	 * @param {string} from The id of the document to connect to the next document
+	 * @param {string} to The id of the document that is being connected with the other
+	 * @param {Object} object The extra data of the edge
+	 * @param {Object} options The options related to the insertion
+	 */
 	insert(from, to, object, options = {}) {
 		/**
 		 * Section that validates parameters
@@ -79,6 +92,13 @@ class TimeTravelEdgeCollection extends GenericTimeCollection {
 		}
 	}
 	
+	/**
+	 * Replaces an edge with a new one, ignoring previous data in the edges
+	 * @param {string} from The id of the document that connects
+	 * @param {string} to The id of the document that is being connected
+	 * @param {Object} object The extra data of the edge
+	 * @param {Object} options The options to consider upon replacement
+	 */
 	replace(from, to, object, options = {}) {
 		/**
 		 * Section that validates parameters
@@ -149,6 +169,12 @@ class TimeTravelEdgeCollection extends GenericTimeCollection {
 		}
 	}
 	
+	/**
+	 * Replaces the edges matched by keys, ignoring previous data in the edges
+	 * @param {Array} handles The ids of the edges to replace
+	 * @param {Object} object The extra data of the edges
+	 * @param {Object} options The options to be considered upon replacement
+	 */
 	replaceByKeys(handles, object, options = {}) {
 		/**
 		 * Section that validates parameters
@@ -173,6 +199,12 @@ class TimeTravelEdgeCollection extends GenericTimeCollection {
 		});
 	}
 	
+	/**
+	 * Replaces the edges matched by example, ignoring previous data in the edge
+	 * @param {Object} example The example to match against the edges
+	 * @param {Object} object The new data to replace
+	 * @param {Object} options The options to consider upon replacement
+	 */
 	replaceByExample(example, object, options = {}) {
 		/**
 		 * Section that validates parameters
@@ -197,6 +229,13 @@ class TimeTravelEdgeCollection extends GenericTimeCollection {
 		});
 	}
 	
+	/**
+	 * Updates the edge with the new data, respecting previous data from the edge
+	 * @param {string} from The id of the document that connects
+	 * @param {string} to The id of the document that is being connected
+	 * @param {Object} object The extra data to merge with the previous
+	 * @param {Object} options The options to consider upon updating
+	 */
 	update(from, to, object, options = {}) {
 		/**
 		 * Section that validates parameters
@@ -274,6 +313,12 @@ class TimeTravelEdgeCollection extends GenericTimeCollection {
 		}
 	}
 	
+	/**
+	 * Updates all edges that are matched by keys with the new data, respecting the previous data of the edges
+	 * @param {Array} handles The ids to match
+	 * @param {Object} object The extra data to merge with the previous data
+	 * @param {Object} options The options to consider upon updating
+	 */
 	updateByKeys(handles, object, options = {}) {
 		/**
 		 * Section that validates parameters
@@ -298,6 +343,12 @@ class TimeTravelEdgeCollection extends GenericTimeCollection {
 		});
 	}
 	
+	/**
+	 * Updates all edges that match the example, respecting previous data in the edges
+	 * @param {Object} example The example to match against
+	 * @param {Object} object The extra data to merge with the previous
+	 * @param {Object} options The options to consider upon updating
+	 */
 	updateByExample(example, object, options = {}) {
 		/**
 		 * Section that validates parameters
@@ -322,6 +373,11 @@ class TimeTravelEdgeCollection extends GenericTimeCollection {
 		});
 	}
 	
+	/**
+	 * Expires the edge selected by handle
+	 * @param {string} handle The id of the edge
+	 * @param {Object} options The options to consider upon removal
+	 */
 	remove(handle, options = {}) {
 		/**
 		 * Section that validates parameters
@@ -369,6 +425,11 @@ class TimeTravelEdgeCollection extends GenericTimeCollection {
 		}
 	}
 	
+	/**
+	 * Expires all edges matched by the ids provided
+	 * @param {Array} handles The ids to match
+	 * @param {Object} options The options to consider upon removal
+	 */
 	removeByKeys(handles, options = {}) {
 		/**
 		 * Section that validates parameters
@@ -390,6 +451,11 @@ class TimeTravelEdgeCollection extends GenericTimeCollection {
 		});
 	}
 	
+	/**
+	 * Expires all edges matched by the example provided
+	 * @param {Object} example The example to match against
+	 * @param {Object} options The options to consider upon removal
+	 */
 	removeByExample(example, options = {}) {
 		/**
 		 * Section that validates parameters
@@ -411,6 +477,11 @@ class TimeTravelEdgeCollection extends GenericTimeCollection {
 		});
 	}
 	
+	/**
+	 * Returns all edges matched by the handle to have a history of the edge and its expired counterparts
+	 * @param handle The id to match
+	 * @returns {Array} The edges
+	 */
 	history(handle) {
 		/**
 		 * Section that validates parameters
@@ -436,6 +507,12 @@ class TimeTravelEdgeCollection extends GenericTimeCollection {
 		}
 	}
 	
+	/**
+	 * Returns the previous edge or the same edge if no previous was found
+	 * @param {string} handle The id of the edge
+	 * @param {Object} revision The current edge
+	 * @returns The previous edge
+	 */
 	previous(handle, revision) {
 		/**
 		 * Section that validates parameters
@@ -468,6 +545,12 @@ class TimeTravelEdgeCollection extends GenericTimeCollection {
 		}
 	}
 	
+	/**
+	 * Returns the next edge or the same edge if no next was found
+	 * @param handle The id of the edge
+	 * @param revision The current edge
+	 * @returns The next edge
+	 */
 	next(handle, revision) {
 		/**
 		 * Section that validates parameters
@@ -500,6 +583,12 @@ class TimeTravelEdgeCollection extends GenericTimeCollection {
 		}
 	}
 	
+	/**
+	 * Returns all edges of the handle
+	 * @param handle The id of the edges
+	 * @returns {Array} The edges
+	 */
+	// TODO: Make sure these only return non expired edges?
 	edges(handle) {
 		/**
 		 * Section that validates parameters
@@ -518,6 +607,12 @@ class TimeTravelEdgeCollection extends GenericTimeCollection {
 		}
 	}
 	
+	/**
+	 * Returns all inbound edges of the handle
+	 * @param handle The id of the edge
+	 * @returns {Array} The inbound edges
+	 */
+	// TODO: Make sure these only return non expired edges?
 	inEdges(handle) {
 		/**
 		 * Section that validates parameters
@@ -536,6 +631,11 @@ class TimeTravelEdgeCollection extends GenericTimeCollection {
 		}
 	}
 	
+	/**
+	 * Returns all outbound edges of the handle
+	 * @param handle The id of the edge
+	 * @returns {Array} The edges
+	 */
 	outEdges(handle) {
 		/**
 		 * Section that validates parameters
