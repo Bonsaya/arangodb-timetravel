@@ -139,6 +139,8 @@ class TimeTravelCollection extends GenericTimeCollection {
 					let edgeCollection = db._collection(edge);
 					// Generate the Inbound Proxy Key
 					let inboundProxyKey = edge + '/' + object.id + settings.proxy.inboundAppendix;
+					// Generate the Outbound Proxy Key
+					let outboundProxyKey = edge + '/' + object.id + settings.proxy.outboundAppendix;
 					// Establish current Date
 					let dateNow = Date.now();
 					// Fetch the recent unexpired version of vertex and edge if any
@@ -153,6 +155,16 @@ class TimeTravelCollection extends GenericTimeCollection {
 					oldDocumentsAndEdges.forEach((documentAndEdge) => {
 						documentCollection.update(documentAndEdge['document']._key, {expiresAt: dateNow});
 						edgeCollection.update(documentAndEdge['edge']._key, {expiresAt: dateNow});
+					});
+					// Fetch unexpired edges to outbound proxy
+					let oldOutboundEdges = db._query(aqlQuery`
+						FOR v, edge IN INBOUND ${outboundProxyKey} ${edgeCollection}
+						FILTER edge.expiresAt == 8640000000000000
+						RETURN edge
+					`).toArray()
+					// Expire old outbound edges
+					oldOutboundEdges.forEach((edge) => {
+						edgeCollection.update(edge._key, {expiresAt: dateNow});
 					});
 					// Insert the updated document
 					let newDocument = documentCollection.insert(Object.assign(object, {
@@ -220,6 +232,8 @@ class TimeTravelCollection extends GenericTimeCollection {
 					let edgeCollection = db._collection(edge);
 					// Generate the Inbound Proxy Key
 					let inboundProxyKey = edge + '/' + object.id + settings.proxy.inboundAppendix;
+					// Generate the Outbound Proxy Key
+					let outboundProxyKey = edge + '/' + object.id + settings.proxy.outboundAppendix;
 					// Fetch the recent unexpired version of vertex and edge if any
 					let oldDocumentsAndEdges = db._query(aqlQuery`
 							FOR vertex, edge IN OUTBOUND ${inboundProxyKey} ${edgeCollection}
@@ -239,6 +253,16 @@ class TimeTravelCollection extends GenericTimeCollection {
 						}
 						documentCollection.update(documentAndEdge['document']._key, {expiresAt: dateNow});
 						edgeCollection.update(documentAndEdge['edge']._key, {expiresAt: dateNow});
+					});
+					// Fetch unexpired edges to outbound proxy
+					let oldOutboundEdges = db._query(aqlQuery`
+						FOR v, edge IN INBOUND ${outboundProxyKey} ${edgeCollection}
+						FILTER edge.expiresAt == 8640000000000000
+						RETURN edge
+					`).toArray()
+					// Expire old outbound edges
+					oldOutboundEdges.forEach((edge) => {
+						edgeCollection.update(edge._key, {expiresAt: dateNow});
 					});
 					// Insert the updated document
 					let newDocument = documentCollection.insert(Object.assign(document, object, {
@@ -306,6 +330,16 @@ class TimeTravelCollection extends GenericTimeCollection {
 					oldDocumentsAndEdges.forEach((documentAndEdge) => {
 						documentCollection.update(documentAndEdge['document']._key, {expiresAt: dateNow});
 						edgeCollection.update(documentAndEdge['edge']._key, {expiresAt: dateNow});
+					});
+					// Fetch unexpired edges to outbound proxy
+					let oldOutboundEdges = db._query(aqlQuery`
+						FOR v, edge IN INBOUND ${outboundProxyKey} ${edgeCollection}
+						FILTER edge.expiresAt == 8640000000000000
+						RETURN edge
+					`).toArray()
+					// Expire old outbound edges
+					oldOutboundEdges.forEach((edge) => {
+						edgeCollection.update(edge._key, {expiresAt: dateNow});
 					});
 					// TODO: Do we have to expire all edges pointing to the inbound and outbound proxy or is expiring
 					// TODO: them enough?
