@@ -1,6 +1,6 @@
 /*
  * ===========================
- * timetravel.js 02.08.18 15:53
+ * timetravel.js 02.08.18 17:36
  * Kevin 'Extremo' Sekin
  * Copyright (c) 2018
  * ===========================
@@ -10,10 +10,22 @@ import {TimeTravelCollection} from 'timetravelcollection';
 import {TimeTravelEdgeCollection} from 'timetraveledgecollection';
 
 class TimeTravel {
+	
+	/**
+	 * Establishes the TimeTravel Framework
+	 * @param {ArangoDatabase} db The arangoDB DB
+	 * @param {Object} settings The settings related to the framework
+	 */
 	constructor(db, settings) {
 		this.db = db;
 		this.settings = settings;
 	}
+	
+	/**
+	 * Creates a timetravel document collection
+	 * @param name The name of the collection
+	 * @returns {TimeTravelCollection} The timetravel document collection
+	 */
 	createDocumentCollection (name) {
 		const collectionName = name+this.settings.timeTravelPresentAppendix;
 		const outdatedCollectionName = name+this.settings.timeTravelPastAppendix;
@@ -33,6 +45,12 @@ class TimeTravel {
 			return new TimeTravelCollection(this.db, collectionName, this.settings);
 		}
 	}
+	
+	/**
+	 * Creates a timetravel edge collection
+	 * @param name The name of the edge collection
+	 * @returns {TimeTravelEdgeCollection} The timetravel edge collection
+	 */
 	createEdgeCollection(name) {
 		const edgeCollectionName = name+this.settings.timeTravelPresentAppendix();
 		const outdatedEdgeCollectionName = name+this.settings.timeTravelPastAppendix();
@@ -45,9 +63,21 @@ class TimeTravel {
 			return new TimeTravelEdgeCollection(this.db, edgeCollectionName, this.settings);
 		}
 	}
+	
+	/**
+	 * Opens a timetravel document collection
+	 * @param name The name of the document collection
+	 * @returns {TimeTravelCollection} The timetravel document collection
+	 */
 	documentCollection(name) {
 		return new TimeTravelCollection(this.db, name+this.settings.timeTravelPresentAppendix, this.settings);
 	}
+	
+	/**
+	 * Opens a timetravel edge collection
+	 * @param name The name of the edge collection
+	 * @returns {TimeTravelEdgeCollection} The timetravel edge collection
+	 */
 	edgeCollection(name) {
 		return new TimeTravelEdgeCollection(this.db, name+this.settings.timeTravelPresentAppendix, this.settings);
 	}
