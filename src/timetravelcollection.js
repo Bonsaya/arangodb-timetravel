@@ -1,6 +1,6 @@
 /*
  * ===========================
- * timetravelcollection.js 02.08.18 15:53
+ * timetravelcollection.js 02.08.18 17:12
  * Kevin 'Extremo' Sekin
  * Copyright (c) 2018
  * ===========================
@@ -10,10 +10,21 @@ import {GenericTimeCollection} from 'src/generictimecollection';
 
 class TimeTravelCollection extends GenericTimeCollection {
 	
+	/**
+	 * Establishes the TimeTravelCollection
+	 * @param {ArangoDatabase} db The arangoDB db constant to access arangoDB
+	 * @param {string} name The name of the collection
+	 * @param {Object} settings The settings related to the timetravel collection
+	 */
 	constructor(db, name, settings) {
 		super(db, name, settings);
 	}
 	
+	/**
+	 * Inserts a new logical vertex (document) into the timetravel collection
+	 * @param {Object} object The document to be inserted
+	 * @param {Object} options The options to use for insertion
+	 */
 	insert(object, options = {}) {
 		/**
 		 * Section that validates parameters
@@ -99,6 +110,12 @@ class TimeTravelCollection extends GenericTimeCollection {
 		}
 	}
 	
+	/**
+	 * Replaces a document in the logical vertex with a new document, ignoring any data in the previous documents
+	 * @param {string} handle The id of the document to replace
+	 * @param {Object} object The new data of the document
+	 * @param {Object} options The options related to replacing the document
+	 */
 	replace(handle, object, options = {}) {
 		/**
 		 * Section that validates parameters
@@ -189,6 +206,12 @@ class TimeTravelCollection extends GenericTimeCollection {
 		}
 	}
 	
+	/**
+	 * Updates a document inside the logical vertex while respecting previous data of the latest document
+	 * @param {string} handle The id of the document to update
+	 * @param {Object} object The new data to overwrite previous data with
+	 * @param {Object} options The options to consider when updating
+	 */
 	update(handle, object, options = {}) {
 		/**
 		 * Section that validates parameters
@@ -288,6 +311,11 @@ class TimeTravelCollection extends GenericTimeCollection {
 		}
 	}
 	
+	/**
+	 * Expires all documents from a logical vertex, including all edges pointing to the logical vertex
+	 * @param {string] handle The id of the logical vertex
+	 * @param {Object} options The options to consider upon removal
+	 */
 	remove(handle, options = {}) {
 		/**
 		 * Section that validates parameters
@@ -378,6 +406,11 @@ class TimeTravelCollection extends GenericTimeCollection {
 		}
 	}
 	
+	/**
+	 * Expires all logical vertices that match the ids provided in handles, including all edges pointing to them
+	 * @param {Array} handles The ids of the logical vertices
+	 * @param {Object} options The options to consider upon removal
+	 */
 	removeByKeys(handles, options = {}) {
 		/**
 		 * Section that validates parameters
@@ -397,6 +430,11 @@ class TimeTravelCollection extends GenericTimeCollection {
 		})
 	}
 	
+	/**
+	 * Expires all logical vertices that match the example provided, including all edges pointing to them
+	 * @param {Object} example The example to compare with the logical vertices
+	 * @param {Object} options The options to consider upon removal
+	 */
 	removeByExample(example, options = {}) {
 		/**
 		 * Section that validates parameters
@@ -418,6 +456,12 @@ class TimeTravelCollection extends GenericTimeCollection {
 		})
 	}
 	
+	/**
+	 * Replaces the documents in all logical vertices that match the ids provided with the new data, ignoring previous data
+	 * @param {Array} handles The ids to replace
+	 * @param {Object} object The new document
+	 * @param {Object} options The options to consider for replacement
+	 */
 	replaceByKeys(handles, object, options = {}) {
 		/**
 		 * Section that validates parameters
@@ -441,6 +485,12 @@ class TimeTravelCollection extends GenericTimeCollection {
 		});
 	}
 	
+	/**
+	 * Replaces the documents that match the example provided, ignoring previous data from the existing documents
+	 * @param {Object} example The example to match
+	 * @param {Object} object The new document to replace the old one with
+	 * @param {Object} options The options to consider for replacement
+	 */
 	replaceByExample(example, object, options = {}) {
 		/**
 		 * Section that validates parameters
@@ -473,6 +523,12 @@ class TimeTravelCollection extends GenericTimeCollection {
 		})
 	}
 	
+	/**
+	 * Updates the documents matched by the keys provided while considering previous data inside the existing documents
+	 * @param {Array} handles The ids of the logical vertices
+	 * @param {Object} object The new data
+	 * @param {Object} options The options to consider when updating
+	 */
 	updateByKeys(handles, object, options = {}) {
 		/**
 		 * Section that validates parameters
@@ -496,6 +552,12 @@ class TimeTravelCollection extends GenericTimeCollection {
 		});
 	}
 	
+	/**
+	 * Updates the documents matched by the example provided while considering previous data inside the existing documents
+	 * @param {Object} example The example to match the documents against
+	 * @param {Object} object The new data
+	 * @param {Object} options The options to consider when updating
+	 */
 	updateByExample(example, object, options = {}) {
 		/**
 		 * Section that validates parameters
@@ -521,6 +583,11 @@ class TimeTravelCollection extends GenericTimeCollection {
 		})
 	}
 	
+	/**
+	 * Returns all edges and documents inside the logical vertex to have an overview of the history
+	 * @param {string} handle The id of the logical vertex
+	 * @returns {Array} Returns an array of [{document: vertex, edge: edge}]
+	 */
 	history(handle) {
 		/**
 		 * Section that validates parameters
@@ -548,6 +615,12 @@ class TimeTravelCollection extends GenericTimeCollection {
 		}
 	}
 	
+	/**
+	 * Returns the previous document in the logical vertex if any, otherwise returns the same document provided
+	 * @param {string] handle The id of the logical vertex
+	 * @param {Object} revision The current document
+	 * @returns {Object} The previous document or the current provided document if there are no more previous documents
+	 */
 	previous(handle, revision) {
 		/**
 		 * Section that validates parameters
@@ -583,6 +656,12 @@ class TimeTravelCollection extends GenericTimeCollection {
 		}
 	}
 	
+	/**
+	 * Returns the next document in the logical vertex if any, otherwise returns the same document provided
+	 * @param {string} handle The id of the logical vertex
+	 * @param {Object} revision The current document
+	 * @returns {Object} The next document or the current provided document if there are no more next documents
+	 */
 	next(handle, revision) {
 		/**
 		 * Section that validates parameters
@@ -618,6 +697,12 @@ class TimeTravelCollection extends GenericTimeCollection {
 		}
 	}
 	
+	/**
+	 * Returns all logical vertices in the state that they were on the date of interest
+	 * @param {Date} dateOfInterest The date of interest
+	 * @param {boolean} excludeCurrent Whether to exclude all currently active documents that are still valid
+	 * @returns {Array} The documents that were valid during the date of interest
+	 */
 	documentsByDate(dateOfInterest, excludeCurrent = false) {
 		/**
 		 * Section that validates parameters
@@ -673,6 +758,12 @@ class TimeTravelCollection extends GenericTimeCollection {
 		return uniqueDocuments;
 	}
 	
+	/**
+	 * Returns all documents that were valid within a certain date range
+	 * @param {Date} dateRangeMin The minimum date to be valid at
+	 * @param {Date} dateRangeMax The maximum date to be valid at
+	 * @returns {Array} The documents that were valid given the timeframe
+	 */
 	documentsByDateRange(dateRangeMin, dateRangeMax) {
 		/**
 		 * Section that validates parameters
@@ -718,6 +809,11 @@ class TimeTravelCollection extends GenericTimeCollection {
 		return uniqueDocuments;
 	}
 	
+	/**
+	 * Returns the latest document with the given handle
+	 * @param {string} handle The id of the logical vertex
+	 * @returns {Object} The latest document
+	 */
 	document(handle) {
 		/**
 		 * Section that validates parameters
@@ -728,10 +824,23 @@ class TimeTravelCollection extends GenericTimeCollection {
 		/**
 		 * Begin of actual method
 		 */
-		// We use the Inbound Proxy, as that key remains unique and the same for each document and thus is predictable
-		return this.collection.document(handle + this.settings.proxy.inboundAppendix);
+		let edgeCollection = db._collection(this.name + this.settings.edgeAppendix);
+		try {
+			return db._query(aqlQuery`
+				FOR vertex, edge IN OUTBOUND ${handle + this.settings.proxy.inboundAppendix} ${edgeCollection}
+				FILTER expiresAt == 8640000000000000
+				RETURN vertex
+			`).next();
+		} catch (e) {
+			throw new Error('[TimeTravel] document received handle that could not be found.');
+		}
 	}
 	
+	/**
+	 * Returns the latest documents of the given handles
+	 * @param {Array} handles The ids of the documents
+	 * @returns {Array} The latest documents
+	 */
 	documents(handles) {
 		/**
 		 * Section that validates parameters
@@ -753,6 +862,11 @@ class TimeTravelCollection extends GenericTimeCollection {
 		return documents;
 	}
 	
+	/**
+	 * Checks whether a document with a certain id exists
+	 * @param {string} handle The id of the document
+	 * @returns {boolean} Whether the document exists
+	 */
 	exists(handle) {
 		/**
 		 * Section that validates parameters
