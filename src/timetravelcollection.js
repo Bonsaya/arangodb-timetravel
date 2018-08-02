@@ -2,7 +2,7 @@
  * ===========================
  * timetravelcollection.js 02.08.18 15:53
  * Kevin 'Extremo' Sekin
- * Copyright (c) 2018.
+ * Copyright (c) 2018
  * ===========================
  */
 
