@@ -6,9 +6,6 @@
  * ===========================
  */
 
-// TODO: Ensure that the internal functions you use in the transactions are somehow imported from the node_module since
-// TODO: you must code the transactions in isolation or they wont work.
-
 import {GenericTimeCollection} from 'src/generictimecollection';
 
 class TimeTravelCollection extends GenericTimeCollection {
@@ -41,29 +38,29 @@ class TimeTravelCollection extends GenericTimeCollection {
 		/**
 		 * Begin of actual method
 		 */
-		this.db._executeTransaction({
-			collections: {
-				write: [this.name, this.name + this.settings.edgeAppendix]
-			},
-			action: function({doc, edge, object, options, settings}) {
-				// Import arangoDB database driver
-				const db = require('@arangodb').db;
-				// Open up the collections to be inserted into
-				let documentCollection = db._collection(doc);
-				let edgeCollection = db._collection(edge);
-				// Generate the Inbound Proxy Key
-				let inboundProxyKey = edge + '/' + object.id + settings.proxy.inboundAppendix;
-				// Generate the Outbound Proxy Key
-				let outboundProxyKey = edge + '/' + object.id + settings.proxy.outboundAppendix;
-				// Establish current Date
-				let dateNow = Date.now();
-				// Check if there were previous documents and edges
-				if (this.exists(object.id)) {
-					// We have previous documents and edges, meaning the inbound proxy already exists
-					// And the insert command was used by accident instead of the update command!
-					// So we simply redirect to the update function!
-					this.update(object.id, object, options);
-				} else {
+		// Check if there are previous documents and edges
+		if (this.exists(object.id)) {
+			// We have previous documents and edges, meaning the inbound proxy already exists
+			// And the insert command was used by accident instead of the update command!
+			// So we simply redirect to the update function!
+			this.update(object.id, object, options);
+		} else {
+			this.db._executeTransaction({
+				collections: {
+					write: [this.name, this.name + this.settings.edgeAppendix]
+				},
+				action: function({doc, edge, object, options, settings}) {
+					// Import arangoDB database driver
+					const db = require('@arangodb').db;
+					// Open up the collections to be inserted into
+					let documentCollection = db._collection(doc);
+					let edgeCollection = db._collection(edge);
+					// Generate the Inbound Proxy Key
+					let inboundProxyKey = edge + '/' + object.id + settings.proxy.inboundAppendix;
+					// Generate the Outbound Proxy Key
+					let outboundProxyKey = edge + '/' + object.id + settings.proxy.outboundAppendix;
+					// Establish current Date
+					let dateNow = Date.now();
 					// Insert new document
 					let newDocument = documentCollection.insert(Object.assign(object, {
 						createdAt: dateNow,
@@ -90,16 +87,16 @@ class TimeTravelCollection extends GenericTimeCollection {
 						createdAt: dateNow,
 						expiresAt: 8640000000000000
 					}, options);
+				},
+				params: {
+					doc: this.name,
+					edge: this.name + this.settings.edgeAppendix,
+					object: object,
+					options: options,
+					settings: this.settings
 				}
-			},
-			params: {
-				doc: this.name,
-				edge: this.name + this.settings.edgeAppendix,
-				object: object,
-				options: options,
-				settings: this.settings
-			}
-		});
+			});
+		}
 	}
 	
 	replace(handle, object, options = {}) {
@@ -129,28 +126,27 @@ class TimeTravelCollection extends GenericTimeCollection {
 		/**
 		 * Begin of actual method
 		 */
-		this.db._executeTransaction({
-			collections: {
-				write: [this.name, this.name + this.settings.edgeAppendix]
-			},
-			action: function({doc, edge, object, options, settings}) {
-				// Import arangoDB database driver
-				const db = require('@arangodb').db;
-				// Open up the collections to be inserted into
-				let documentCollection = db._collection(doc);
-				let edgeCollection = db._collection(edge);
-				// Generate the Inbound Proxy Key
-				let inboundProxyKey = edge + '/' + object.id + settings.proxy.inboundAppendix;
-				// Establish current Date
-				let dateNow = Date.now();
-				// Check if there were previous documents and edges
-				if (this.exists(object.id)) {
+		if (this.exists(object.id)) {
+			this.db._executeTransaction({
+				collections: {
+					write: [this.name, this.name + this.settings.edgeAppendix]
+				},
+				action: function({doc, edge, object, options, settings}) {
+					// Import arangoDB database driver
+					const db = require('@arangodb').db;
+					// Open up the collections to be inserted into
+					let documentCollection = db._collection(doc);
+					let edgeCollection = db._collection(edge);
+					// Generate the Inbound Proxy Key
+					let inboundProxyKey = edge + '/' + object.id + settings.proxy.inboundAppendix;
+					// Establish current Date
+					let dateNow = Date.now();
 					// Fetch the recent unexpired version of vertex and edge if any
 					let oldDocumentsAndEdges = db._query(aqlQuery`
-							FOR vertex, edge IN OUTBOUND ${inboundProxyKey} ${edgeCollection}
-							FILTER edge.expiresAt == 8640000000000000
-							RETURN { 'document': vertex, 'edge': edge }
-						`).toArray();
+						FOR vertex, edge IN OUTBOUND ${inboundProxyKey} ${edgeCollection}
+						FILTER edge.expiresAt == 8640000000000000
+						RETURN { 'document': vertex, 'edge': edge }
+					`).toArray();
 					// Establish current Date
 					let dateNow = Date.now();
 					// Expire the old edges and documents
@@ -169,19 +165,18 @@ class TimeTravelCollection extends GenericTimeCollection {
 						createdAt: dateNow,
 						expiresAt: 8640000000000000
 					}, options);
-				} else {
-					// It does not exists so we cannot replace it, redirect to insert
-					this.insert(Object.assign(object, {id: handle}), options);
+				},
+				params: {
+					doc: this.name,
+					edge: this.name + this.settings.edgeAppendix,
+					object: object,
+					options: options,
+					settings: this.settings
 				}
-			},
-			params: {
-				doc: this.name,
-				edge: this.name + this.settings.edgeAppendix,
-				object: object,
-				options: options,
-				settings: this.settings
-			}
-		});
+			});
+		} else {
+			this.insert(Object.assign(object, {id: handle}), options);
+		}
 	}
 	
 	update(handle, object, options = {}) {
