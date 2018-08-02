@@ -48,7 +48,7 @@ class TimeTravelEdgeCollection extends GenericTimeCollection {
 			collections: {
 				write: [this.name]
 			},
-			action: function({edge, from, to, object, options}) {
+			action: function({edge, from, to, object, options, settings}) {
 				// Import arangoDB database driver
 				const db = require('@arangodb').db;
 				// Open up the edge collection
@@ -61,7 +61,8 @@ class TimeTravelEdgeCollection extends GenericTimeCollection {
 					// Establish the current date
 					let dateNow = Date.now();
 					// Otherwise we need to insert the new edge
-					edgeCollection.insert(from, to, Object.assign(object, {
+					edgeCollection.insert(from + settings.proxy.outboundAppendix, to
+						+ settings.proxy.inboundAppendix, Object.assign(object, {
 						createdAt: dateNow,
 						expiresAt: 8640000000000000
 					}), options);
@@ -72,7 +73,8 @@ class TimeTravelEdgeCollection extends GenericTimeCollection {
 				from: from,
 				to: to,
 				object: object,
-				options: options
+				options: options,
+				settings: this.settings
 			}
 		});
 	}
@@ -111,7 +113,7 @@ class TimeTravelEdgeCollection extends GenericTimeCollection {
 			collections: {
 				write: [this.name]
 			},
-			action: function({edge, from, to, object, options}) {
+			action: function({edge, from, to, object, options, settings}) {
 				// Import arangoDB database driver
 				const db = require('@arangodb').db;
 				// Open up the edge collection
@@ -126,7 +128,8 @@ class TimeTravelEdgeCollection extends GenericTimeCollection {
 						edgeCollection.update(edge._key, {expiresAt: dateNow});
 					});
 					// Insert the new edge
-					edgeCollection.insert(from, to, Object.assign(object, {
+					edgeCollection.insert(from + settings.proxy.outboundAppendix, to
+						+ settings.proxy.inboundAppendix, Object.assign(object, {
 						createdAt: dateNow,
 						expiresAt: 8640000000000000
 					}), options);
@@ -140,7 +143,8 @@ class TimeTravelEdgeCollection extends GenericTimeCollection {
 				from: from,
 				to: to,
 				object: object,
-				options: options
+				options: options,
+				settings: this.settings,
 			}
 		});
 	}
@@ -227,7 +231,7 @@ class TimeTravelEdgeCollection extends GenericTimeCollection {
 			collections: {
 				write: [this.name]
 			},
-			action: function({edge, from, to, object, options}) {
+			action: function({edge, from, to, object, options, settings}) {
 				// Import arangoDB database driver
 				const db = require('@arangodb').db;
 				// Open up the edge collection
@@ -249,7 +253,8 @@ class TimeTravelEdgeCollection extends GenericTimeCollection {
 						edgeCollection.update(edge._key, {expiresAt: dateNow});
 					});
 					// Insert the new edge
-					edgeCollection.insert(from, to, Object.assign(latestEdge, object, {
+					edgeCollection.insert(from + settings.proxy.outboundAppendix, to
+						+ settings.proxy.inboundAppendix, Object.assign(latestEdge, object, {
 						createdAt: dateNow,
 						expiresAt: 8640000000000000
 					}), options);
@@ -263,7 +268,8 @@ class TimeTravelEdgeCollection extends GenericTimeCollection {
 				from: from,
 				to: to,
 				object: object,
-				options: options
+				options: options,
+				settings: this.settings
 			}
 		});
 	}
