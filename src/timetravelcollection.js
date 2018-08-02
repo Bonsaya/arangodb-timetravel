@@ -538,7 +538,6 @@ class TimeTravelCollection extends GenericTimeCollection {
 				+ this.settings.proxy.inboundAppendix;
 			// Fetch the vertex that expired when the new one was created to get the previous document
 			try {
-				// TODO: Check if the return is still caught by the try catch block if the document cant be fetched
 				return this.db._query(aqlQuery`
 					FOR vertex IN OUTBOUND ${inboundProxyKey} ${edgeCollection}
 					FILTER expiresAt == ${revision.createdAt}
@@ -574,7 +573,6 @@ class TimeTravelCollection extends GenericTimeCollection {
 				+ this.settings.proxy.inboundAppendix;
 			// Fetch the vertex that was created when the new one was expired to get the next document
 			try {
-				// TODO: Check if the return is still caught by the try catch block if the document cant be fetched
 				return this.db._query(aqlQuery`
 					FOR vertex IN OUTBOUND ${inboundProxyKey} ${edgeCollection}
 					FILTER createdAt == ${revision.expiresAt}

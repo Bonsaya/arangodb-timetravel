@@ -455,7 +455,6 @@ class TimeTravelEdgeCollection extends GenericTimeCollection {
 			let edgeCollection = this.db._collection(this.name);
 			// Fetch the vertex that expired when the new one was created to get the previous document
 			try {
-				// TODO: Check if the return is still caught by the try catch block if the document cant be fetched
 				return this.db._query(aqlQuery`
 					FOR vertex IN ${edgeCollection}
 					FILTER expiresAt == ${revision.createdAt} && id == ${handle}
@@ -488,7 +487,6 @@ class TimeTravelEdgeCollection extends GenericTimeCollection {
 			let edgeCollection = this.db._collection(this.name);
 			// Fetch the vertex that was created when the new one was expired to get the next document
 			try {
-				// TODO: Check if the return is still caught by the try catch block if the document cant be fetched
 				return this.db._query(aqlQuery`
 					FOR vertex IN ${edgeCollection}
 					FILTER createdAt == ${revision.expiresAt} && id == ${handle}
