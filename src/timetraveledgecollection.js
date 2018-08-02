@@ -1,6 +1,6 @@
 /*
  * ===========================
- * timetraveledgecollection.js 14.07.18
+ * timetraveledgecollection.js 02.08.18 15:53
  * Kevin 'Extremo' Sekin
  * Copyright (c) 2018.
  * ===========================
