@@ -42,16 +42,16 @@ class TimeTravelCollection extends GenericTimeCollection {
 			collections: {
 				write: [this.name, this.name + this.settings.edgeAppendix]
 			},
-			action: function({doc, edge, object, options}) {
+			action: function({doc, edge, object, options, settings}) {
 				// Import arangoDB database driver
 				const db = require('@arangodb').db;
 				// Open up the collections to be inserted into
 				let documentCollection = db._collection(doc);
 				let edgeCollection = db._collection(edge);
 				// Generate the Inbound Proxy Key
-				let inboundProxyKey = edge + '/' + object.id + '_INBOUNDPROXY';
+				let inboundProxyKey = edge + '/' + object.id + settings.proxy.inboundAppendix;
 				// Generate the Outbound Proxy Key
-				let outboundProxyKey = edge + '/' + object.id + '_OUTBOUNDPROXY';
+				let outboundProxyKey = edge + '/' + object.id + settings.proxy.outboundAppendix;
 				// Establish current Date
 				let dateNow = Date.now();
 				// Check if there were previous documents and edges
@@ -93,7 +93,8 @@ class TimeTravelCollection extends GenericTimeCollection {
 				doc: this.name,
 				edge: this.name + this.settings.edgeAppendix,
 				object: object,
-				options: options
+				options: options,
+				settings: this.settings
 			}
 		});
 	}
@@ -129,14 +130,14 @@ class TimeTravelCollection extends GenericTimeCollection {
 			collections: {
 				write: [this.name, this.name + this.settings.edgeAppendix]
 			},
-			action: function({doc, edge, object, options}) {
+			action: function({doc, edge, object, options, settings}) {
 				// Import arangoDB database driver
 				const db = require('@arangodb').db;
 				// Open up the collections to be inserted into
 				let documentCollection = db._collection(doc);
 				let edgeCollection = db._collection(edge);
 				// Generate the Inbound Proxy Key
-				let inboundProxyKey = edge + '/' + object.id + '_INBOUNDPROXY';
+				let inboundProxyKey = edge + '/' + object.id + settings.proxy.inboundAppendix;
 				// Establish current Date
 				let dateNow = Date.now();
 				// Check if there were previous documents and edges
@@ -174,7 +175,8 @@ class TimeTravelCollection extends GenericTimeCollection {
 				doc: this.name,
 				edge: this.name + this.settings.edgeAppendix,
 				object: object,
-				options: options
+				options: options,
+				settings: this.settings
 			}
 		});
 	}
@@ -212,14 +214,14 @@ class TimeTravelCollection extends GenericTimeCollection {
 				collections: {
 					write: [this.name, this.name + this.settings.edgeAppendix]
 				},
-				action: function({doc, edge, object, options}) {
+				action: function({doc, edge, object, options, settings}) {
 					// Import arangoDB database driver
 					const db = require('@arangodb').db;
 					// Open up the collections to be inserted into
 					let documentCollection = db._collection(doc);
 					let edgeCollection = db._collection(edge);
 					// Generate the Inbound Proxy Key
-					let inboundProxyKey = edge + '/' + object.id + '_INBOUNDPROXY';
+					let inboundProxyKey = edge + '/' + object.id + settings.proxy.inboundAppendix;
 					// Fetch the recent unexpired version of vertex and edge if any
 					let oldDocumentsAndEdges = db._query(aqlQuery`
 							FOR vertex, edge IN OUTBOUND ${inboundProxyKey} ${edgeCollection}
@@ -256,7 +258,8 @@ class TimeTravelCollection extends GenericTimeCollection {
 					doc: this.name,
 					edge: this.name + this.settings.edgeAppendix,
 					object: object,
-					options: options
+					options: options,
+					settings: this.settings
 				}
 			});
 		} else {
@@ -282,16 +285,16 @@ class TimeTravelCollection extends GenericTimeCollection {
 			collections: {
 				write: [this.name, this.name + this.settings.edgeAppendix]
 			},
-			action: function({doc, edge, handle, options}) {
+			action: function({doc, edge, handle, options, settings}) {
 				// Import arangoDB database driver
 				const db = require('@arangodb').db;
 				// Open up the collections to be inserted into
 				let documentCollection = db._collection(doc);
 				let edgeCollection = db._collection(edge);
 				// Generate the Inbound Proxy Key
-				let inboundProxyKey = edge + '/' + handle + '_INBOUNDPROXY';
+				let inboundProxyKey = edge + '/' + handle + settings.proxy.inboundAppendix;
 				// Generate the Outbound Proxy Key
-				let outboundProxyKey = edge + '/' + handle + '_OUTBOUNDPROXY';
+				let outboundProxyKey = edge + '/' + handle + settings.proxy.outboundAppendix;
 				// Fetch the recent unexpired vertex and the edge to it
 				let oldDocumentsAndEdges = db._query(aqlQuery`
 					FOR vertex, edge IN OUTBOUND ${inboundProxyKey} ${edgeCollection}
@@ -335,7 +338,8 @@ class TimeTravelCollection extends GenericTimeCollection {
 				doc: this.name,
 				edge: this.name + this.settings.edgeAppendix,
 				handle: handle,
-				options: options
+				options: options,
+				settings: this.settings
 			}
 		});
 	}
@@ -498,7 +502,8 @@ class TimeTravelCollection extends GenericTimeCollection {
 			// Open the edge collection
 			let edgeCollection = this.db._collection(this.name + this.settings.edgeAppendix);
 			// Generate the Inbound Proxy Key
-			let inboundProxyKey = this.name + this.settings.edgeAppendix + '/' + handle + '_INBOUNDPROXY';
+			let inboundProxyKey = this.name + this.settings.edgeAppendix + '/' + handle
+				+ this.settings.proxy.inboundAppendix;
 			// Return all edges and vertices related to that inboundProxy
 			return this.db._query(aqlQuery`
 				FOR vertex, edge IN OUTBOUND ${inboundProxyKey} ${edgeCollection}
@@ -527,7 +532,8 @@ class TimeTravelCollection extends GenericTimeCollection {
 			// Open the edge collection
 			let edgeCollection = this.db._collection(this.name + this.settings.edgeAppendix);
 			// Generate the Inbound Proxy Key
-			let inboundProxyKey = this.name + this.settings.edgeAppendix + '/' + handle + '_INBOUNDPROXY';
+			let inboundProxyKey = this.name + this.settings.edgeAppendix + '/' + handle
+				+ this.settings.proxy.inboundAppendix;
 			// Fetch the vertex that expired when the new one was created to get the previous document
 			try {
 				// TODO: Check if the return is still caught by the try catch block if the document cant be fetched
@@ -562,7 +568,8 @@ class TimeTravelCollection extends GenericTimeCollection {
 			// Open the edge collection
 			let edgeCollection = this.db._collection(this.name + this.settings.edgeAppendix);
 			// Generate the Inbound Proxy Key
-			let inboundProxyKey = this.name + this.settings.edgeAppendix + '/' + handle + '_INBOUNDPROXY';
+			let inboundProxyKey = this.name + this.settings.edgeAppendix + '/' + handle
+				+ this.settings.proxy.inboundAppendix;
 			// Fetch the vertex that was created when the new one was expired to get the next document
 			try {
 				// TODO: Check if the return is still caught by the try catch block if the document cant be fetched
@@ -690,7 +697,7 @@ class TimeTravelCollection extends GenericTimeCollection {
 		 * Begin of actual method
 		 */
 		// We use the Inbound Proxy, as that key remains unique and the same for each document and thus is predictable
-		return this.collection.document(handle + '_INBOUNDPROXY');
+		return this.collection.document(handle + this.settings.proxy.inboundAppendix);
 	}
 	
 	documents(handles) {
@@ -725,7 +732,7 @@ class TimeTravelCollection extends GenericTimeCollection {
 		 * Begin of actual method
 		 */
 		// We use the Inbound Proxy, as that key remains unique and the same for each document and thus is predictable
-		return this.collection.exists(handle + '_INBOUNDPROXY');
+		return this.collection.exists(handle + this.settings.proxy.inboundAppendix);
 	}
 }
 
