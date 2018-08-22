@@ -6,7 +6,7 @@
  * ===========================
  */
 
-import {GenericTimeCollection} from 'src/generictimecollection';
+const GenericTimeCollection = require('./generictimecollection');
 
 class TimeTravelEdgeCollection extends GenericTimeCollection {
 	
@@ -661,4 +661,4 @@ class TimeTravelEdgeCollection extends GenericTimeCollection {
 	}
 }
 
-module.exports.TimeTravelEdgeCollection = TimeTravelEdgeCollection;
+module.exports = TimeTravelEdgeCollection;

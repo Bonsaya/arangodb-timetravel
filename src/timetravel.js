@@ -6,8 +6,8 @@
  * ===========================
  */
 
-import {TimeTravelCollection} from 'timetravelcollection';
-import {TimeTravelEdgeCollection} from 'timetraveledgecollection';
+const TimeTravelCollection = require('./timetravelcollection');
+const TimeTravelEdgeCollection = require('./timetraveledgecollection');
 
 class TimeTravel {
 	
@@ -27,10 +27,10 @@ class TimeTravel {
 	 * @returns {TimeTravelCollection} The timetravel document collection
 	 */
 	createDocumentCollection (name) {
-		const collectionName = name+this.settings.timeTravelPresentAppendix;
-		const outdatedCollectionName = name+this.settings.timeTravelPastAppendix;
-		const edgeCollectionName = name+this.settings.timeTravelPresentAppendix+this.settings.edgeAppendix;
-		const outdatedEdgeCollectionName = name+this.settings.timeTravelPastAppendix+this.settings.edgeAppendix;
+		const collectionName = module.context.collectionName(name+this.settings.timeTravelPresentAppendix);
+		const outdatedCollectionName = module.context.collectionName(name+this.settings.timeTravelPastAppendix);
+		const edgeCollectionName = module.context.collectionName(name+this.settings.timeTravelPresentAppendix+this.settings.edgeAppendix);
+		const outdatedEdgeCollectionName = module.context.collectionName(name+this.settings.timeTravelPastAppendix+this.settings.edgeAppendix);
 		
 		if (this.db._collection(collectionName) ||
 			this.db._collection(edgeCollectionName) ||
@@ -52,8 +52,8 @@ class TimeTravel {
 	 * @returns {TimeTravelEdgeCollection} The timetravel edge collection
 	 */
 	createEdgeCollection(name) {
-		const edgeCollectionName = name+this.settings.timeTravelPresentAppendix();
-		const outdatedEdgeCollectionName = name+this.settings.timeTravelPastAppendix();
+		const edgeCollectionName = module.context.collectionName(name+this.settings.timeTravelPresentAppendix);
+		const outdatedEdgeCollectionName = module.context.collectionName(name+this.settings.timeTravelPastAppendix);
 		if (this.db._collection(edgeCollectionName) ||
 			this.db._collection(outdatedEdgeCollectionName)) {
 			throw new Error('[TimeTravel] The edge collection already exists');
@@ -70,7 +70,7 @@ class TimeTravel {
 	 * @returns {TimeTravelCollection} The timetravel document collection
 	 */
 	documentCollection(name) {
-		return new TimeTravelCollection(this.db, name+this.settings.timeTravelPresentAppendix, this.settings);
+		return new TimeTravelCollection(this.db, module.context.collectionName(name+this.settings.timeTravelPresentAppendix), this.settings);
 	}
 	
 	/**
@@ -79,8 +79,8 @@ class TimeTravel {
 	 * @returns {TimeTravelEdgeCollection} The timetravel edge collection
 	 */
 	edgeCollection(name) {
-		return new TimeTravelEdgeCollection(this.db, name+this.settings.timeTravelPresentAppendix, this.settings);
+		return new TimeTravelEdgeCollection(this.db, module.context.collectionName(name+this.settings.timeTravelPresentAppendix), this.settings);
 	}
 }
 
-module.exports.TimeTravel = TimeTravel;
+module.exports = TimeTravel;

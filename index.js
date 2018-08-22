@@ -6,7 +6,7 @@
  * ===========================
  */
 
-const {TimeTravel} = require('./src/timetravel');
+const TimeTravel = require('./src/timetravel');
 
 module.exports = function(db, settings) {
 	return new TimeTravel(db, settings);

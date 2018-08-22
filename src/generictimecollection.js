@@ -111,7 +111,6 @@ class GenericTimeCollection {
 		`).toArray();
 		return documents.size !== 0;
 	}
-	
 }
 
-module.exports.GenericCollection = GenericCollection;
+module.exports = GenericTimeCollection;
