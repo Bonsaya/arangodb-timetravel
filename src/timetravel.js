@@ -22,15 +22,26 @@ class TimeTravel {
 	}
 	
 	/**
+	 * Prefixes the name for the current service
+	 * @param name The name to prefix
+	 * @returns {String} Returns the prefixed name
+	 */
+	prefixedCollectionName(name) {
+		return module.context.collectionName(name);
+	}
+	
+	/**
 	 * Creates a timetravel document collection
 	 * @param name The name of the collection
 	 * @returns {TimeTravelCollection} The timetravel document collection
 	 */
 	createDocumentCollection (name) {
-		const collectionName = module.context.collectionName(name+this.settings.timeTravelPresentAppendix);
-		const outdatedCollectionName = module.context.collectionName(name+this.settings.timeTravelPastAppendix);
-		const edgeCollectionName = module.context.collectionName(name+this.settings.timeTravelPresentAppendix+this.settings.edgeAppendix);
-		const outdatedEdgeCollectionName = module.context.collectionName(name+this.settings.timeTravelPastAppendix+this.settings.edgeAppendix);
+		const collectionName = this.prefixedCollectionName(name + this.settings.timeTravelPresentAppendix);
+		const outdatedCollectionName = this.prefixedCollectionName(name + this.settings.timeTravelPastAppendix);
+		const edgeCollectionName = this.prefixedCollectionName(name + this.settings.timeTravelPresentAppendix
+			+ this.settings.edgeAppendix);
+		const outdatedEdgeCollectionName = this.prefixedCollectionName(name + this.settings.timeTravelPastAppendix
+			+ this.settings.edgeAppendix);
 		
 		if (this.db._collection(collectionName) ||
 			this.db._collection(edgeCollectionName) ||
@@ -52,8 +63,8 @@ class TimeTravel {
 	 * @returns {TimeTravelEdgeCollection} The timetravel edge collection
 	 */
 	createEdgeCollection(name) {
-		const edgeCollectionName = module.context.collectionName(name+this.settings.timeTravelPresentAppendix);
-		const outdatedEdgeCollectionName = module.context.collectionName(name+this.settings.timeTravelPastAppendix);
+		const edgeCollectionName = this.prefixedCollectionName(name + this.settings.timeTravelPresentAppendix);
+		const outdatedEdgeCollectionName = this.prefixedCollectionName(name + this.settings.timeTravelPastAppendix);
 		if (this.db._collection(edgeCollectionName) ||
 			this.db._collection(outdatedEdgeCollectionName)) {
 			throw new Error('[TimeTravel] The edge collection already exists');
@@ -70,7 +81,8 @@ class TimeTravel {
 	 * @returns {TimeTravelCollection} The timetravel document collection
 	 */
 	documentCollection(name) {
-		return new TimeTravelCollection(this.db, module.context.collectionName(name+this.settings.timeTravelPresentAppendix), this.settings);
+		return new TimeTravelCollection(this.db, this.prefixedCollectionName(name
+			+ this.settings.timeTravelPresentAppendix), this.settings);
 	}
 	
 	/**
@@ -79,7 +91,8 @@ class TimeTravel {
 	 * @returns {TimeTravelEdgeCollection} The timetravel edge collection
 	 */
 	edgeCollection(name) {
-		return new TimeTravelEdgeCollection(this.db, module.context.collectionName(name+this.settings.timeTravelPresentAppendix), this.settings);
+		return new TimeTravelEdgeCollection(this.db, this.prefixedCollectionName(name
+			+ this.settings.timeTravelPresentAppendix), this.settings);
 	}
 }
 
