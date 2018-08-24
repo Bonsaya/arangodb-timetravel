@@ -54,7 +54,7 @@ class TimeTravelCollection extends GenericTimeCollection {
 			// We have previous documents and edges, meaning the inbound proxy already exists
 			// And the insert command was used by accident instead of the update command!
 			// So we simply redirect to the update function!
-			this.update(object.id, object, options);
+			this.update(object, options);
 		} else {
 			this.db._executeTransaction({
 				collections: {
@@ -67,9 +67,9 @@ class TimeTravelCollection extends GenericTimeCollection {
 					let documentCollection = db._collection(doc);
 					let edgeCollection = db._collection(edge);
 					// Generate the Inbound Proxy Key
-					let inboundProxyKey = edge + '/' + object.id + settings.proxy.inboundAppendix;
+					let inboundProxyKey = object.id + settings.proxy.inboundAppendix;
 					// Generate the Outbound Proxy Key
-					let outboundProxyKey = edge + '/' + object.id + settings.proxy.outboundAppendix;
+					let outboundProxyKey = object.id + settings.proxy.outboundAppendix;
 					// Establish current Date
 					let dateNow = Date.now();
 					// Insert new document
@@ -90,11 +90,15 @@ class TimeTravelCollection extends GenericTimeCollection {
 					}, options);
 					// And now we need to tie them together with the first document
 					// By inserting the edges from the inbound proxy to the document and from the document to the outbound proxy
-					edgeCollection.insert(inboundProxy._key, newDocument._id, {
+					edgeCollection.insert({
+						_from: inboundProxy._id,
+						_to: newDocument._id,
 						createdAt: dateNow,
 						expiresAt: 8640000000000000
 					}, options);
-					edgeCollection.insert(newDocument._id, outboundProxy._id, {
+					edgeCollection.insert({
+						_from: newDocument._id,
+						_to: outboundProxy._id,
 						createdAt: dateNow,
 						expiresAt: 8640000000000000
 					}, options);
@@ -112,22 +116,18 @@ class TimeTravelCollection extends GenericTimeCollection {
 	
 	/**
 	 * Replaces a document in the logical vertex with a new document, ignoring any data in the previous documents
-	 * @param {string} handle The id of the document to replace
 	 * @param {Object} object The new data of the document
 	 * @param {Object} options The options related to replacing the document
 	 */
-	replace(handle, object, options = {}) {
+	replace(object, options = {}) {
 		/**
 		 * Section that validates parameters
 		 */
-		if (typeof handle !== 'string') {
-			throw new Error('[TimeTravel] replace received non-string as first parameter (handle)');
-		}
 		if (object !== Object(object)) {
-			throw new Error('[TimeTravel] replace received non-object as second parameter (object)');
+			throw new Error('[TimeTravel] replace received non-object as first parameter (object)');
 		}
 		if (options !== Object(options)) {
-			throw new Error('[TimeTravel] replace received non-object as third parameter (options)');
+			throw new Error('[TimeTravel] replace received non-object as second parameter (options)');
 		}
 		if (typeof object._key === 'string') {
 			object.id = object._key;
@@ -155,9 +155,9 @@ class TimeTravelCollection extends GenericTimeCollection {
 					let documentCollection = db._collection(doc);
 					let edgeCollection = db._collection(edge);
 					// Generate the Inbound Proxy Key
-					let inboundProxyKey = edge + '/' + object.id + settings.proxy.inboundAppendix;
+					let inboundProxyKey = doc + '/' + object.id + settings.proxy.inboundAppendix;
 					// Generate the Outbound Proxy Key
-					let outboundProxyKey = edge + '/' + object.id + settings.proxy.outboundAppendix;
+					let outboundProxyKey = doc + '/' + object.id + settings.proxy.outboundAppendix;
 					// Fetch the recent unexpired version of vertex and edge if any
 					let oldDocumentsAndEdges = db._query(aqlQuery`
 						FOR vertex, edge IN OUTBOUND ${inboundProxyKey} ${edgeCollection}
@@ -188,7 +188,17 @@ class TimeTravelCollection extends GenericTimeCollection {
 					}), options);
 					// We have previous documents and edges, meaning the inbound proxy already exists
 					// So we simply insert the new edge!
-					edgeCollection.insert(inboundProxyKey, newDocument._id, {
+					// Inbound
+					edgeCollection.insert({
+						_from: inboundProxyKey,
+						_to: newDocument._id,
+						createdAt: dateNow,
+						expiresAt: 8640000000000000
+					}, options);
+					// Outbound
+					edgeCollection.insert({
+						_from: newDocument._id,
+						_to: outboundProxyKey,
 						createdAt: dateNow,
 						expiresAt: 8640000000000000
 					}, options);
@@ -202,23 +212,19 @@ class TimeTravelCollection extends GenericTimeCollection {
 				}
 			});
 		} else {
-			this.insert(Object.assign(object, {id: handle}), options);
+			this.insert(object, options);
 		}
 	}
 	
 	/**
 	 * Updates a document inside the logical vertex while respecting previous data of the latest document
-	 * @param {string} handle The id of the document to update
 	 * @param {Object} object The new data to overwrite previous data with
 	 * @param {Object} options The options to consider when updating
 	 */
-	update(handle, object, options = {}) {
+	update(object, options = {}) {
 		/**
 		 * Section that validates parameters
 		 */
-		if (typeof handle !== 'string') {
-			throw new Error('[TimeTravel] update received non-string as first parameter (handle)');
-		}
 		if (object !== Object(object)) {
 			throw new Error('[TimeTravel] update received non-object as second parameter (object)');
 		}
@@ -239,8 +245,8 @@ class TimeTravelCollection extends GenericTimeCollection {
 		/**
 		 * Begin of actual method
 		 */
-		// Let us first check if the handle exists!
-		if (this.exists(handle)) {
+		// Let us first check if the object exists!
+		if (this.exists(object.id)) {
 			this.db._executeTransaction({
 				collections: {
 					write: [this.name, this.name + this.settings.edgeAppendix]
@@ -252,14 +258,14 @@ class TimeTravelCollection extends GenericTimeCollection {
 					let documentCollection = db._collection(doc);
 					let edgeCollection = db._collection(edge);
 					// Generate the Inbound Proxy Key
-					let inboundProxyKey = edge + '/' + object.id + settings.proxy.inboundAppendix;
+					let inboundProxyKey = doc + '/' + object.id + settings.proxy.inboundAppendix;
 					// Generate the Outbound Proxy Key
-					let outboundProxyKey = edge + '/' + object.id + settings.proxy.outboundAppendix;
+					let outboundProxyKey = doc + '/' + object.id + settings.proxy.outboundAppendix;
 					// Fetch the recent unexpired version of vertex and edge if any
 					let oldDocumentsAndEdges = db._query(aqlQuery`
 							FOR vertex, edge IN OUTBOUND ${inboundProxyKey} ${edgeCollection}
 							FILTER edge.expiresAt == 8640000000000000
-							RETURN { 'document': vertex, 'edge': edge }
+							RETURN { "document": vertex, "edge": edge }
 						`).toArray();
 					// Establish current Date
 					let dateNow = Date.now();
@@ -285,6 +291,10 @@ class TimeTravelCollection extends GenericTimeCollection {
 					oldOutboundEdges.forEach((edge) => {
 						edgeCollection.update(edge._key, {expiresAt: dateNow});
 					});
+					// Delete the previous _key, _rev, _id from the document, so arangoDB can choose a new one
+					delete document._key;
+					delete document._rev;
+					delete document._id;
 					// Insert the updated document
 					let newDocument = documentCollection.insert(Object.assign(document, object, {
 						createdAt: dateNow,
@@ -292,7 +302,17 @@ class TimeTravelCollection extends GenericTimeCollection {
 					}), options);
 					// We have previous documents and edges, meaning the inbound proxy already exists
 					// So we simply insert the new edge!
-					edgeCollection.insert(inboundProxyKey, newDocument._id, {
+					// Inbound
+					edgeCollection.insert({
+						_from: inboundProxyKey,
+						_to: newDocument._id,
+						createdAt: dateNow,
+						expiresAt: 8640000000000000
+					}, options);
+					// Outbound
+					edgeCollection.insert({
+						_from: newDocument._id,
+						_to: outboundProxyKey,
 						createdAt: dateNow,
 						expiresAt: 8640000000000000
 					}, options);
@@ -307,7 +327,7 @@ class TimeTravelCollection extends GenericTimeCollection {
 			});
 		} else {
 			// Because if it does not exist, we simply redirect to the insert method
-			this.insert(Object.assign(object, {id: handle}), options);
+			this.insert(object, options);
 		}
 	}
 	
@@ -341,9 +361,9 @@ class TimeTravelCollection extends GenericTimeCollection {
 					let documentCollection = db._collection(doc);
 					let edgeCollection = db._collection(edge);
 					// Generate the Inbound Proxy Key
-					let inboundProxyKey = edge + '/' + handle + settings.proxy.inboundAppendix;
+					let inboundProxyKey = doc + '/' + handle + settings.proxy.inboundAppendix;
 					// Generate the Outbound Proxy Key
-					let outboundProxyKey = edge + '/' + handle + settings.proxy.outboundAppendix;
+					let outboundProxyKey = doc + '/' + handle + settings.proxy.outboundAppendix;
 					// Fetch the recent unexpired vertex and the edge to it
 					let oldDocumentsAndEdges = db._query(aqlQuery`
 					FOR vertex, edge IN OUTBOUND ${inboundProxyKey} ${edgeCollection}
@@ -548,7 +568,7 @@ class TimeTravelCollection extends GenericTimeCollection {
 		// We handle each handle seperately so we can rely on a single method for all update functionality!
 		handles.forEach((handle) => {
 			// We simply redirect to the update method
-			this.update(handle, object, options);
+			this.update(Object.assign(object, {id: handle}), options);
 		});
 	}
 	
@@ -603,7 +623,7 @@ class TimeTravelCollection extends GenericTimeCollection {
 			// Open the edge collection
 			let edgeCollection = this.db._collection(this.name + this.settings.edgeAppendix);
 			// Generate the Inbound Proxy Key
-			let inboundProxyKey = this.name + this.settings.edgeAppendix + '/' + handle
+			let inboundProxyKey = this.name + '/' + handle
 				+ this.settings.proxy.inboundAppendix;
 			// Return all edges and vertices related to that inboundProxy
 			return this.db._query(aqlQuery`
@@ -642,18 +662,23 @@ class TimeTravelCollection extends GenericTimeCollection {
 			// Open the edge collection
 			let edgeCollection = this.db._collection(this.name + this.settings.edgeAppendix);
 			// Generate the Inbound Proxy Key
-			let inboundProxyKey = this.name + this.settings.edgeAppendix + '/' + handle
+			let inboundProxyKey = this.name + '/' + handle
 				+ this.settings.proxy.inboundAppendix;
 			// Fetch the vertex that expired when the new one was created to get the previous document
+			let document = null;
 			try {
-				return this.db._query(aqlQuery`
+				document = this.db._query(aqlQuery`
 					FOR vertex IN OUTBOUND ${inboundProxyKey} ${edgeCollection}
-					FILTER expiresAt == ${revision.createdAt}
+					FILTER vertex.expiresAt == ${revision.createdAt}
 					RETURN vertex
 				`).next();
 			} catch (e) {
 				return revision;
 			}
+			if (!document) {
+				return revision;
+			}
+			return document;
 		} else {
 			throw new Error('[TimeTravel] previous received handle that was not found.');
 		}
@@ -686,18 +711,23 @@ class TimeTravelCollection extends GenericTimeCollection {
 			// Open the edge collection
 			let edgeCollection = this.db._collection(this.name + this.settings.edgeAppendix);
 			// Generate the Inbound Proxy Key
-			let inboundProxyKey = this.name + this.settings.edgeAppendix + '/' + handle
+			let inboundProxyKey = this.name + '/' + handle
 				+ this.settings.proxy.inboundAppendix;
 			// Fetch the vertex that was created when the new one was expired to get the next document
+			let document = null;
 			try {
-				return this.db._query(aqlQuery`
+				document = this.db._query(aqlQuery`
 					FOR vertex IN OUTBOUND ${inboundProxyKey} ${edgeCollection}
-					FILTER createdAt == ${revision.expiresAt}
+					FILTER vertex.createdAt == ${revision.expiresAt}
 					RETURN vertex
 				`).next();
 			} catch (e) {
 				return revision;
 			}
+			if (!document) {
+				return revision;
+			}
+			return document;
 		} else {
 			throw new Error('[TimeTravel] previous received handle that was not found.');
 		}
@@ -705,11 +735,12 @@ class TimeTravelCollection extends GenericTimeCollection {
 	
 	/**
 	 * Returns all logical vertices in the state that they were on the date of interest
+	 * @param {String} handle The id of the documents of interest
 	 * @param {Date} dateOfInterest The date of interest
-	 * @param {boolean} excludeCurrent Whether to exclude all currently active documents that are still valid
+	 * @param {boolean} excludeCurrent Whether to prefer createdAt or expiresAt
 	 * @returns {Array} The documents that were valid during the date of interest
 	 */
-	documentsByDate(dateOfInterest, excludeCurrent = false) {
+	documentsByDate(handle, dateOfInterest, excludeCurrent = false) {
 		/**
 		 * Section that validates parameters
 		 */
@@ -729,56 +760,42 @@ class TimeTravelCollection extends GenericTimeCollection {
 		// Do we want the currently active documents?
 		if (excludeCurrent) {
 			// If not, we populate the documents with all documents that were valid until the dateOfInterest but not beyond
-			// TODO: These queries dont make sense yet.. what is the use-case? Need to think about them again
 			documents = this.db._query(aqlQuery`
 				FOR vertex IN ${edgeCollection}
-				FILTER expiresAt >= ${dateOfInterest} && expiresAt != 8640000000000000
+				FILTER vertex.id==${handle} && vertex.createdAt < ${dateOfInterest} && vertex.expiresAt >= ${dateOfInterest}
 				RETURN vertex
 			`).toArray();
 		} else {
 			// Otherwise we populate the documents with all documents, even still valid ones beyond the date of interest
-			// TODO: These queries dont make sense yet.. what is the use-case? Need to think about them again
 			documents = this.db._query(aqlQuery`
 				FOR vertex IN ${edgeCollection}
-				FILTER expiresAt >= ${dateOfInterest}
+				FILTER vertex.id==${handle} && vertex.createdAt <= ${dateOfInterest} && vertex.expiresAt > ${dateOfInterest}
 				RETURN vertex
 			`).toArray();
 		}
-		// And now we want to clean them up into uniqueDocuments
-		let uniqueDocuments = [];
-		// So we use the ID of the documents and compare the createdAt dates to get the latest
-		documents.forEach((document) => {
-			// Do we have the document already?
-			if (document.id in uniqueDocuments) {
-				// Then let us compare the creation dates
-				if (uniqueDocuments[document.id].createdAt < document.createdAt) {
-					// And if it is, we overwrite the document with the newer one
-					uniqueDocuments[document.id] = document;
-				}
-			} else {
-				// If we document does not exist yet, we insert it immediately
-				uniqueDocuments[document.id] = document;
-			}
-		});
-		// And finally, we return all unique documents that are the newest still valid documents of the date of interest
-		return uniqueDocuments;
+		// And finally, we return all documents of the date of interest
+		return documents;
 	}
 	
 	/**
 	 * Returns all documents that were valid within a certain date range
+	 * @param {String} handle The id of the documents of interest
 	 * @param {Date} dateRangeMin The minimum date to be valid at
 	 * @param {Date} dateRangeMax The maximum date to be valid at
 	 * @returns {Array} The documents that were valid given the timeframe
 	 */
-	documentsByDateRange(dateRangeMin, dateRangeMax) {
+	documentsByDateRange(handle, dateRangeMin, dateRangeMax) {
 		/**
 		 * Section that validates parameters
 		 */
+		if (typeof handle !== 'string') {
+			throw new Error('[TimeTravel] documentsByDateRange received non-string as first parameter (handle)');
+		}
 		if (!(dateRangeMin instanceof Date && !isNaN(dateRangeMin))) {
-			throw new Error('[TimeTravel] documentsByDateRange received non-date as first parameter (dateRangeMin)');
+			throw new Error('[TimeTravel] documentsByDateRange received non-date as second parameter (dateRangeMin)');
 		}
 		if (!(dateRangeMax instanceof Date && !isNaN(dateRangeMax))) {
-			throw new Error('[TimeTravel] documentsByDateRange received non-date as second parameter (dateRangeMax)');
+			throw new Error('[TimeTravel] documentsByDateRange received non-date as third parameter (dateRangeMax)');
 		}
 		if (dateRangeMin >= dateRangeMax) {
 			throw new Error('[TimeTravel] documentsByDateRange received a minimum date that exceeds or equals the maximum date (dateRangeMin >= dateRangeMax)');
@@ -792,27 +809,11 @@ class TimeTravelCollection extends GenericTimeCollection {
 		// TODO: These queries dont make sense yet.. what is the use-case? Need to think about them again
 		let documents = this.db._query(aqlQuery`
 				FOR vertex IN ${edgeCollection}
-				FILTER expiresAt >= ${dateRangeMin} && expiresAt <= ${dateRangeMax}
+				FILTER vertex.id==${handle} && vertex.createdAt <= ${dateRangeMin} && vertex.expiresAt > ${dateRangeMax}
 				RETURN vertex
 			`).toArray();
-		// And now we want to clean them up into uniqueDocuments
-		let uniqueDocuments = [];
-		// So we use the ID of the documents and compare the createdAt dates to get the latest
-		documents.forEach((document) => {
-			// Do we have the document already?
-			if (document.id in uniqueDocuments) {
-				// Then let us compare the creation dates
-				if (uniqueDocuments[document.id].createdAt < document.createdAt) {
-					// And if it is, we overwrite the document with the newer one
-					uniqueDocuments[document.id] = document;
-				}
-			} else {
-				// If we document does not exist yet, we insert it immediately
-				uniqueDocuments[document.id] = document;
-			}
-		});
-		// And finally, we return all unique documents that are the newest still valid documents of the date of interest
-		return uniqueDocuments;
+		// And finally, we return all documents of interest
+		return documents;
 	}
 	
 	/**
@@ -830,11 +831,12 @@ class TimeTravelCollection extends GenericTimeCollection {
 		/**
 		 * Begin of actual method
 		 */
-		let edgeCollection = db._collection(this.name + this.settings.edgeAppendix);
+		let edgeCollection = this.db._collection(this.name + this.settings.edgeAppendix);
 		try {
-			return db._query(aqlQuery`
-				FOR vertex, edge IN OUTBOUND ${handle + this.settings.proxy.inboundAppendix} ${edgeCollection}
-				FILTER expiresAt == 8640000000000000
+			return this.db._query(aqlQuery`
+				FOR vertex, edge IN OUTBOUND ${this.name + '/' + handle
+			+ this.settings.proxy.inboundAppendix} ${edgeCollection}
+				FILTER vertex.expiresAt == 8640000000000000
 				RETURN vertex
 			`).next();
 		} catch (e) {

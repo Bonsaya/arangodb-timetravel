@@ -66,7 +66,7 @@ class TimeTravelEdgeCollection extends GenericTimeCollection {
 				collections: {
 					write: [this.name]
 				},
-				action: function({edge, from, to, object, options, settings}) {
+				action: function({edge, from, to, object, options}) {
 					// Import arangoDB database driver
 					const db = require('@arangodb').db;
 					// Open up the edge collection
@@ -74,19 +74,19 @@ class TimeTravelEdgeCollection extends GenericTimeCollection {
 					// Establish the current date
 					let dateNow = Date.now();
 					// Otherwise we need to insert the new edge
-					edgeCollection.insert(from + settings.proxy.outboundAppendix, to
-						+ settings.proxy.inboundAppendix, Object.assign(object, {
+					edgeCollection.insert(Object.assign({
+						_from: from,
+						_to: to,
 						createdAt: dateNow,
 						expiresAt: 8640000000000000
-					}), options);
+					}, object), options);
 				},
 				params: {
 					edge: this.name,
-					from: from,
-					to: to,
+					from: from + this.settings.proxy.outboundAppendix,
+					to: to + this.settings.proxy.inboundAppendix,
 					object: object,
-					options: options,
-					settings: this.settings
+					options: options
 				}
 			});
 		}
@@ -135,7 +135,7 @@ class TimeTravelEdgeCollection extends GenericTimeCollection {
 				collections: {
 					write: [this.name]
 				},
-				action: function({edge, from, to, object, options, settings}) {
+				action: function({edge, from, to, object, options}) {
 					// Import arangoDB database driver
 					const db = require('@arangodb').db;
 					// Open up the edge collection
@@ -143,24 +143,28 @@ class TimeTravelEdgeCollection extends GenericTimeCollection {
 					// Establish current date
 					let dateNow = Date.now();
 					// Expire previous edges
-					let currentEdges = this.documents([object.id]);
+					let currentEdges = db._query(aqlQuery`
+							FOR vertex IN ${edgeCollection}
+							FILTER vertex.id==${object.id} && vertex.expiresAt==8640000000000000
+							RETURN vertex
+						`).toArray();
 					currentEdges.forEach((edge) => {
 						edgeCollection.update(edge._key, {expiresAt: dateNow});
 					});
 					// Insert the new edge
-					edgeCollection.insert(from + settings.proxy.outboundAppendix, to
-						+ settings.proxy.inboundAppendix, Object.assign(object, {
+					edgeCollection.insert(Object.assign({
+						_from: from,
+						_to: to,
 						createdAt: dateNow,
 						expiresAt: 8640000000000000
-					}), options);
+					}, object), options);
 				},
 				params: {
 					edge: this.name,
-					from: from,
-					to: to,
+					from: from + this.settings.proxy.outboundAppendix,
+					to: to + this.settings.proxy.inboundAppendix,
 					object: object,
-					options: options,
-					settings: this.settings,
+					options: options
 				}
 			});
 		} else {
@@ -272,7 +276,7 @@ class TimeTravelEdgeCollection extends GenericTimeCollection {
 				collections: {
 					write: [this.name]
 				},
-				action: function({edge, from, to, object, options, settings}) {
+				action: function({edge, from, to, object, options}) {
 					// Import arangoDB database driver
 					const db = require('@arangodb').db;
 					// Open up the edge collection
@@ -282,7 +286,11 @@ class TimeTravelEdgeCollection extends GenericTimeCollection {
 					// Build the current version of the edge
 					let latestEdge = {createdAt: 0};
 					// Expire previous edges
-					let currentEdges = this.documents([object.id]);
+					let currentEdges = db._query(aqlQuery`
+							FOR vertex IN ${edgeCollection}
+							FILTER vertex.id==${object.id} && vertex.expiresAt==8640000000000000
+							RETURN vertex
+						`).toArray();
 					currentEdges.forEach((edge) => {
 						// If the latestEdge was created before the current edge we're looking at
 						if (latestEdge.createdAt < edge.createdAt) {
@@ -292,19 +300,19 @@ class TimeTravelEdgeCollection extends GenericTimeCollection {
 						edgeCollection.update(edge._key, {expiresAt: dateNow});
 					});
 					// Insert the new edge
-					edgeCollection.insert(from + settings.proxy.outboundAppendix, to
-						+ settings.proxy.inboundAppendix, Object.assign(latestEdge, object, {
+					edgeCollection.insert(Object.assign({
+						_from: from,
+						_to: to,
 						createdAt: dateNow,
 						expiresAt: 8640000000000000
-					}), options);
+					}, object), options);
 				},
 				params: {
 					edge: this.name,
-					from: from,
-					to: to,
+					from: from + this.settings.proxy.outboundAppendix,
+					to: to + this.settings.proxy.inboundAppendix,
 					object: object,
-					options: options,
-					settings: this.settings
+					options: options
 				}
 			});
 		} else {
@@ -408,7 +416,11 @@ class TimeTravelEdgeCollection extends GenericTimeCollection {
 					// Establish current date
 					let dateNow = Date.now();
 					// Expire all edges
-					let currentEdges = this.documents([handle]);
+					let currentEdges = db._query(aqlQuery`
+							FOR vertex IN ${edgeCollection}
+							FILTER vertex.id==${handle} && vertex.expiresAt==8640000000000000
+							RETURN vertex
+						`).toArray();
 					currentEdges.forEach((edge) => {
 						edgeCollection.update(edge._key, {expiresAt: dateNow});
 					});
@@ -534,15 +546,20 @@ class TimeTravelEdgeCollection extends GenericTimeCollection {
 			// Open the edge collection
 			let edgeCollection = this.db._collection(this.name);
 			// Fetch the vertex that expired when the new one was created to get the previous document
+			let document = null;
 			try {
-				return this.db._query(aqlQuery`
+				document = this.db._query(aqlQuery`
 					FOR vertex IN ${edgeCollection}
-					FILTER expiresAt == ${revision.createdAt} && id == ${handle}
+					FILTER vertex.expiresAt == ${revision.createdAt} && vertex.id == ${handle}
 					RETURN vertex
 				`).next();
 			} catch (e) {
 				return revision;
 			}
+			if (!document) {
+				return revision;
+			}
+			return document;
 		} else {
 			throw new Error('[TimeTravel] previous received handle that was not found.');
 		}
@@ -575,15 +592,20 @@ class TimeTravelEdgeCollection extends GenericTimeCollection {
 			// Open the edge collection
 			let edgeCollection = this.db._collection(this.name);
 			// Fetch the vertex that was created when the new one was expired to get the next document
+			let document = null;
 			try {
-				return this.db._query(aqlQuery`
+				document = this.db._query(aqlQuery`
 					FOR vertex IN ${edgeCollection}
-					FILTER createdAt == ${revision.expiresAt} && id == ${handle}
+					FILTER vertex.createdAt == ${revision.expiresAt} && vertex.id == ${handle}
 					RETURN vertex
 				`).next();
 			} catch (e) {
 				return revision;
 			}
+			if (!document) {
+				return revision;
+			}
+			return document;
 		} else {
 			throw new Error('[TimeTravel] next received handle that was not found.');
 		}

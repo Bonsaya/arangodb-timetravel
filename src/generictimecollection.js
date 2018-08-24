@@ -58,10 +58,9 @@ class GenericTimeCollection {
 		 * Begin of actual method
 		 */
 		try {
-			// TODO: Check if the return is still caught by the try catch block if the document cant be fetched
-			return db._query(aqlQuery`
+			return this.db._query(aqlQuery`
 				FOR vertex IN ${this.collection}
-				FILTER id==${handle} && expiresAt==8640000000000000
+				FILTER vertex.id==${handle} && vertex.expiresAt==8640000000000000
 				RETURN vertex
 			`).next();
 		} catch (e) {
@@ -104,12 +103,12 @@ class GenericTimeCollection {
 		/**
 		 * Begin of actual method
 		 */
-		let documents = db._query(aqlQuery`
+		let documents = this.db._query(aqlQuery`
 			FOR vertex IN ${this.collection}
-			FILTER id==${handle} && expiresAt==8640000000000000
+			FILTER vertex.id==${handle} && vertex.expiresAt==8640000000000000
 			RETURN vertex
 		`).toArray();
-		return documents.size !== 0;
+		return documents.length !== 0;
 	}
 }
 
