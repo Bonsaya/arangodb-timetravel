@@ -54,7 +54,7 @@ class TimeTravelCollection extends GenericTimeCollection {
 			// We have previous documents and edges, meaning the inbound proxy already exists
 			// And the insert command was used by accident instead of the update command!
 			// So we simply redirect to the update function!
-			this.update(object, options);
+			this.update(object.id, object, options);
 		} else {
 			this.db._executeTransaction({
 				collections: {
@@ -116,10 +116,11 @@ class TimeTravelCollection extends GenericTimeCollection {
 	
 	/**
 	 * Replaces a document in the logical vertex with a new document, ignoring any data in the previous documents
+	 * @param {String} handle The handle of the document
 	 * @param {Object} object The new data of the document
 	 * @param {Object} options The options related to replacing the document
 	 */
-	replace(object, options = {}) {
+	replace(handle, object, options = {}) {
 		/**
 		 * Section that validates parameters
 		 */
@@ -130,13 +131,13 @@ class TimeTravelCollection extends GenericTimeCollection {
 			throw new Error('[TimeTravel] replace received non-object as second parameter (options)');
 		}
 		if (typeof object._key === 'string') {
-			object.id = object._key;
 			delete object._key;
 		}
 		if (typeof object._id === 'string') {
-			object.id = object._id.split('/')[1];
 			delete object._id;
 		}
+		// Slip the handle into the object
+		object = Object.assign(object, {id: handle});
 		if (typeof object.id !== 'string') {
 			throw new Error('[TimeTravel] Attempted to replace document without id, _id or _key value');
 		}
@@ -218,10 +219,11 @@ class TimeTravelCollection extends GenericTimeCollection {
 	
 	/**
 	 * Updates a document inside the logical vertex while respecting previous data of the latest document
+	 * @param {String} handle The handle of the document
 	 * @param {Object} object The new data to overwrite previous data with
 	 * @param {Object} options The options to consider when updating
 	 */
-	update(object, options = {}) {
+	update(handle, object, options = {}) {
 		/**
 		 * Section that validates parameters
 		 */
@@ -232,13 +234,13 @@ class TimeTravelCollection extends GenericTimeCollection {
 			throw new Error('[TimeTravel] update received non-object as third parameter (options)');
 		}
 		if (typeof object._key === 'string') {
-			object.id = object._key;
 			delete object._key;
 		}
 		if (typeof object._id === 'string') {
-			object.id = object._id.split('/')[1];
 			delete object._id;
 		}
+		// Slip the handle into the object
+		object = Object.assign(object, {id: handle});
 		if (typeof object.id !== 'string') {
 			throw new Error('[TimeTravel] Attempted to update document without id, _id or _key value');
 		}
@@ -500,8 +502,8 @@ class TimeTravelCollection extends GenericTimeCollection {
 		 */
 		// We handle each handle seperately so we can rely on a single method for all replace functionality!
 		handles.forEach((handle) => {
-			// We simply redirect to the insert method, as this will expire old entries if they exist and thus "replace" it.
-			this.insert(Object.assign(object, {id: handle}), options);
+			// We simply redirect to the replace method, as this will expire old entries if they exist and thus "replace" it.
+			this.replace(handle, object, options);
 		});
 	}
 	
@@ -536,10 +538,8 @@ class TimeTravelCollection extends GenericTimeCollection {
 			delete document._key;
 			delete document._rev;
 			delete document._id;
-			// Then we can redirect to the insert method, which expires old entries if they exist and thus "replaces"
-			// our document in question. For efficiency's sake, we will only submit the "id" to the new object despite
-			// having deleted all the internal ArangoDB indexes(which would not be passed anyway)
-			this.insert(Object.assign(object, {id: document.id}), options);
+			// Then we can redirect to the replace method
+			this.replace(document.id, object, options);
 		})
 	}
 	
@@ -568,7 +568,7 @@ class TimeTravelCollection extends GenericTimeCollection {
 		// We handle each handle seperately so we can rely on a single method for all update functionality!
 		handles.forEach((handle) => {
 			// We simply redirect to the update method
-			this.update(Object.assign(object, {id: handle}), options);
+			this.update(handle, object, options);
 		});
 	}
 	
