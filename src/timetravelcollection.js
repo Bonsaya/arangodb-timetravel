@@ -833,7 +833,7 @@ class TimeTravelCollection extends GenericTimeCollection {
 		/**
 		 * Begin of actual method
 		 */
-		let edgeCollection = db._collection(this.name + this.settings.timeTravelEdgeAppendix);
+		let edgeCollection = this.db._collection(this.name + this.settings.timeTravelEdgeAppendix);
 		try {
 			return this.db._query(aqlQuery`
 				FOR vertex, edge IN OUTBOUND ${this.name + '/' + handle
