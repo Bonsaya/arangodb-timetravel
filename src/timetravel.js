@@ -10,7 +10,7 @@ const TimeTravelCollection = require('./timetravelcollection');
 const TimeTravelEdgeCollection = require('./timetraveledgecollection');
 
 const Version = "v1.0.0";
-const SettingsCollection = "timetravel_settings__";
+const SettingsCollection = "timetravel_settings__internal";
 
 class TimeTravel {
 	
