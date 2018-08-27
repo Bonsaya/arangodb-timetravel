@@ -235,10 +235,10 @@ class TimeTravelEdgeCollection extends GenericTimeCollection {
 		 * Section that validates parameters
 		 */
 		if (object !== Object(object)) {
-			throw new Error('[TimeTravel] insert received non-object as third parameter (object)');
+			throw new Error('[TimeTravel] insert received non-object as first parameter (object)');
 		}
 		if (options !== Object(options)) {
-			throw new Error('[TimeTravel] insert received non-object as fourth parameter (options)');
+			throw new Error('[TimeTravel] insert received non-object as second parameter (options)');
 		}
 		if (typeof object._key === 'string') {
 			object.id = object._key;
