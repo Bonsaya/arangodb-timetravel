@@ -124,6 +124,9 @@ class TimeTravelCollection extends GenericTimeCollection {
 		/**
 		 * Section that validates parameters
 		 */
+		if (typeof handle !== 'string') {
+			throw new Error('[TimeTravel] replace received non-string as first parameter (handle)');
+		}
 		if (object !== Object(object)) {
 			throw new Error('[TimeTravel] replace received non-object as first parameter (object)');
 		}
@@ -227,6 +230,9 @@ class TimeTravelCollection extends GenericTimeCollection {
 		/**
 		 * Section that validates parameters
 		 */
+		if (typeof handle !== 'string') {
+			throw new Error('[TimeTravel] update received non-string as first parameter (handle)');
+		}
 		if (object !== Object(object)) {
 			throw new Error('[TimeTravel] update received non-object as second parameter (object)');
 		}
