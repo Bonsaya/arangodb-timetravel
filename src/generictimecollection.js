@@ -17,7 +17,7 @@ class GenericTimeCollection {
 	constructor(db, name, settings) {
 		this.db = db;
 		this.name = name;
-		this.collection = db._collection(name);
+		this.collection = this.db._collection(name);
 		this.settings = settings;
 	}
 	
