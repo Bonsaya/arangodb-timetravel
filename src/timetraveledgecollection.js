@@ -664,6 +664,7 @@ class TimeTravelEdgeCollection extends GenericTimeCollection {
 	 * @param handle The id of the edge
 	 * @returns {Array} The edges
 	 */
+	// TODO: Make sure these only return non expired edges?
 	outEdges(handle) {
 		/**
 		 * Section that validates parameters

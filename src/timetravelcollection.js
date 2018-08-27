@@ -58,7 +58,7 @@ class TimeTravelCollection extends GenericTimeCollection {
 		} else {
 			this.db._executeTransaction({
 				collections: {
-					write: [this.name, this.name + this.settings.edgeAppendix]
+					write: [this.name, this.name + this.settings.timeTravelEdgeAppendix]
 				},
 				action: function({doc, edge, object, options, settings}) {
 					// Import arangoDB database driver
@@ -105,7 +105,7 @@ class TimeTravelCollection extends GenericTimeCollection {
 				},
 				params: {
 					doc: this.name,
-					edge: this.name + this.settings.edgeAppendix,
+					edge: this.name + this.settings.timeTravelEdgeAppendix,
 					object: object,
 					options: options,
 					settings: this.settings
@@ -146,7 +146,7 @@ class TimeTravelCollection extends GenericTimeCollection {
 		if (this.exists(object.id)) {
 			this.db._executeTransaction({
 				collections: {
-					write: [this.name, this.name + this.settings.edgeAppendix]
+					write: [this.name, this.name + this.settings.timeTravelEdgeAppendix]
 				},
 				action: function({doc, edge, object, options, settings}) {
 					// Import arangoDB database driver
@@ -205,7 +205,7 @@ class TimeTravelCollection extends GenericTimeCollection {
 				},
 				params: {
 					doc: this.name,
-					edge: this.name + this.settings.edgeAppendix,
+					edge: this.name + this.settings.timeTravelEdgeAppendix,
 					object: object,
 					options: options,
 					settings: this.settings
@@ -249,7 +249,7 @@ class TimeTravelCollection extends GenericTimeCollection {
 		if (this.exists(object.id)) {
 			this.db._executeTransaction({
 				collections: {
-					write: [this.name, this.name + this.settings.edgeAppendix]
+					write: [this.name, this.name + this.settings.timeTravelEdgeAppendix]
 				},
 				action: function({doc, edge, object, options, settings}) {
 					// Import arangoDB database driver
@@ -319,7 +319,7 @@ class TimeTravelCollection extends GenericTimeCollection {
 				},
 				params: {
 					doc: this.name,
-					edge: this.name + this.settings.edgeAppendix,
+					edge: this.name + this.settings.timeTravelEdgeAppendix,
 					object: object,
 					options: options,
 					settings: this.settings
@@ -352,7 +352,7 @@ class TimeTravelCollection extends GenericTimeCollection {
 		if (this.exists(handle)) {
 			this.db._executeTransaction({
 				collections: {
-					write: [this.name, this.name + this.settings.edgeAppendix]
+					write: [this.name, this.name + this.settings.timeTravelEdgeAppendix]
 				},
 				action: function({doc, edge, handle, options, settings}) {
 					// Import arangoDB database driver
@@ -415,7 +415,7 @@ class TimeTravelCollection extends GenericTimeCollection {
 				},
 				params: {
 					doc: this.name,
-					edge: this.name + this.settings.edgeAppendix,
+					edge: this.name + this.settings.timeTravelEdgeAppendix,
 					handle: handle,
 					options: options,
 					settings: this.settings
@@ -621,7 +621,7 @@ class TimeTravelCollection extends GenericTimeCollection {
 		// Let us first check if the handle exists!
 		if (this.exists(handle)) {
 			// Open the edge collection
-			let edgeCollection = this.db._collection(this.name + this.settings.edgeAppendix);
+			let edgeCollection = this.db._collection(this.name + this.settings.timeTravelEdgeAppendix);
 			// Generate the Inbound Proxy Key
 			let inboundProxyKey = this.name + '/' + handle
 				+ this.settings.proxy.inboundAppendix;
@@ -660,7 +660,7 @@ class TimeTravelCollection extends GenericTimeCollection {
 		// Let us first check if the handle exists!
 		if (this.exists(handle)) {
 			// Open the edge collection
-			let edgeCollection = this.db._collection(this.name + this.settings.edgeAppendix);
+			let edgeCollection = this.db._collection(this.name + this.settings.timeTravelEdgeAppendix);
 			// Generate the Inbound Proxy Key
 			let inboundProxyKey = this.name + '/' + handle
 				+ this.settings.proxy.inboundAppendix;
@@ -675,10 +675,6 @@ class TimeTravelCollection extends GenericTimeCollection {
 			} catch (e) {
 				return revision;
 			}
-			if (!document) {
-				return revision;
-			}
-			return document;
 		} else {
 			throw new Error('[TimeTravel] previous received handle that was not found.');
 		}
@@ -709,7 +705,7 @@ class TimeTravelCollection extends GenericTimeCollection {
 		// Let us first check if the handle exists!
 		if (this.exists(handle)) {
 			// Open the edge collection
-			let edgeCollection = this.db._collection(this.name + this.settings.edgeAppendix);
+			let edgeCollection = this.db._collection(this.name + this.settings.timeTravelEdgeAppendix);
 			// Generate the Inbound Proxy Key
 			let inboundProxyKey = this.name + '/' + handle
 				+ this.settings.proxy.inboundAppendix;
@@ -754,7 +750,7 @@ class TimeTravelCollection extends GenericTimeCollection {
 		 * Begin of actual method
 		 */
 			// Open up the edge collection
-		let edgeCollection = this.db._collection(this.name + this.settings.edgeAppendix);
+		let edgeCollection = this.db._collection(this.name + this.settings.timeTravelEdgeAppendix);
 		// Let us store all documents that are found for cleanup later
 		let documents = [];
 		// Do we want the currently active documents?
@@ -804,7 +800,7 @@ class TimeTravelCollection extends GenericTimeCollection {
 		 * Begin of actual method
 		 */
 			// Open up the edge collection
-		let edgeCollection = this.db._collection(this.name + this.settings.edgeAppendix);
+		let edgeCollection = this.db._collection(this.name + this.settings.timeTravelEdgeAppendix);
 		// Let us fetch and store all documents that are found for cleanup later
 		// TODO: These queries dont make sense yet.. what is the use-case? Need to think about them again
 		let documents = this.db._query(aqlQuery`
@@ -831,7 +827,7 @@ class TimeTravelCollection extends GenericTimeCollection {
 		/**
 		 * Begin of actual method
 		 */
-		let edgeCollection = this.db._collection(this.name + this.settings.edgeAppendix);
+		let edgeCollection = db._collection(this.name + this.settings.timeTravelEdgeAppendix);
 		try {
 			return this.db._query(aqlQuery`
 				FOR vertex, edge IN OUTBOUND ${this.name + '/' + handle
