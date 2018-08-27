@@ -185,7 +185,7 @@ class TimeTravel {
 	/**
 	 * Opens a timetravel collection
 	 * @param name The name of the collection
-	 * @returns {TimeTravelCollection|TimeTravelEdgeCollection} The timetravel collection
+	 * @returns {TimeTravelCollection|TimeTravelEdgeCollection|Boolean} The timetravel collection
 	 */
 	collection(name) {
 		// Verify that the timetravel settings collection already exists
@@ -200,7 +200,9 @@ class TimeTravel {
 			return new TimeTravelEdgeCollection(this.db, this.prefixedCollectionName(name
 				+ this.settings.timeTravelPresentAppendix), this.settings);
 		} else {
-			throw new Error(`[TimeTravel] The collection ${name} you attempted to open is not a timetravel collection.`);
+			// TODO: Determine whether returning false rather than that it is not a timetravel collection is better?
+			// throw new Error(`[TimeTravel] The collection ${name} you attempted to open is not a timetravel collection.`);
+			return false;
 		}
 	}
 }
