@@ -58,7 +58,7 @@ class TimeTravelEdgeCollection extends GenericTimeCollection {
 		// Check if the edge already exists
 		if (this.exists(object.id)) {
 			// And redirect to update if it already does
-			this.update(object, options);
+			this.update(object.id, object, options);
 		} else {
 			this.db._executeTransaction({
 				collections: {
@@ -92,27 +92,30 @@ class TimeTravelEdgeCollection extends GenericTimeCollection {
 	
 	/**
 	 * Replaces an edge with a new one, ignoring previous data in the edges
+	 * @param {String} handle The handle of the document
 	 * @param {Object} object The extra data of the edge
 	 * @param {Object} options The options to consider upon replacement
 	 */
-	replace(object, options = {}) {
+	replace(handle, object, options = {}) {
 		/**
 		 * Section that validates parameters
 		 */
+		if (typeof handle !== 'string') {
+			throw new Error('[TimeTravel] replace received non-string as first parameter (handle)');
+		}
 		if (object !== Object(object)) {
-			throw new Error('[TimeTravel] insert received non-object as first parameter (object)');
+			throw new Error('[TimeTravel] insert received non-object as second parameter (object)');
 		}
 		if (options !== Object(options)) {
-			throw new Error('[TimeTravel] insert received non-object as second parameter (options)');
+			throw new Error('[TimeTravel] insert received non-object as third parameter (options)');
 		}
 		if (typeof object._key === 'string') {
-			object.id = object._key;
 			delete object._key;
 		}
 		if (typeof object._id === 'string') {
-			object.id = object._id.split('/')[1];
 			delete object._id;
 		}
+		object = Object.assign(object, {id: handle});
 		if (typeof object.id !== 'string') {
 			throw new Error('[TimeTravel] Attempted to insert edge without id, _id or _key value');
 		}
@@ -191,7 +194,7 @@ class TimeTravelEdgeCollection extends GenericTimeCollection {
 		let documents = this.documents(handles);
 		documents.forEach((document) => {
 			// And redirect each of them to the replace function
-			this.replace(Object.assign(object, {id: document.id}), options);
+			this.replace(document.id, object, options);
 		});
 	}
 	
@@ -221,33 +224,36 @@ class TimeTravelEdgeCollection extends GenericTimeCollection {
 		let documents = this.byExample(example);
 		documents.forEach((document) => {
 			// And redirect each of them to the replace function
-			this.replace(Object.assign(object, {id: document.id}), options);
+			this.replace(document.id, object, options);
 		});
 	}
 	
 	/**
 	 * Updates the edge with the new data, respecting previous data from the edge
+	 * @param {String} handle The handle of the document
 	 * @param {Object} object The extra data to merge with the previous
 	 * @param {Object} options The options to consider upon updating
 	 */
-	update(object, options = {}) {
+	update(handle, object, options = {}) {
 		/**
 		 * Section that validates parameters
 		 */
+		if (typeof handle !== 'string') {
+			throw new Error('[TimeTravel] replace received non-string as first parameter (handle)');
+		}
 		if (object !== Object(object)) {
-			throw new Error('[TimeTravel] insert received non-object as first parameter (object)');
+			throw new Error('[TimeTravel] insert received non-object as second parameter (object)');
 		}
 		if (options !== Object(options)) {
-			throw new Error('[TimeTravel] insert received non-object as second parameter (options)');
+			throw new Error('[TimeTravel] insert received non-object as third parameter (options)');
 		}
 		if (typeof object._key === 'string') {
-			object.id = object._key;
 			delete object._key;
 		}
 		if (typeof object._id === 'string') {
-			object.id = object._id.split('/')[1];
 			delete object._id;
 		}
+		object = Object.assign(object, {id: handle});
 		if (typeof object.id !== 'string') {
 			throw new Error('[TimeTravel] Attempted to insert edge without id, _id or _key value');
 		}
@@ -331,7 +337,7 @@ class TimeTravelEdgeCollection extends GenericTimeCollection {
 		let documents = this.documents(handles);
 		documents.forEach((document) => {
 			// And redirect each of them to the update function
-			this.update(Object.assign(object, {id: document.id}), options);
+			this.update(document.id, object, options);
 		});
 	}
 	
@@ -361,7 +367,7 @@ class TimeTravelEdgeCollection extends GenericTimeCollection {
 		let documents = this.byExample(example);
 		documents.forEach((document) => {
 			// And redirect each of them to the update function
-			this.update(Object.assign(object, {id: document.id}), options);
+			this.update(document.id, object, options);
 		});
 	}
 	
