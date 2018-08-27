@@ -133,9 +133,9 @@ class TimeTravel {
 		const collectionName = this.prefixedCollectionName(name + this.settings.timeTravelPresentAppendix);
 		const outdatedCollectionName = this.prefixedCollectionName(name + this.settings.timeTravelPastAppendix);
 		const edgeCollectionName = this.prefixedCollectionName(name + this.settings.timeTravelPresentAppendix
-			+ this.settings.edgeAppendix);
+			+ this.settings.timeTravelEdgeAppendix);
 		const outdatedEdgeCollectionName = this.prefixedCollectionName(name + this.settings.timeTravelPastAppendix
-			+ this.settings.edgeAppendix);
+			+ this.settings.timeTravelEdgeAppendix);
 		// Ensure they do not exist so that we don't run into any conflicts!
 		if (this.db._collection(collectionName) ||
 			this.db._collection(edgeCollectionName) ||
