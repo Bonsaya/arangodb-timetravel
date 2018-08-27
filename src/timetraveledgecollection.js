@@ -116,12 +116,6 @@ class TimeTravelEdgeCollection extends GenericTimeCollection {
 		if (typeof object.id !== 'string') {
 			throw new Error('[TimeTravel] Attempted to insert edge without id, _id or _key value');
 		}
-		if (typeof object._from !== 'string') {
-			throw new Error('[TimeTravel] Attempted to insert edge without _from value');
-		}
-		if (typeof object._to !== 'string') {
-			throw new Error('[TimeTravel] Attempted to insert edge without _to value');
-		}
 		/**
 		 * Begin of actual method
 		 */
@@ -131,7 +125,7 @@ class TimeTravelEdgeCollection extends GenericTimeCollection {
 				collections: {
 					write: [this.name]
 				},
-				action: function({edge, from, to, object, options}) {
+				action: function({edge, object, options}) {
 					// Import arangoDB database driver
 					const db = require('@arangodb').db;
 					// Open up the edge collection
@@ -139,6 +133,8 @@ class TimeTravelEdgeCollection extends GenericTimeCollection {
 					// Establish current date
 					let dateNow = Date.now();
 					// Expire previous edges
+					let from = undefined;
+					let to = undefined;
 					let currentEdges = db._query(aqlQuery`
 							FOR vertex IN ${edgeCollection}
 							FILTER vertex.id==${object.id} && vertex.expiresAt==8640000000000000
@@ -146,6 +142,8 @@ class TimeTravelEdgeCollection extends GenericTimeCollection {
 						`).toArray();
 					currentEdges.forEach((edge) => {
 						edgeCollection.update(edge._key, {expiresAt: dateNow});
+						from = edge._from;
+						to = edge._to;
 					});
 					// Insert the new edge
 					edgeCollection.insert(Object.assign({
@@ -157,8 +155,6 @@ class TimeTravelEdgeCollection extends GenericTimeCollection {
 				},
 				params: {
 					edge: this.name,
-					from: object._from + this.settings.proxy.outboundAppendix,
-					to: object._to + this.settings.proxy.inboundAppendix,
 					object: object,
 					options: options
 				}
@@ -195,7 +191,7 @@ class TimeTravelEdgeCollection extends GenericTimeCollection {
 		let documents = this.documents(handles);
 		documents.forEach((document) => {
 			// And redirect each of them to the replace function
-			this.replace(Object.assign(object, {id: document.id, _from: document._from, _to: document._to}), options);
+			this.replace(Object.assign(object, {id: document.id}), options);
 		});
 	}
 	
@@ -225,7 +221,7 @@ class TimeTravelEdgeCollection extends GenericTimeCollection {
 		let documents = this.byExample(example);
 		documents.forEach((document) => {
 			// And redirect each of them to the replace function
-			this.replace(Object.assign(object, {id: document.id, _from: document._from, _to: document._to}), options);
+			this.replace(Object.assign(object, {id: document.id}), options);
 		});
 	}
 	
@@ -255,12 +251,6 @@ class TimeTravelEdgeCollection extends GenericTimeCollection {
 		if (typeof object.id !== 'string') {
 			throw new Error('[TimeTravel] Attempted to insert edge without id, _id or _key value');
 		}
-		if (typeof object._from !== 'string') {
-			throw new Error('[TimeTravel] Attempted to insert edge without _from value');
-		}
-		if (typeof object._to !== 'string') {
-			throw new Error('[TimeTravel] Attempted to insert edge without _to value');
-		}
 		/**
 		 * Begin of actual method
 		 */
@@ -270,7 +260,7 @@ class TimeTravelEdgeCollection extends GenericTimeCollection {
 				collections: {
 					write: [this.name]
 				},
-				action: function({edge, from, to, object, options}) {
+				action: function({edge, object, options}) {
 					// Import arangoDB database driver
 					const db = require('@arangodb').db;
 					// Open up the edge collection
@@ -293,18 +283,18 @@ class TimeTravelEdgeCollection extends GenericTimeCollection {
 						}
 						edgeCollection.update(edge._key, {expiresAt: dateNow});
 					});
+					// Remove unimportant data from latest Edge
+					delete latestEdge._key;
+					delete latestEdge._rev;
+					delete latestEdge._id;
 					// Insert the new edge
-					edgeCollection.insert(Object.assign({
-						_from: from,
-						_to: to,
+					edgeCollection.insert(Object.assign(latestEdge, {
 						createdAt: dateNow,
 						expiresAt: 8640000000000000
 					}, object), options);
 				},
 				params: {
 					edge: this.name,
-					from: object._from + this.settings.proxy.outboundAppendix,
-					to: object._to + this.settings.proxy.inboundAppendix,
 					object: object,
 					options: options
 				}
@@ -341,7 +331,7 @@ class TimeTravelEdgeCollection extends GenericTimeCollection {
 		let documents = this.documents(handles);
 		documents.forEach((document) => {
 			// And redirect each of them to the update function
-			this.update(Object.assign(object, {id: document.id, _from: document._from, _to: document._to}), options);
+			this.update(Object.assign(object, {id: document.id}), options);
 		});
 	}
 	
@@ -371,7 +361,7 @@ class TimeTravelEdgeCollection extends GenericTimeCollection {
 		let documents = this.byExample(example);
 		documents.forEach((document) => {
 			// And redirect each of them to the update function
-			this.update(Object.assign(object, {id: document.id, _from: document._from, _to: document._to}), options);
+			this.update(Object.assign(object, {id: document.id}), options);
 		});
 	}
 	
