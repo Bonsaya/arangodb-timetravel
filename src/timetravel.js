@@ -84,12 +84,12 @@ class TimeTravel {
 				name: "TimeTravel Framework Settings",
 				version: Version,
 				settings: {
-					presentAppendix: this.settings.timeTravelPresentAppendix,
-					pastAppendix: this.settings.timeTravelPastAppendix,
-					edgeAppendix: this.settings.timeTravelEdgeAppendix,
+					presentAppendix: settings.timeTravelPresentAppendix,
+					pastAppendix: settings.timeTravelPastAppendix,
+					edgeAppendix: settings.timeTravelEdgeAppendix,
 					proxy: {
-						outboundAppendix: this.settings.proxy.outboundAppendix,
-						inboundAppendix: this.settings.proxy.inboundAppendix
+						outboundAppendix: settings.proxy.outboundAppendix,
+						inboundAppendix: settings.proxy.inboundAppendix
 					}
 				}
 			});
