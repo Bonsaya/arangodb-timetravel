@@ -59,19 +59,19 @@ class TimeTravel {
 		/**
 		 * Section that validates parameters
 		 */
-		if (typeof this.settings.timeTravelPresentAppendix !== 'string') {
+		if (typeof settings.timeTravelPresentAppendix !== 'string') {
 			throw new Error('[TimeTravel] Please provide a timeTravelPresentAppendix in settings.');
 		}
-		if (typeof this.settings.timeTravelPastAppendix !== 'string') {
+		if (typeof settings.timeTravelPastAppendix !== 'string') {
 			throw new Error('[TimeTravel] Please provide a timeTravelPastAppendix in settings.');
 		}
-		if (typeof this.settings.timeTravelEdgeAppendix !== 'string') {
+		if (typeof settings.timeTravelEdgeAppendix !== 'string') {
 			throw new Error('[TimeTravel] Please provide a timeTravelEdgeAppendix in settings.');
 		}
-		if (typeof this.settings.proxy.outboundAppendix !== 'string') {
+		if (typeof settings.proxy.outboundAppendix !== 'string') {
 			throw new Error('[TimeTravel] Please provide a proxy.outboundAppendix in settings.');
 		}
-		if (typeof this.settings.proxy.inboundAppendix !== 'string') {
+		if (typeof settings.proxy.inboundAppendix !== 'string') {
 			throw new Error('[TimeTravel] Please provide a proxy.inboundAppendix in settings.');
 		}
 		/**
