@@ -216,7 +216,7 @@ class TimeTravelCollection extends GenericTimeCollection {
 				}
 			});
 		} else {
-			this.insert(object, options);
+			this.insert(Object.assign(object, {id: handle}), options);
 		}
 	}
 	
@@ -335,7 +335,7 @@ class TimeTravelCollection extends GenericTimeCollection {
 			});
 		} else {
 			// Because if it does not exist, we simply redirect to the insert method
-			this.insert(object, options);
+			this.insert(Object.assign(object, {id: handle}), options);
 		}
 	}
 	
