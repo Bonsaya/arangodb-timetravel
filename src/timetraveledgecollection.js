@@ -717,6 +717,65 @@ class TimeTravelEdgeCollection extends GenericTimeCollection {
 			throw new Error('[TimeTravel] outEdges received a handle that could not be found');
 		}
 	}
+	
+	/**
+	 * Returns the plain document handle
+	 * @param handle The document handle
+	 * @return {String|Boolean} The plain document handle or false on failure
+	 */
+	plainKey(handle) {
+		// Establish splitPosition variable to use for the index
+		let splitPosition = -1;
+		// Check if the inboundAppendix is in the handle
+		if ((splitPosition = handle.indexOf(this.settings.proxy.inboundAppendix)) !== -1) {
+			// And if so, return the plain document handle
+			return handle.slice(0, splitPosition);
+			// Check if the outboundAppendix is in the handle
+		} else if ((splitPosition = handle.indexOf(this.settings.proxy.outboundAppendix)) !== -1) {
+			// And if so, return the plain document handle
+			return handle.slice(0, splitPosition);
+			// If none are in the document handle
+		} else {
+			// We return false for failure
+			return false;
+		}
+	}
+	
+	/**
+	 * Returns the latest condition for use in AQL filters
+	 * @returns {string} The latest condition
+	 */
+	latest() {
+		return 'expiresAt == 8640000000000000';
+	}
+	
+	/**
+	 * Returns the inboundKey for a document handle
+	 * @param {String} handle The document handle
+	 * @returns {String} The inboundKey for the document handle
+	 */
+	inboundKey(handle) {
+		return handle + this.settings.proxy.inboundAppendix;
+	}
+	
+	/**
+	 * Returns the outboundKey for a document handle
+	 * @param {String} handle The document handle
+	 * @returns {String} The outboundKey for the document handle
+	 */
+	outboundKey(handle) {
+		return handle + this.settings.proxy.outboundAppendix;
+	}
+	
+	/**
+	 * Returns the arango collection so you can use it in AQL
+	 * @returns {String} Returns the arangoDB collection
+	 */
+	toString() {
+		// Return the [ArangoCollection ID] as defined in js/common/modules/@arangodb/arango-collection-common.js
+		// For use in aqlQueries!
+		return this.collection.toString();
+	}
 }
 
 module.exports = TimeTravelEdgeCollection;
