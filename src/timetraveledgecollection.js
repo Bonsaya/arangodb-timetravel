@@ -7,6 +7,7 @@
  */
 
 const GenericTimeCollection = require('./generictimecollection');
+const TimeTravel = require('./timetravel');
 
 class TimeTravelEdgeCollection extends GenericTimeCollection {
 	
@@ -18,6 +19,33 @@ class TimeTravelEdgeCollection extends GenericTimeCollection {
 	 */
 	constructor(db, name, settings) {
 		super(db, name, settings);
+		this.timeTravelSettings = false;
+	}
+	
+	/**
+	 * Checks whether the collection is a timetravel collection or not
+	 * @param name The collection name
+	 * @return {Boolean} Whether it is a timetravel collection or not
+	 */
+	isTimeTravelCollection(name) {
+		/**
+		 * Section that validates parameters
+		 */
+		if (typeof name !== 'string') {
+			throw new Error('[TimeTravel] isTimeTravelCollection received non-string as first parameter(name)');
+		}
+		/**
+		 * Begin of actual method
+		 */
+		// Determine whether we've already got the timetravel settings collection opened
+		if (!this.timeTravelSettings) {
+			this.timeTravelSettings = this.db._collection(TimeTravel.timeTravelSettingsCollectionName());
+		}
+		// Fetch the latest collection info so that we can always be sure its accurate
+		let collectionInfo = this.timeTravelSettings.document('__collections__');
+		// And return whether it is a timetravel collection
+		return (collectionInfo.collections.document.includes(name) ||
+			collectionInfo.collections.edge.includes(name));
 	}
 	
 	/**
@@ -60,6 +88,23 @@ class TimeTravelEdgeCollection extends GenericTimeCollection {
 			// And redirect to update if it already does
 			this.update(object.id, object, options);
 		} else {
+			// Establish that by default, we do not append the outbound and inbound prefixes for the transaction
+			let appendOutbound = false;
+			let appendInbound = false;
+			// Define the splitPosition to be -1 and use it to search _from and _to for a collection
+			let splitPosition = -1;
+			// Determine whether _from has a collection before the key, seperated by / character
+			if ((splitPosition = object._from.indexOf('/')) !== -1) {
+				// If we do, let us slice the string off at that location to get the document collection the document exists in
+				let outboundCollection = object._from.slice(0, splitPosition);
+				// And determine if the document collection is part of our timetravel framework (whether to append the outbound prefix)
+				appendOutbound = this.isTimeTravelCollection(outboundCollection);
+			}
+			// Same as above
+			if ((splitPosition = object._to.indexOf('/')) !== -1) {
+				let inboundCollection = object._to.slice(0, splitPosition);
+				appendInbound = this.isTimeTravelCollection(inboundCollection);
+			}
 			this.db._executeTransaction({
 				collections: {
 					write: [this.name]
@@ -81,8 +126,8 @@ class TimeTravelEdgeCollection extends GenericTimeCollection {
 				},
 				params: {
 					edge: this.name,
-					from: object._from + this.settings.proxy.outboundAppendix,
-					to: object._to + this.settings.proxy.inboundAppendix,
+					from: appendOutbound ? object._from + this.settings.proxy.outboundAppendix : object._from,
+					to: appendInbound ? object._to + this.settings.proxy.inboundAppendix : object._to,
 					object: object,
 					options: options
 				}

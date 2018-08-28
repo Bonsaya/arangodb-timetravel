@@ -43,6 +43,14 @@ class TimeTravel {
 	}
 	
 	/**
+	 * Returns the settings collection name
+	 * @returns {string} The settings collection name
+	 */
+	static get timeTravelSettingsCollectionName() {
+		return SettingsCollection;
+	}
+	
+	/**
 	 * Returns the settings collection of the timetravel framework
 	 * @returns {ArangoCollection} The arango timetravel settings collection
 	 */
