@@ -21,7 +21,7 @@ class TimeTravel {
 	 */
 	constructor(db, settings) {
 		this.db = db;
-		this.initializeSettings(settings);
+		this.collectionInfo = this.initializeSettings(settings).document('__collections__');
 		this.settings = settings;
 	}
 	
@@ -77,7 +77,8 @@ class TimeTravel {
 		/**
 		 * Begin of actual method
 		 */
-		if (!this.settingsCollection()) {
+		let timeTravelSettings = false;
+		if (!(timeTravelSettings = this.settingsCollection())) {
 			let settingsCol = this.db._createDocumentCollection(SettingsCollection);
 			settingsCol.insert({
 				_key: "__settings__",
@@ -103,7 +104,8 @@ class TimeTravel {
 			});
 			return settingsCol;
 		} else {
-			let settingsObj = this.settingsCollection().document('__settings__');
+			
+			let settingsObj = timeTravelSettings.document('__settings__');
 			if (settingsObj.presentAppendix !== settings.timeTravelPresentAppendix) {
 				throw new Error(`{TimeTravel] presentAppendix settings do not match. You provided ${settings.timeTravelPresentAppendix} but previously established timetravel with ${settingsObj.presentAppendix}`);
 			}
@@ -143,12 +145,9 @@ class TimeTravel {
 			this.db._collection(outdatedEdgeCollectionName)) {
 			throw new Error('[TimeTravel] The document collection already exists');
 		} else {
-			// Verify that the timetravel settings collection already exists
-			let frameworkSettings = this.settingsCollection();
 			// Insert the new collections as timetravel collections inside the settings
-			let frameworkCollections = frameworkSettings.document('__collections__');
-			frameworkCollections.collections.document.push(name)
-			frameworkSettings.update('__collections__', frameworkCollections, {mergeObjects: false});
+			this.collectionInfo.collections.document.push(name);
+			this.settingsCollection().update('__collections__', this.collectionInfo, {mergeObjects: false});
 			// Create the collections necessary for the timetravel
 			this.db._createDocumentCollection(collectionName);
 			this.db._createEdgeCollection(edgeCollectionName);
@@ -170,12 +169,9 @@ class TimeTravel {
 			this.db._collection(outdatedEdgeCollectionName)) {
 			throw new Error('[TimeTravel] The edge collection already exists');
 		} else {
-			// Verify that the timetravel settings collection already exists
-			let frameworkSettings = this.settingsCollection();
 			// Insert the new collections as timetravel collections inside the settings
-			let frameworkCollections = frameworkSettings.document('__collections__');
-			frameworkCollections.collections.edge.push(name)
-			frameworkSettings.update('__collections__', frameworkCollections, {mergeObjects: false});
+			this.collectionInfo.collections.edge.push(name);
+			this.settingsCollection().update('__collections__', this.collectionInfo, {mergeObjects: false});
 			this.db._createEdgeCollection(edgeCollectionName);
 			this.db._createEdgeCollection(outdatedEdgeCollectionName);
 			return new TimeTravelEdgeCollection(this.db, edgeCollectionName, this.settings);
@@ -188,15 +184,11 @@ class TimeTravel {
 	 * @returns {TimeTravelCollection|TimeTravelEdgeCollection|Boolean} The timetravel collection
 	 */
 	collection(name) {
-		// Verify that the timetravel settings collection already exists
-		let frameworkSettings = this.settingsCollection();
-		// Fetch the existing collections in the timetravel framework
-		let frameworkCollections = frameworkSettings.document('__collections__');
 		// Determine whether the attempted collection is a timetravel collection
-		if (frameworkCollections.collections.document.includes(name)) {
+		if (this.collectionInfo.collections.document.includes(name)) {
 			return new TimeTravelCollection(this.db, this.prefixedCollectionName(name
 				+ this.settings.timeTravelPresentAppendix), this.settings);
-		} else if (frameworkCollections.collections.edge.includes(name)) {
+		} else if (this.collectionInfo.collections.edge.includes(name)) {
 			return new TimeTravelEdgeCollection(this.db, this.prefixedCollectionName(name
 				+ this.settings.timeTravelPresentAppendix), this.settings);
 		} else {
