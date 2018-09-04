@@ -67,14 +67,14 @@ class TimeTravel {
 		/**
 		 * Section that validates parameters
 		 */
-		if (typeof settings.timeTravelPresentAppendix !== 'string') {
-			throw new Error('[TimeTravel] Please provide a timeTravelPresentAppendix in settings.');
+		if (typeof settings.presentAppendix !== 'string') {
+			throw new Error('[TimeTravel] Please provide a presentAppendix in settings.');
 		}
-		if (typeof settings.timeTravelPastAppendix !== 'string') {
-			throw new Error('[TimeTravel] Please provide a timeTravelPastAppendix in settings.');
+		if (typeof settings.pastAppendix !== 'string') {
+			throw new Error('[TimeTravel] Please provide a pastAppendix in settings.');
 		}
-		if (typeof settings.timeTravelEdgeAppendix !== 'string') {
-			throw new Error('[TimeTravel] Please provide a timeTravelEdgeAppendix in settings.');
+		if (typeof settings.edgeAppendix !== 'string') {
+			throw new Error('[TimeTravel] Please provide a edgeAppendix in settings.');
 		}
 		if (typeof settings.proxy.outboundAppendix !== 'string') {
 			throw new Error('[TimeTravel] Please provide a proxy.outboundAppendix in settings.');
@@ -93,9 +93,9 @@ class TimeTravel {
 				name: "TimeTravel Framework Settings",
 				version: Version,
 				settings: {
-					presentAppendix: settings.timeTravelPresentAppendix,
-					pastAppendix: settings.timeTravelPastAppendix,
-					edgeAppendix: settings.timeTravelEdgeAppendix,
+					presentAppendix: settings.presentAppendix,
+					pastAppendix: settings.pastAppendix,
+					edgeAppendix: settings.edgeAppendix,
 					proxy: {
 						outboundAppendix: settings.proxy.outboundAppendix,
 						inboundAppendix: settings.proxy.inboundAppendix
@@ -114,14 +114,14 @@ class TimeTravel {
 		} else {
 			
 			let settingsObj = timeTravelSettings.document('__settings__');
-			if (settingsObj.presentAppendix !== settings.timeTravelPresentAppendix) {
-				throw new Error(`{TimeTravel] presentAppendix settings do not match. You provided ${settings.timeTravelPresentAppendix} but previously established timetravel with ${settingsObj.presentAppendix}`);
+			if (settingsObj.presentAppendix !== settings.presentAppendix) {
+				throw new Error(`{TimeTravel] presentAppendix settings do not match. You provided ${settings.presentAppendix} but previously established timetravel with ${settingsObj.presentAppendix}`);
 			}
-			if (settingsObj.pastAppendix !== settings.timeTravelPastAppendix) {
-				throw new Error(`{TimeTravel] pastAppendix settings do not match. You provided ${settings.timeTravelPastAppendix} but previously established timetravel with ${settingsObj.pastAppendix}`);
+			if (settingsObj.pastAppendix !== settings.pastAppendix) {
+				throw new Error(`{TimeTravel] pastAppendix settings do not match. You provided ${settings.pastAppendix} but previously established timetravel with ${settingsObj.pastAppendix}`);
 			}
-			if (settingsObj.edgeAppendix !== settings.timeTravelEdgeAppendix) {
-				throw new Error(`{TimeTravel] edgeAppendix settings do not match. You provided ${settings.timeTravelEdgeAppendix} but previously established timetravel with ${settingsObj.edgeAppendix}`);
+			if (settingsObj.edgeAppendix !== settings.edgeAppendix) {
+				throw new Error(`{TimeTravel] edgeAppendix settings do not match. You provided ${settings.edgeAppendix} but previously established timetravel with ${settingsObj.edgeAppendix}`);
 			}
 			if (settingsObj.proxy.outboundAppendix !== settings.proxy.outboundAppendix) {
 				throw new Error(`{TimeTravel] proxy.outboundAppendix settings do not match. You provided ${settings.proxy.outboundAppendix} but previously established timetravel with ${settingsObj.proxy.outboundAppendix}`);
@@ -140,12 +140,12 @@ class TimeTravel {
 	 */
 	createDocumentCollection(name) {
 		// Establish all the names of the document and edge collections necessary
-		const collectionName = this.prefixedCollectionName(name + this.settings.timeTravelPresentAppendix);
-		const outdatedCollectionName = this.prefixedCollectionName(name + this.settings.timeTravelPastAppendix);
-		const edgeCollectionName = this.prefixedCollectionName(name + this.settings.timeTravelPresentAppendix
-			+ this.settings.timeTravelEdgeAppendix);
-		const outdatedEdgeCollectionName = this.prefixedCollectionName(name + this.settings.timeTravelPastAppendix
-			+ this.settings.timeTravelEdgeAppendix);
+		const collectionName = this.prefixedCollectionName(name + this.settings.presentAppendix);
+		const outdatedCollectionName = this.prefixedCollectionName(name + this.settings.pastAppendix);
+		const edgeCollectionName = this.prefixedCollectionName(name + this.settings.presentAppendix
+			+ this.settings.edgeAppendix);
+		const outdatedEdgeCollectionName = this.prefixedCollectionName(name + this.settings.pastAppendix
+			+ this.settings.edgeAppendix);
 		// Ensure they do not exist so that we don't run into any conflicts!
 		if (this.db._collection(collectionName) ||
 			this.db._collection(edgeCollectionName) ||
@@ -171,8 +171,8 @@ class TimeTravel {
 	 * @returns {TimeTravelEdgeCollection} The timetravel edge collection
 	 */
 	createEdgeCollection(name) {
-		const edgeCollectionName = this.prefixedCollectionName(name + this.settings.timeTravelPresentAppendix);
-		const outdatedEdgeCollectionName = this.prefixedCollectionName(name + this.settings.timeTravelPastAppendix);
+		const edgeCollectionName = this.prefixedCollectionName(name + this.settings.presentAppendix);
+		const outdatedEdgeCollectionName = this.prefixedCollectionName(name + this.settings.pastAppendix);
 		if (this.db._collection(edgeCollectionName) ||
 			this.db._collection(outdatedEdgeCollectionName)) {
 			throw new Error('[TimeTravel] The edge collection already exists');
@@ -195,10 +195,10 @@ class TimeTravel {
 		// Determine whether the attempted collection is a timetravel collection
 		if (this.collectionInfo.collections.document.includes(name)) {
 			return new TimeTravelCollection(this.db, this.prefixedCollectionName(name
-				+ this.settings.timeTravelPresentAppendix), this.settings);
+				+ this.settings.presentAppendix), this.settings);
 		} else if (this.collectionInfo.collections.edge.includes(name)) {
 			return new TimeTravelEdgeCollection(this.db, this.prefixedCollectionName(name
-				+ this.settings.timeTravelPresentAppendix), this.settings);
+				+ this.settings.presentAppendix), this.settings);
 		} else {
 			// TODO: Determine whether returning false rather than that it is not a timetravel collection is better?
 			// throw new Error(`[TimeTravel] The collection ${name} you attempted to open is not a timetravel collection.`);
