@@ -161,6 +161,19 @@ class TimeTravel {
 			this.db._createEdgeCollection(edgeCollectionName);
 			this.db._createDocumentCollection(outdatedCollectionName);
 			this.db._createEdgeCollection(outdatedEdgeCollectionName);
+			// Add the skiplists
+			let collectionPresent = this.db._collection(collectionName);
+			let edgeCollectionPresent = this.db._collection(edgeCollectionName);
+			let collectionPast = this.db._collection(outdatedCollectionName);
+			let edgeCollectionPast = this.db._collection(outdatedEdgeCollectionName);
+			collectionPresent.ensureIndex({type: "skiplist", fields: ['createdAt', 'expiresAt'], unique: false});
+			collectionPresent.ensureIndex({type: "skiplist", fields: ['id'], unique: true});
+			edgeCollectionPresent.ensureIndex({type: "skiplist", fields: ['createdAt', 'expiresAt'], unique: false});
+			edgeCollectionPresent.ensureIndex({type: "skiplist", fields: ['id'], unique: true});
+			collectionPast.ensureIndex({type: "skiplist", fields: ['createdAt', 'expiresAt'], unique: false});
+			collectionPast.ensureIndex({type: "skiplist", fields: ['id'], unique: true});
+			edgeCollectionPast.ensureIndex({type: "skiplist", fields: ['createdAt', 'expiresAt'], unique: false});
+			edgeCollectionPast.ensureIndex({type: "skiplist", fields: ['id'], unique: true});
 			return new TimeTravelCollection(this.db, collectionName, this.settings);
 		}
 	}
@@ -180,8 +193,16 @@ class TimeTravel {
 			// Insert the new collections as timetravel collections inside the settings
 			this.collectionInfo.collections.edge.push(name);
 			this.settingsCollection().update('__collections__', this.collectionInfo, {mergeObjects: false});
+			// Create the edge collections
 			this.db._createEdgeCollection(edgeCollectionName);
 			this.db._createEdgeCollection(outdatedEdgeCollectionName);
+			// Create the skiplists
+			let edgeCollectionPresent = this.db._collection(edgeCollectionName);
+			let edgeCollectionPast = this.db._collection(outdatedEdgeCollectionName);
+			edgeCollectionPresent.ensureIndex({type: "skiplist", fields: ['createdAt', 'expiresAt'], unique: false});
+			edgeCollectionPresent.ensureIndex({type: "skiplist", fields: ['id'], unique: true});
+			edgeCollectionPast.ensureIndex({type: "skiplist", fields: ['createdAt', 'expiresAt'], unique: false});
+			edgeCollectionPast.ensureIndex({type: "skiplist", fields: ['id'], unique: true});
 			return new TimeTravelEdgeCollection(this.db, edgeCollectionName, this.settings);
 		}
 	}
