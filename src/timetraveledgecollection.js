@@ -40,7 +40,7 @@ class TimeTravelEdgeCollection extends GenericTimeCollection {
 		 */
 		// Determine whether we've already got the timetravel settings collection opened
 		if (!this.timeTravelSettings) {
-			this.timeTravelSettings = this.db._collection(TimeTravelInfo.timeTravelSettingsCollectionName);
+			this.timeTravelSettings = this.db._collection(TimeTravelInfo.settingsCollectionName);
 		}
 		// Fetch the latest collection info so that we can always be sure its accurate
 		let collectionInfo = this.timeTravelSettings.document('__collections__');
