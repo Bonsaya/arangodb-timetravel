@@ -6,12 +6,9 @@
  * ===========================
  */
 
+const TimeTravelInfo = require('./timetravelinfo');
 const TimeTravelCollection = require('./timetravelcollection');
 const TimeTravelEdgeCollection = require('./timetraveledgecollection');
-
-const Version = "v1.0.0";
-const SettingsCollection = "timetravel_settings__internal";
-const MaxTime = 8640000000000000;
 
 class TimeTravel {
 	
@@ -36,35 +33,11 @@ class TimeTravel {
 	}
 	
 	/**
-	 * Returns the current version of the timetravel framework
-	 * @returns {string} The current version string
-	 */
-	static get version() {
-		return Version;
-	}
-	
-	/**
-	 * Returns the settings collection name
-	 * @returns {string} The settings collection name
-	 */
-	static get timeTravelSettingsCollectionName() {
-		return SettingsCollection;
-	}
-	
-	/**
-	 * Returns the maximum time that is possible as timestamp
-	 * @returns {number} The max timestamp
-	 */
-	static get maxTime() {
-		return MaxTime;
-	}
-	
-	/**
 	 * Returns the settings collection of the timetravel framework
 	 * @returns {ArangoCollection} The arango timetravel settings collection
 	 */
 	settingsCollection() {
-		return this.db._collection(SettingsCollection);
+		return this.db._collection(TimeTravelInfo.settingsCollectionName);
 	}
 	
 	/**
@@ -96,7 +69,7 @@ class TimeTravel {
 		 */
 		let timeTravelSettings = false;
 		if (!(timeTravelSettings = this.settingsCollection())) {
-			let settingsCol = this.db._createDocumentCollection(SettingsCollection);
+			let settingsCol = this.db._createDocumentCollection(TimeTravelInfo.settingsCollectionName);
 			settingsCol.insert({
 				_key: "__settings__",
 				name: "TimeTravel Framework Settings",

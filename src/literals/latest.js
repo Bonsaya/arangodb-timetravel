@@ -7,6 +7,6 @@
  */
 
 const TimeTravelLiteral = require('./literal');
-const TimeTravel = require('../timetravel');
+const TimeTravelInfo = require('../timetravelinfo');
 
-module.exports = new TimeTravelLiteral('expiresAt == ' + String(TimeTravel.maxTime));
+module.exports = new TimeTravelLiteral('expiresAt == ' + TimeTravelInfo.maxTime.toString());

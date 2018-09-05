@@ -7,7 +7,7 @@
  */
 
 const GenericTimeCollection = require('./generictimecollection');
-const TimeTravel = require('./timetravel');
+const TimeTravelInfo = require('./timetravelinfo');
 const latest = require('./literals/latest');
 
 class TimeTravelCollection extends GenericTimeCollection {
@@ -109,7 +109,7 @@ class TimeTravelCollection extends GenericTimeCollection {
 					doc: this.name,
 					edge: this.name + this.settings.edgeAppendix,
 					object: object,
-					maxTime: TimeTravel.maxTime,
+					maxTime: TimeTravelInfo.maxTime,
 					options: options,
 					settings: this.settings
 				}
@@ -214,7 +214,7 @@ class TimeTravelCollection extends GenericTimeCollection {
 					doc: this.name,
 					edge: this.name + this.settings.edgeAppendix,
 					object: object,
-					maxTime: TimeTravel.maxTime,
+					maxTime: TimeTravelInfo.maxTime,
 					latest: latest,
 					options: options,
 					settings: this.settings
@@ -334,7 +334,7 @@ class TimeTravelCollection extends GenericTimeCollection {
 					doc: this.name,
 					edge: this.name + this.settings.edgeAppendix,
 					object: object,
-					maxTime: TimeTravel.maxTime,
+					maxTime: TimeTravelInfo.maxTime,
 					latest: latest,
 					options: options,
 					settings: this.settings

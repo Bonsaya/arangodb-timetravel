@@ -7,7 +7,7 @@
  */
 
 const GenericTimeCollection = require('./generictimecollection');
-const TimeTravel = require('./timetravel');
+const TimeTravelInfo = require('./timetravelinfo');
 const latest = require('./literals/latest');
 
 class TimeTravelEdgeCollection extends GenericTimeCollection {
@@ -40,7 +40,7 @@ class TimeTravelEdgeCollection extends GenericTimeCollection {
 		 */
 		// Determine whether we've already got the timetravel settings collection opened
 		if (!this.timeTravelSettings) {
-			this.timeTravelSettings = this.db._collection(TimeTravel.timeTravelSettingsCollectionName);
+			this.timeTravelSettings = this.db._collection(TimeTravelInfo.timeTravelSettingsCollectionName);
 		}
 		// Fetch the latest collection info so that we can always be sure its accurate
 		let collectionInfo = this.timeTravelSettings.document('__collections__');
@@ -130,7 +130,7 @@ class TimeTravelEdgeCollection extends GenericTimeCollection {
 					from: appendOutbound ? object._from + this.settings.proxy.outboundAppendix : object._from,
 					to: appendInbound ? object._to + this.settings.proxy.inboundAppendix : object._to,
 					object: object,
-					maxTime: TimeTravel.maxTime,
+					maxTime: TimeTravelInfo.maxTime,
 					options: options
 				}
 			});
@@ -206,7 +206,7 @@ class TimeTravelEdgeCollection extends GenericTimeCollection {
 				params: {
 					edge: this.name,
 					object: object,
-					maxTime: TimeTravel.maxTime,
+					maxTime: TimeTravelInfo.maxTime,
 					latest: latest,
 					options: options
 				}
@@ -351,7 +351,7 @@ class TimeTravelEdgeCollection extends GenericTimeCollection {
 				params: {
 					edge: this.name,
 					object: object,
-					maxTime: TimeTravel.maxTime,
+					maxTime: TimeTravelInfo.maxTime,
 					latest: latest,
 					options: options
 				}
