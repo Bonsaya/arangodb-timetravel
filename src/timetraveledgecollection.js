@@ -186,9 +186,9 @@ class TimeTravelEdgeCollection extends GenericTimeCollection {
 					let from = undefined;
 					let to = undefined;
 					let currentEdges = db._query(aqlQuery`
-							FOR vertex IN ${edgeCollection}
-							FILTER vertex.id==${object.id} && vertex.${latest}
-							RETURN vertex
+							FOR edge IN ${edgeCollection}
+							FILTER edge.id==${object.id} && edge.${latest}
+							RETURN edge
 						`).toArray();
 					currentEdges.forEach((edge) => {
 						edgeCollection.update(edge._key, {expiresAt: dateNow});
@@ -326,9 +326,9 @@ class TimeTravelEdgeCollection extends GenericTimeCollection {
 					let latestEdge = {createdAt: 0};
 					// Expire previous edges
 					let currentEdges = db._query(aqlQuery`
-							FOR vertex IN ${edgeCollection}
-							FILTER vertex.id==${object.id} && vertex.${latest}
-							RETURN vertex
+							FOR edge IN ${edgeCollection}
+							FILTER edge.id==${object.id} && edge.${latest}
+							RETURN edge
 						`).toArray();
 					currentEdges.forEach((edge) => {
 						// If the latestEdge was created before the current edge we're looking at
@@ -458,9 +458,9 @@ class TimeTravelEdgeCollection extends GenericTimeCollection {
 					let dateNow = Date.now();
 					// Expire all edges
 					let currentEdges = db._query(aqlQuery`
-							FOR vertex IN ${edgeCollection}
-							FILTER vertex.id==${handle} && vertex.${latest}
-							RETURN vertex
+							FOR edge IN ${edgeCollection}
+							FILTER edge.id==${handle} && edge.${latest}
+							RETURN edge
 						`).toArray();
 					currentEdges.forEach((edge) => {
 						edgeCollection.update(edge._key, {expiresAt: dateNow});
@@ -552,9 +552,9 @@ class TimeTravelEdgeCollection extends GenericTimeCollection {
 			let edgeCollection = this.db._collection(this.name);
 			// Return all edges with the handle
 			return this.db._query(aqlQuery`
-				FOR vertex IN ${edgeCollection}
-				FILTER vertex.id == ${handle}
-				RETURN vertex
+				FOR edge IN ${edgeCollection}
+				FILTER edge.id == ${handle}
+				RETURN edge
 			`).toArray();
 		} else {
 			throw new Error('[TimeTravel] history received handle that was not found.');
@@ -591,9 +591,9 @@ class TimeTravelEdgeCollection extends GenericTimeCollection {
 			let document = null;
 			try {
 				document = this.db._query(aqlQuery`
-					FOR vertex IN ${edgeCollection}
-					FILTER vertex.expiresAt == ${revision.createdAt} && vertex.id == ${handle}
-					RETURN vertex
+					FOR edge IN ${edgeCollection}
+					FILTER edge.expiresAt == ${revision.createdAt} && edge.id == ${handle}
+					RETURN edge
 				`).next();
 			} catch (e) {
 				return revision;
@@ -637,9 +637,9 @@ class TimeTravelEdgeCollection extends GenericTimeCollection {
 			let document = null;
 			try {
 				document = this.db._query(aqlQuery`
-					FOR vertex IN ${edgeCollection}
-					FILTER vertex.createdAt == ${revision.expiresAt} && vertex.id == ${handle}
-					RETURN vertex
+					FOR edge IN ${edgeCollection}
+					FILTER edge.createdAt == ${revision.expiresAt} && edge.id == ${handle}
+					RETURN edge
 				`).next();
 			} catch (e) {
 				return revision;
