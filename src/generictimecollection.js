@@ -6,6 +6,8 @@
  * ===========================
  */
 
+const latest = require('./literals/latest');
+
 class GenericTimeCollection {
 	
 	/**
@@ -111,7 +113,7 @@ class GenericTimeCollection {
 		try {
 			return this.db._query(aqlQuery`
 				FOR vertex IN ${this.collection}
-				FILTER vertex.id==${handle} && vertex.expiresAt==8640000000000000
+				FILTER vertex.id==${handle} && vertex.${latest}
 				RETURN vertex
 			`).next();
 		} catch (e) {
@@ -175,7 +177,7 @@ class GenericTimeCollection {
 		 */
 		let documents = this.db._query(aqlQuery`
 			FOR vertex IN ${this.collection}
-			FILTER vertex.id==${handle} && vertex.expiresAt==8640000000000000
+			FILTER vertex.id==${handle} && vertex.${latest}
 			RETURN vertex
 		`).toArray();
 		return documents.length !== 0;

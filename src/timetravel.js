@@ -11,6 +11,7 @@ const TimeTravelEdgeCollection = require('./timetraveledgecollection');
 
 const Version = "v1.0.0";
 const SettingsCollection = "timetravel_settings__internal";
+const MaxTime = 8640000000000000;
 
 class TimeTravel {
 	
@@ -48,6 +49,14 @@ class TimeTravel {
 	 */
 	static get timeTravelSettingsCollectionName() {
 		return SettingsCollection;
+	}
+	
+	/**
+	 * Returns the maximum time that is possible as timestamp
+	 * @returns {number} The max timestamp
+	 */
+	static get maxTime() {
+		return MaxTime;
 	}
 	
 	/**

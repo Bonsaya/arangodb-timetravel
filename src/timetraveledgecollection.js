@@ -8,6 +8,7 @@
 
 const GenericTimeCollection = require('./generictimecollection');
 const TimeTravel = require('./timetravel');
+const latest = require('./literals/latest');
 
 class TimeTravelEdgeCollection extends GenericTimeCollection {
 	
@@ -121,7 +122,7 @@ class TimeTravelEdgeCollection extends GenericTimeCollection {
 						_from: from,
 						_to: to,
 						createdAt: dateNow,
-						expiresAt: 8640000000000000
+						expiresAt: TimeTravel.maxTime()
 					}, object), options);
 				},
 				params: {
@@ -185,7 +186,7 @@ class TimeTravelEdgeCollection extends GenericTimeCollection {
 					let to = undefined;
 					let currentEdges = db._query(aqlQuery`
 							FOR vertex IN ${edgeCollection}
-							FILTER vertex.id==${object.id} && vertex.expiresAt==8640000000000000
+							FILTER vertex.id==${object.id} && vertex.${latest}
 							RETURN vertex
 						`).toArray();
 					currentEdges.forEach((edge) => {
@@ -198,7 +199,7 @@ class TimeTravelEdgeCollection extends GenericTimeCollection {
 						_from: from,
 						_to: to,
 						createdAt: dateNow,
-						expiresAt: 8640000000000000
+						expiresAt: TimeTravel.maxTime()
 					}, object), options);
 				},
 				params: {
@@ -323,7 +324,7 @@ class TimeTravelEdgeCollection extends GenericTimeCollection {
 					// Expire previous edges
 					let currentEdges = db._query(aqlQuery`
 							FOR vertex IN ${edgeCollection}
-							FILTER vertex.id==${object.id} && vertex.expiresAt==8640000000000000
+							FILTER vertex.id==${object.id} && vertex.${latest}
 							RETURN vertex
 						`).toArray();
 					currentEdges.forEach((edge) => {
@@ -341,7 +342,7 @@ class TimeTravelEdgeCollection extends GenericTimeCollection {
 					// Insert the new edge
 					edgeCollection.insert(Object.assign(latestEdge, {
 						createdAt: dateNow,
-						expiresAt: 8640000000000000
+						expiresAt: TimeTravel.maxTime()
 					}, object), options);
 				},
 				params: {
@@ -453,7 +454,7 @@ class TimeTravelEdgeCollection extends GenericTimeCollection {
 					// Expire all edges
 					let currentEdges = db._query(aqlQuery`
 							FOR vertex IN ${edgeCollection}
-							FILTER vertex.id==${handle} && vertex.expiresAt==8640000000000000
+							FILTER vertex.id==${handle} && vertex.${latest}
 							RETURN vertex
 						`).toArray();
 					currentEdges.forEach((edge) => {

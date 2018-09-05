@@ -7,6 +7,8 @@
  */
 
 const GenericTimeCollection = require('./generictimecollection');
+const TimeTravel = require('./timetravel');
+const latest = require('./literals/latest');
 
 class TimeTravelCollection extends GenericTimeCollection {
 	
@@ -75,18 +77,18 @@ class TimeTravelCollection extends GenericTimeCollection {
 					// Insert new document
 					let newDocument = documentCollection.insert(Object.assign(object, {
 						createdAt: dateNow,
-						expiresAt: 8640000000000000
+						expiresAt: TimeTravel.maxTime()
 					}), options);
 					// There are no previous documents or edges, so we need to create the inbound and outbound proxies!
 					let inboundProxy = documentCollection.insert({
 						_key: inboundProxyKey,
 						createdAt: dateNow,
-						expiresAt: 8640000000000000
+						expiresAt: TimeTravel.maxTime()
 					}, options);
 					let outboundProxy = documentCollection.insert({
 						_key: outboundProxyKey,
 						createdAt: dateNow,
-						expiresAt: 8640000000000000
+						expiresAt: TimeTravel.maxTime()
 					}, options);
 					// And now we need to tie them together with the first document
 					// By inserting the edges from the inbound proxy to the document and from the document to the outbound proxy
@@ -94,13 +96,13 @@ class TimeTravelCollection extends GenericTimeCollection {
 						_from: inboundProxy._id,
 						_to: newDocument._id,
 						createdAt: dateNow,
-						expiresAt: 8640000000000000
+						expiresAt: TimeTravel.maxTime()
 					}, options);
 					edgeCollection.insert({
 						_from: newDocument._id,
 						_to: outboundProxy._id,
 						createdAt: dateNow,
-						expiresAt: 8640000000000000
+						expiresAt: TimeTravel.maxTime()
 					}, options);
 				},
 				params: {
@@ -165,7 +167,7 @@ class TimeTravelCollection extends GenericTimeCollection {
 					// Fetch the recent unexpired version of vertex and edge if any
 					let oldDocumentsAndEdges = db._query(aqlQuery`
 						FOR vertex, edge IN OUTBOUND ${inboundProxyKey} ${edgeCollection}
-						FILTER edge.expiresAt == 8640000000000000
+						FILTER edge.${latest}
 						RETURN { 'document': vertex, 'edge': edge }
 					`).toArray();
 					// Establish current Date
@@ -178,7 +180,7 @@ class TimeTravelCollection extends GenericTimeCollection {
 					// Fetch unexpired edges to outbound proxy
 					let oldOutboundEdges = db._query(aqlQuery`
 						FOR v, edge IN INBOUND ${outboundProxyKey} ${edgeCollection}
-						FILTER edge.expiresAt == 8640000000000000
+						FILTER edge.${latest}
 						RETURN edge
 					`).toArray()
 					// Expire old outbound edges
@@ -188,7 +190,7 @@ class TimeTravelCollection extends GenericTimeCollection {
 					// Insert the updated document
 					let newDocument = documentCollection.insert(Object.assign(object, {
 						createdAt: dateNow,
-						expiresAt: 8640000000000000
+						expiresAt: TimeTravel.maxTime()
 					}), options);
 					// We have previous documents and edges, meaning the inbound proxy already exists
 					// So we simply insert the new edge!
@@ -197,14 +199,14 @@ class TimeTravelCollection extends GenericTimeCollection {
 						_from: inboundProxyKey,
 						_to: newDocument._id,
 						createdAt: dateNow,
-						expiresAt: 8640000000000000
+						expiresAt: TimeTravel.maxTime()
 					}, options);
 					// Outbound
 					edgeCollection.insert({
 						_from: newDocument._id,
 						_to: outboundProxyKey,
 						createdAt: dateNow,
-						expiresAt: 8640000000000000
+						expiresAt: TimeTravel.maxTime()
 					}, options);
 				},
 				params: {
@@ -272,7 +274,7 @@ class TimeTravelCollection extends GenericTimeCollection {
 					// Fetch the recent unexpired version of vertex and edge if any
 					let oldDocumentsAndEdges = db._query(aqlQuery`
 							FOR vertex, edge IN OUTBOUND ${inboundProxyKey} ${edgeCollection}
-							FILTER edge.expiresAt == 8640000000000000
+							FILTER edge.${latest}
 							RETURN { "document": vertex, "edge": edge }
 						`).toArray();
 					// Establish current Date
@@ -292,7 +294,7 @@ class TimeTravelCollection extends GenericTimeCollection {
 					// Fetch unexpired edges to outbound proxy
 					let oldOutboundEdges = db._query(aqlQuery`
 						FOR v, edge IN INBOUND ${outboundProxyKey} ${edgeCollection}
-						FILTER edge.expiresAt == 8640000000000000
+						FILTER edge.${latest}
 						RETURN edge
 					`).toArray()
 					// Expire old outbound edges
@@ -306,7 +308,7 @@ class TimeTravelCollection extends GenericTimeCollection {
 					// Insert the updated document
 					let newDocument = documentCollection.insert(Object.assign(document, object, {
 						createdAt: dateNow,
-						expiresAt: 8640000000000000
+						expiresAt: TimeTravel.maxTime()
 					}), options);
 					// We have previous documents and edges, meaning the inbound proxy already exists
 					// So we simply insert the new edge!
@@ -315,14 +317,14 @@ class TimeTravelCollection extends GenericTimeCollection {
 						_from: inboundProxyKey,
 						_to: newDocument._id,
 						createdAt: dateNow,
-						expiresAt: 8640000000000000
+						expiresAt: TimeTravel.maxTime()
 					}, options);
 					// Outbound
 					edgeCollection.insert({
 						_from: newDocument._id,
 						_to: outboundProxyKey,
 						createdAt: dateNow,
-						expiresAt: 8640000000000000
+						expiresAt: TimeTravel.maxTime()
 					}, options);
 				},
 				params: {
@@ -375,7 +377,7 @@ class TimeTravelCollection extends GenericTimeCollection {
 					// Fetch the recent unexpired vertex and the edge to it
 					let oldDocumentsAndEdges = db._query(aqlQuery`
 					FOR vertex, edge IN OUTBOUND ${inboundProxyKey} ${edgeCollection}
-					FILTER edge.expiresAt == 8640000000000000
+					FILTER edge.${latest}
 					RETURN { 'document': vertex, 'edge': edge }
 				`).toArray();
 					// Establish current Date
@@ -388,7 +390,7 @@ class TimeTravelCollection extends GenericTimeCollection {
 					// Fetch unexpired edges to outbound proxy
 					let oldOutboundEdges = db._query(aqlQuery`
 						FOR v, edge IN INBOUND ${outboundProxyKey} ${edgeCollection}
-						FILTER edge.expiresAt == 8640000000000000
+						FILTER edge.${latest}
 						RETURN edge
 					`).toArray()
 					// Expire old outbound edges
@@ -400,7 +402,7 @@ class TimeTravelCollection extends GenericTimeCollection {
 					// Fetch all the edges to the inbound proxy
 					let inboundEdges = db._query(aqlQuery`
 					FOR v, edge IN INBOUND ${inboundProxyKey} ${edgeCollection}
-					FILTER edge.expiresAt == 8640000000000000
+					FILTER edge.${latest}
 					RETURN edge
 				`).toArray()
 					// Expire all the edges to the inbound proxy
@@ -410,7 +412,7 @@ class TimeTravelCollection extends GenericTimeCollection {
 					// Fetch all the edges to the outbound proxy
 					let outboundEdges = db._query(aqlQuery`
 					FOR v, edge IN OUTBOUND ${outboundProxyKey} ${edgeCollection}
-					FILTER edge.expiresAt == 8640000000000000
+					FILTER edge.${latest}
 					RETURN edge
 				`).toArray()
 					// Expire all the edges to the outbound proxy
@@ -838,7 +840,7 @@ class TimeTravelCollection extends GenericTimeCollection {
 			return this.db._query(aqlQuery`
 				FOR vertex, edge IN OUTBOUND ${this.name + '/' + handle
 			+ this.settings.proxy.inboundAppendix} ${edgeCollection}
-				FILTER vertex.expiresAt == 8640000000000000
+				FILTER vertex.${latest}
 				RETURN vertex
 			`).next();
 		} catch (e) {
@@ -919,7 +921,7 @@ class TimeTravelCollection extends GenericTimeCollection {
 	 * @returns {string} The latest condition
 	 */
 	latest() {
-		return 'expiresAt == 8640000000000000';
+		return latest.toAQL();
 	}
 	
 	/**
