@@ -166,15 +166,11 @@ class TimeTravel {
 			this.collectionInfo.collections.document.push(name);
 			this.settingsCollection().update('__collections__', this.collectionInfo, {mergeObjects: false});
 			// Create the collections necessary for the timetravel
-			this.db._createDocumentCollection(collectionName);
-			this.db._createEdgeCollection(edgeCollectionName);
-			this.db._createDocumentCollection(outdatedCollectionName);
-			this.db._createEdgeCollection(outdatedEdgeCollectionName);
+			let collectionPresent = this.db._createDocumentCollection(collectionName);
+			let edgeCollectionPresent = this.db._createEdgeCollection(edgeCollectionName);
+			let collectionPast = this.db._createDocumentCollection(outdatedCollectionName);
+			let edgeCollectionPast = this.db._createEdgeCollection(outdatedEdgeCollectionName);
 			// Add the skiplists
-			let collectionPresent = this.db._collection(collectionName);
-			let edgeCollectionPresent = this.db._collection(edgeCollectionName);
-			let collectionPast = this.db._collection(outdatedCollectionName);
-			let edgeCollectionPast = this.db._collection(outdatedEdgeCollectionName);
 			collectionPresent.ensureIndex({type: "skiplist", fields: ['createdAt', 'expiresAt'], unique: false});
 			collectionPresent.ensureIndex({type: "skiplist", fields: ['id'], unique: true});
 			edgeCollectionPresent.ensureIndex({type: "skiplist", fields: ['createdAt', 'expiresAt'], unique: false});
@@ -203,11 +199,9 @@ class TimeTravel {
 			this.collectionInfo.collections.edge.push(name);
 			this.settingsCollection().update('__collections__', this.collectionInfo, {mergeObjects: false});
 			// Create the edge collections
-			this.db._createEdgeCollection(edgeCollectionName);
-			this.db._createEdgeCollection(outdatedEdgeCollectionName);
+			let edgeCollectionPresent = this.db._createEdgeCollection(edgeCollectionName);
+			let edgeCollectionPast = this.db._createEdgeCollection(outdatedEdgeCollectionName);
 			// Create the skiplists
-			let edgeCollectionPresent = this.db._collection(edgeCollectionName);
-			let edgeCollectionPast = this.db._collection(outdatedEdgeCollectionName);
 			edgeCollectionPresent.ensureIndex({type: "skiplist", fields: ['createdAt', 'expiresAt'], unique: false});
 			edgeCollectionPresent.ensureIndex({type: "skiplist", fields: ['id'], unique: true});
 			edgeCollectionPast.ensureIndex({type: "skiplist", fields: ['createdAt', 'expiresAt'], unique: false});
