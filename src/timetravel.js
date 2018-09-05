@@ -73,7 +73,7 @@ class TimeTravel {
 			settingsCol.insert({
 				_key: "__settings__",
 				name: "TimeTravel Framework Settings",
-				version: Version,
+				version: TimeTravelInfo.version,
 				settings: {
 					presentAppendix: settings.presentAppendix,
 					pastAppendix: settings.pastAppendix,
