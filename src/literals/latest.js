@@ -9,4 +9,4 @@
 const TimeTravelLiteral = require('./literal');
 const TimeTravel = require('../timetravel');
 
-module.exports = new TimeTravelLiteral('expiresAt == ' + TimeTravel.maxTime.toString());
+module.exports = new TimeTravelLiteral('expiresAt == ' + TimeTravel.maxTime);
