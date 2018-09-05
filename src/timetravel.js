@@ -144,14 +144,14 @@ class TimeTravel {
 			let collectionPast = this.db._createDocumentCollection(outdatedCollectionName);
 			let edgeCollectionPast = this.db._createEdgeCollection(outdatedEdgeCollectionName);
 			// Add the skiplists
-			collectionPresent.ensureIndex({type: "skiplist", fields: ['createdAt', 'expiresAt', 'id'], unique: false});
+			collectionPresent.ensureIndex({type: "skiplist", fields: ['id', 'expiresAt', 'createdAt'], unique: false});
 			edgeCollectionPresent.ensureIndex({
 				type: "skiplist",
-				fields: ['createdAt', 'expiresAt', 'id'],
+				fields: ['id', 'expiresAt', 'createdAt'],
 				unique: false
 			});
-			collectionPast.ensureIndex({type: "skiplist", fields: ['createdAt', 'expiresAt', 'id'], unique: false});
-			edgeCollectionPast.ensureIndex({type: "skiplist", fields: ['createdAt', 'expiresAt', 'id'], unique: false});
+			collectionPast.ensureIndex({type: "skiplist", fields: ['id', 'expiresAt', 'createdAt'], unique: false});
+			edgeCollectionPast.ensureIndex({type: "skiplist", fields: ['id', 'expiresAt', 'createdAt'], unique: false});
 			return new TimeTravelCollection(this.db, collectionName, this.settings);
 		}
 	}
@@ -177,10 +177,10 @@ class TimeTravel {
 			// Create the skiplists
 			edgeCollectionPresent.ensureIndex({
 				type: "skiplist",
-				fields: ['createdAt', 'expiresAt', 'id'],
+				fields: ['id', 'expiresAt', 'createdAt'],
 				unique: false
 			});
-			edgeCollectionPast.ensureIndex({type: "skiplist", fields: ['createdAt', 'expiresAt', 'id'], unique: false});
+			edgeCollectionPast.ensureIndex({type: "skiplist", fields: ['id', 'expiresAt', 'createdAt'], unique: false});
 			return new TimeTravelEdgeCollection(this.db, edgeCollectionName, this.settings);
 		}
 	}
