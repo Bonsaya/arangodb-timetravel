@@ -95,7 +95,7 @@ class TimeTravel {
 			return settingsCol;
 		} else {
 			
-			let settingsObj = timeTravelSettings.document('__settings__');
+			let settingsObj = timeTravelSettings.document('__settings__').settings;
 			if (settingsObj.presentAppendix !== settings.presentAppendix) {
 				throw new Error(`{TimeTravel] presentAppendix settings do not match. You provided ${settings.presentAppendix} but previously established timetravel with ${settingsObj.presentAppendix}`);
 			}
