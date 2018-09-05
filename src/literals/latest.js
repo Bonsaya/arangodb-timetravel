@@ -7,5 +7,6 @@
  */
 
 const TimeTravelLiteral = require('./literal');
+const TimeTravel = require('../timetravel');
 
-module.exports = new TimeTravelLiteral('expiresAt == 8640000000000000');
+module.exports = new TimeTravelLiteral('expiresAt == ' + TimeTravel.maxTime().toString());
