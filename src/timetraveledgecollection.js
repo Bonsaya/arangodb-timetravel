@@ -110,7 +110,7 @@ class TimeTravelEdgeCollection extends GenericTimeCollection {
 				collections: {
 					write: [this.name]
 				},
-				action: function({edge, from, to, object, options}) {
+				action: function({edge, from, to, object, maxTime, options}) {
 					// Import arangoDB database driver
 					const db = require('@arangodb').db;
 					// Open up the edge collection
@@ -122,7 +122,7 @@ class TimeTravelEdgeCollection extends GenericTimeCollection {
 						_from: from,
 						_to: to,
 						createdAt: dateNow,
-						expiresAt: TimeTravel.maxTime
+						expiresAt: maxTime,
 					}, object), options);
 				},
 				params: {
@@ -130,6 +130,7 @@ class TimeTravelEdgeCollection extends GenericTimeCollection {
 					from: appendOutbound ? object._from + this.settings.proxy.outboundAppendix : object._from,
 					to: appendInbound ? object._to + this.settings.proxy.inboundAppendix : object._to,
 					object: object,
+					maxTime: TimeTravel.maxTime,
 					options: options
 				}
 			});
@@ -174,7 +175,7 @@ class TimeTravelEdgeCollection extends GenericTimeCollection {
 				collections: {
 					write: [this.name]
 				},
-				action: function({edge, object, options}) {
+				action: function({edge, object, maxTime, latest, options}) {
 					// Import arangoDB database driver
 					const db = require('@arangodb').db;
 					// Open up the edge collection
@@ -199,12 +200,14 @@ class TimeTravelEdgeCollection extends GenericTimeCollection {
 						_from: from,
 						_to: to,
 						createdAt: dateNow,
-						expiresAt: TimeTravel.maxTime
+						expiresAt: maxTime,
 					}, object), options);
 				},
 				params: {
 					edge: this.name,
 					object: object,
+					maxTime: TimeTravel.maxTime,
+					latest: latest,
 					options: options
 				}
 			});
@@ -312,7 +315,7 @@ class TimeTravelEdgeCollection extends GenericTimeCollection {
 				collections: {
 					write: [this.name]
 				},
-				action: function({edge, object, options}) {
+				action: function({edge, object, maxTime, latest, options}) {
 					// Import arangoDB database driver
 					const db = require('@arangodb').db;
 					// Open up the edge collection
@@ -342,12 +345,14 @@ class TimeTravelEdgeCollection extends GenericTimeCollection {
 					// Insert the new edge
 					edgeCollection.insert(Object.assign(latestEdge, {
 						createdAt: dateNow,
-						expiresAt: TimeTravel.maxTime
+						expiresAt: maxTime,
 					}, object), options);
 				},
 				params: {
 					edge: this.name,
 					object: object,
+					maxTime: TimeTravel.maxTime,
+					latest: latest,
 					options: options
 				}
 			});
@@ -444,7 +449,7 @@ class TimeTravelEdgeCollection extends GenericTimeCollection {
 				collections: {
 					write: [this.name]
 				},
-				action: function({edge, handle, options}) {
+				action: function({edge, handle, latest, options}) {
 					// Import arangoDB database driver
 					const db = require('@arangodb').db;
 					// Open up the edge collection
@@ -464,6 +469,7 @@ class TimeTravelEdgeCollection extends GenericTimeCollection {
 				params: {
 					edge: this.name,
 					handle: handle,
+					latest: latest,
 					options: options
 				}
 			});
