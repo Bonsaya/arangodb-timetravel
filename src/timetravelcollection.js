@@ -77,18 +77,18 @@ class TimeTravelCollection extends GenericTimeCollection {
 					// Insert new document
 					let newDocument = documentCollection.insert(Object.assign(object, {
 						createdAt: dateNow,
-						expiresAt: TimeTravel.maxTime()
+						expiresAt: TimeTravel.maxTime
 					}), options);
 					// There are no previous documents or edges, so we need to create the inbound and outbound proxies!
 					let inboundProxy = documentCollection.insert({
 						_key: inboundProxyKey,
 						createdAt: dateNow,
-						expiresAt: TimeTravel.maxTime()
+						expiresAt: TimeTravel.maxTime
 					}, options);
 					let outboundProxy = documentCollection.insert({
 						_key: outboundProxyKey,
 						createdAt: dateNow,
-						expiresAt: TimeTravel.maxTime()
+						expiresAt: TimeTravel.maxTime
 					}, options);
 					// And now we need to tie them together with the first document
 					// By inserting the edges from the inbound proxy to the document and from the document to the outbound proxy
@@ -96,13 +96,13 @@ class TimeTravelCollection extends GenericTimeCollection {
 						_from: inboundProxy._id,
 						_to: newDocument._id,
 						createdAt: dateNow,
-						expiresAt: TimeTravel.maxTime()
+						expiresAt: TimeTravel.maxTime
 					}, options);
 					edgeCollection.insert({
 						_from: newDocument._id,
 						_to: outboundProxy._id,
 						createdAt: dateNow,
-						expiresAt: TimeTravel.maxTime()
+						expiresAt: TimeTravel.maxTime
 					}, options);
 				},
 				params: {
@@ -190,7 +190,7 @@ class TimeTravelCollection extends GenericTimeCollection {
 					// Insert the updated document
 					let newDocument = documentCollection.insert(Object.assign(object, {
 						createdAt: dateNow,
-						expiresAt: TimeTravel.maxTime()
+						expiresAt: TimeTravel.maxTime
 					}), options);
 					// We have previous documents and edges, meaning the inbound proxy already exists
 					// So we simply insert the new edge!
@@ -199,14 +199,14 @@ class TimeTravelCollection extends GenericTimeCollection {
 						_from: inboundProxyKey,
 						_to: newDocument._id,
 						createdAt: dateNow,
-						expiresAt: TimeTravel.maxTime()
+						expiresAt: TimeTravel.maxTime
 					}, options);
 					// Outbound
 					edgeCollection.insert({
 						_from: newDocument._id,
 						_to: outboundProxyKey,
 						createdAt: dateNow,
-						expiresAt: TimeTravel.maxTime()
+						expiresAt: TimeTravel.maxTime
 					}, options);
 				},
 				params: {
@@ -308,7 +308,7 @@ class TimeTravelCollection extends GenericTimeCollection {
 					// Insert the updated document
 					let newDocument = documentCollection.insert(Object.assign(document, object, {
 						createdAt: dateNow,
-						expiresAt: TimeTravel.maxTime()
+						expiresAt: TimeTravel.maxTime
 					}), options);
 					// We have previous documents and edges, meaning the inbound proxy already exists
 					// So we simply insert the new edge!
@@ -317,14 +317,14 @@ class TimeTravelCollection extends GenericTimeCollection {
 						_from: inboundProxyKey,
 						_to: newDocument._id,
 						createdAt: dateNow,
-						expiresAt: TimeTravel.maxTime()
+						expiresAt: TimeTravel.maxTime
 					}, options);
 					// Outbound
 					edgeCollection.insert({
 						_from: newDocument._id,
 						_to: outboundProxyKey,
 						createdAt: dateNow,
-						expiresAt: TimeTravel.maxTime()
+						expiresAt: TimeTravel.maxTime
 					}, options);
 				},
 				params: {

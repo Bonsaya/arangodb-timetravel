@@ -40,7 +40,7 @@ class TimeTravelEdgeCollection extends GenericTimeCollection {
 		 */
 		// Determine whether we've already got the timetravel settings collection opened
 		if (!this.timeTravelSettings) {
-			this.timeTravelSettings = this.db._collection(TimeTravel.timeTravelSettingsCollectionName());
+			this.timeTravelSettings = this.db._collection(TimeTravel.timeTravelSettingsCollectionName);
 		}
 		// Fetch the latest collection info so that we can always be sure its accurate
 		let collectionInfo = this.timeTravelSettings.document('__collections__');
@@ -122,7 +122,7 @@ class TimeTravelEdgeCollection extends GenericTimeCollection {
 						_from: from,
 						_to: to,
 						createdAt: dateNow,
-						expiresAt: TimeTravel.maxTime()
+						expiresAt: TimeTravel.maxTime
 					}, object), options);
 				},
 				params: {
@@ -199,7 +199,7 @@ class TimeTravelEdgeCollection extends GenericTimeCollection {
 						_from: from,
 						_to: to,
 						createdAt: dateNow,
-						expiresAt: TimeTravel.maxTime()
+						expiresAt: TimeTravel.maxTime
 					}, object), options);
 				},
 				params: {
@@ -342,7 +342,7 @@ class TimeTravelEdgeCollection extends GenericTimeCollection {
 					// Insert the new edge
 					edgeCollection.insert(Object.assign(latestEdge, {
 						createdAt: dateNow,
-						expiresAt: TimeTravel.maxTime()
+						expiresAt: TimeTravel.maxTime
 					}, object), options);
 				},
 				params: {
