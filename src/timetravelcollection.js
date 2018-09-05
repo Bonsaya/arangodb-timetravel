@@ -637,7 +637,7 @@ class TimeTravelCollection extends GenericTimeCollection {
 			// Return all edges and vertices related to that inboundProxy
 			return this.db._query(aqlQuery`
 				FOR vertex, edge IN OUTBOUND ${inboundProxyKey} ${edgeCollection}
-				RETURN { 'document': vertex, 'edge': edge }
+				RETURN vertex
 			`).toArray();
 		} else {
 			throw new Error('[TimeTravel] history received handle that was not found.');
