@@ -547,11 +547,6 @@ class TimeTravelCollection extends GenericTimeCollection {
 		let documents = this.byExample(example).toArray();
 		// Then we need to replace each one with the new object!
 		documents.forEach((document) => {
-			// We delete all the internal keys of ArangoDB, as we do not use them as indexes
-			// And the insert method would use them to replace the "id" field, which we use as our real index
-			delete document._key;
-			delete document._rev;
-			delete document._id;
 			// Then we can redirect to the replace method
 			this.replace(document.id, object, options);
 		})
