@@ -758,22 +758,25 @@ class TimeTravelCollection extends GenericTimeCollection {
 		/**
 		 * Begin of actual method
 		 */
-			// Open up the edge collection
+			// Open the edge collection
 		let edgeCollection = this.db._collection(this.name + this.settings.edgeAppendix);
+		// Generate the Inbound Proxy Key
+		let inboundProxyKey = this.name + '/' + handle
+			+ this.settings.proxy.inboundAppendix;
 		// Let us store all documents that are found for cleanup later
 		let documents = [];
 		// Do we want the currently active documents?
 		if (excludeCurrent) {
 			// If not, we populate the documents with all documents that were valid until the dateOfInterest but not beyond
 			documents = this.db._query(aqlQuery`
-				FOR vertex IN ${edgeCollection}
+				FOR vertex IN OUTBOUND ${inboundProxyKey} ${edgeCollection}
 				FILTER vertex.id==${handle} && vertex.createdAt < ${dateOfInterest} && vertex.expiresAt >= ${dateOfInterest}
 				RETURN vertex
 			`).toArray();
 		} else {
 			// Otherwise we populate the documents with all documents, even still valid ones beyond the date of interest
 			documents = this.db._query(aqlQuery`
-				FOR vertex IN ${edgeCollection}
+				FOR vertex IN OUTBOUND ${inboundProxyKey} ${edgeCollection}
 				FILTER vertex.id==${handle} && vertex.createdAt <= ${dateOfInterest} && vertex.expiresAt > ${dateOfInterest}
 				RETURN vertex
 			`).toArray();
@@ -808,12 +811,15 @@ class TimeTravelCollection extends GenericTimeCollection {
 		/**
 		 * Begin of actual method
 		 */
-			// Open up the edge collection
+			// Open the edge collection
 		let edgeCollection = this.db._collection(this.name + this.settings.edgeAppendix);
+		// Generate the Inbound Proxy Key
+		let inboundProxyKey = this.name + '/' + handle
+			+ this.settings.proxy.inboundAppendix;
 		// Let us fetch and store all documents that are found for cleanup later
 		// TODO: These queries dont make sense yet.. what is the use-case? Need to think about them again
 		let documents = this.db._query(aqlQuery`
-				FOR vertex IN ${edgeCollection}
+				FOR vertex IN OUTBOUND ${inboundProxyKey} ${edgeCollection}
 				FILTER vertex.id==${handle} && vertex.createdAt <= ${dateRangeMin} && vertex.expiresAt > ${dateRangeMax}
 				RETURN vertex
 			`).toArray();
