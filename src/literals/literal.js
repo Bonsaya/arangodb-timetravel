@@ -16,8 +16,7 @@ class TimeTravelLiteral {
 		/**
 		 * Section validating parameters
 		 */
-		if (typeof value
-			!== 'string') {
+		if (typeof value !== 'string') {
 			throw new Error('[TimeTravel] Attempted to create a literal without string value');
 		}
 		/**
