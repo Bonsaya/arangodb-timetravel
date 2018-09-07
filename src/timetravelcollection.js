@@ -941,7 +941,7 @@ class TimeTravelCollection extends GenericTimeCollection {
 	 * @returns {String} The inboundKey for the document handle
 	 */
 	inboundKey(handle) {
-		return handle + this.settings.proxy.inboundAppendix;
+		return this.name + '/' + handle + this.settings.proxy.inboundAppendix;
 	}
 	
 	/**
@@ -950,7 +950,7 @@ class TimeTravelCollection extends GenericTimeCollection {
 	 * @returns {String} The outboundKey for the document handle
 	 */
 	outboundKey(handle) {
-		return handle + this.settings.proxy.outboundAppendix;
+		return this.name + '/' + handle + this.settings.proxy.outboundAppendix;
 	}
 	
 	/**
