@@ -42,7 +42,11 @@ class TimeTravelCollection extends GenericTimeCollection {
 			delete object._key;
 		}
 		if (typeof object._id === 'string') {
-			object.id = object._id.split('/')[1];
+			let key = object._id.split('/')[1];
+			if (typeof object.id === 'string' && object.id !== key) {
+				throw new Error('[TimeTravel] Attempted to insert edge without consistent _key and _id values!');
+			}
+			object.id = key;
 			delete object._id;
 		}
 		if (typeof object.id !== 'string') {
