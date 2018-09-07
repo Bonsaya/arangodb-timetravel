@@ -660,7 +660,7 @@ class TimeTravelEdgeCollection extends GenericTimeCollection {
 	/**
 	 * Returns all edges of the handle
 	 * @param handle The id of the edges
-	 * @returns {Array} The edges
+	 * @returns {Array} The vertices and edges
 	 */
 	edges(handle) {
 		/**
@@ -673,16 +673,16 @@ class TimeTravelEdgeCollection extends GenericTimeCollection {
 		 * Begin of actual method
 		 */
 		return this.db._query(aqlQuery`
-		FOR edge IN ANY ${handle} ${this.collection}
+		FOR vertex, edge IN ANY ${handle} ${this.collection}
 		FILTER edge.${latest}
-		RETURN edge
+		RETURN {'vertex': vertex, 'edge': edge }
 		`).toArray();
 	}
 	
 	/**
 	 * Returns all inbound edges of the handle
 	 * @param handle The id of the edge
-	 * @returns {Array} The inbound edges
+	 * @returns {Array} The vertices and edges
 	 */
 	inEdges(handle) {
 		/**
@@ -695,16 +695,16 @@ class TimeTravelEdgeCollection extends GenericTimeCollection {
 		 * Begin of actual method
 		 */
 		return this.db._query(aqlQuery`
-		FOR edge IN OUTBOUND ${handle} ${this.collection}
+		FOR vertex, edge IN OUTBOUND ${handle} ${this.collection}
 		FILTER edge.${latest}
-		RETURN edge
+		RETURN {'vertex': vertex, 'edge': edge }
 		`).toArray();
 	}
 	
 	/**
 	 * Returns all outbound edges of the handle
 	 * @param handle The id of the edge
-	 * @returns {Array} The edges
+	 * @returns {Array} The vertices and edges
 	 */
 	outEdges(handle) {
 		/**
@@ -717,9 +717,9 @@ class TimeTravelEdgeCollection extends GenericTimeCollection {
 		 * Begin of actual method
 		 */
 		return this.db._query(aqlQuery`
-		FOR edge IN INBOUND ${handle} ${this.collection}
+		FOR vertex, edge IN INBOUND ${handle} ${this.collection}
 		FILTER edge.${latest}
-		RETURN edge
+		RETURN {'vertex': vertex, 'edge': edge }
 		`).toArray();
 	}
 	
