@@ -834,9 +834,10 @@ class TimeTravelCollection extends GenericTimeCollection {
 	/**
 	 * Returns the latest document with the given handle
 	 * @param {string} handle The id of the logical vertex
+	 * @param {number} dateOfInterest The date we're interested in as a timestamp
 	 * @returns {Object} The latest document
 	 */
-	document(handle) {
+	document(handle, dateOfInterest = TimeTravelInfo.maxTime) {
 		/**
 		 * Section that validates parameters
 		 */
@@ -851,7 +852,7 @@ class TimeTravelCollection extends GenericTimeCollection {
 			return this.db._query(aqlQuery`
 				FOR vertex, edge IN OUTBOUND ${this.name + '/' + handle
 			+ this.settings.proxy.inboundAppendix} ${edgeCollection}
-				FILTER vertex.${latest}
+				FILTER vertex.expiresAt == ${dateOfInterest}
 				RETURN vertex
 			`).next();
 		} catch (e) {
@@ -862,9 +863,10 @@ class TimeTravelCollection extends GenericTimeCollection {
 	/**
 	 * Returns the latest documents of the given handles
 	 * @param {Array} handles The ids of the documents
+	 * @param {number} dateOfInterest The date we're interested in as a timestamp
 	 * @returns {Array} The latest documents
 	 */
-	documents(handles) {
+	documents(handles, dateOfInterest = TimeTravelInfo.maxTime) {
 		/**
 		 * Section that validates parameters
 		 */
@@ -879,7 +881,7 @@ class TimeTravelCollection extends GenericTimeCollection {
 		// forEach is synchronous and causes locking!
 		handles.forEach((handle) => {
 			// And fetch them one by one to have one source of origin for the function
-			documents.push(this.document(handle));
+			documents.push(this.document(handle), dateOfInterest);
 		});
 		// Before returning the resulting array
 		return documents;

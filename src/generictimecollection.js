@@ -6,6 +6,7 @@
  * ===========================
  */
 
+const TimeTravelInfo = require('./timetravelinfo');
 const latest = require('./literals/latest');
 
 class GenericTimeCollection {
@@ -98,9 +99,10 @@ class GenericTimeCollection {
 	/**
 	 * Returns a single timetravel document matched by the handle
 	 * @param {String} handle The handle to match
-	 * @returns {Object) The document that matched tbe handle
+	 * @param {number} dateOfInterest The date we're interested in as a timestamp
+	 * @returns {Object) The document that matched the handle
 	 */
-	document(handle) {
+	document(handle, dateOfInterest = TimeTravelInfo.maxTime) {
 		/**
 		 * Section that validates parameters
 		 */
@@ -113,7 +115,7 @@ class GenericTimeCollection {
 		try {
 			return this.db._query(aqlQuery`
 				FOR vertex IN ${this.collection}
-				FILTER vertex.id==${handle} && vertex.${latest}
+				FILTER vertex.id==${handle} && vertex.expiresAt == ${dateOfInterest}
 				RETURN vertex
 			`).next();
 		} catch (e) {
@@ -124,9 +126,10 @@ class GenericTimeCollection {
 	/**
 	 * Returns an array of documents that match the handles
 	 * @param {Array} handles The handles to match
+	 * @param {number} dateOfInterest The date we're interested in as a timestamp
 	 * @returns {Array} The documents that matched the handles
 	 */
-	documents(handles) {
+	documents(handles, dateOfInterest = TimeTravelInfo.maxTime) {
 		/**
 		 * Section that validates parameters
 		 */
@@ -138,7 +141,7 @@ class GenericTimeCollection {
 		 */
 		let documents = [];
 		handles.forEach((handle) => {
-			documents.push(this.document(handle));
+			documents.push(this.document(handle), dateOfInterest);
 		});
 		return documents;
 	}
