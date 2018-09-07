@@ -662,7 +662,6 @@ class TimeTravelEdgeCollection extends GenericTimeCollection {
 	 * @param handle The id of the edges
 	 * @returns {Array} The edges
 	 */
-	// TODO: Make sure these only return non expired edges?
 	edges(handle) {
 		/**
 		 * Section that validates parameters
@@ -673,12 +672,11 @@ class TimeTravelEdgeCollection extends GenericTimeCollection {
 		/**
 		 * Begin of actual method
 		 */
-		if (this.exists(handle)) {
-			let document = this.document(handle);
-			return this.collection.edges(document._key);
-		} else {
-			throw new Error('[TimeTravel] edges received a handle that could not be found');
-		}
+		return this.db._query(aqlQuery`
+		FOR edge IN ANY ${handle} ${this.collection}
+		FILTER edge.${latest}
+		RETURN edge
+		`).toArray();
 	}
 	
 	/**
@@ -686,7 +684,6 @@ class TimeTravelEdgeCollection extends GenericTimeCollection {
 	 * @param handle The id of the edge
 	 * @returns {Array} The inbound edges
 	 */
-	// TODO: Make sure these only return non expired edges?
 	inEdges(handle) {
 		/**
 		 * Section that validates parameters
@@ -697,12 +694,11 @@ class TimeTravelEdgeCollection extends GenericTimeCollection {
 		/**
 		 * Begin of actual method
 		 */
-		if (this.exists(handle)) {
-			let document = this.document(handle);
-			return this.collection.inEdges(document._key);
-		} else {
-			throw new Error('[TimeTravel] inEdges received a handle that could not be found');
-		}
+		return this.db._query(aqlQuery`
+		FOR edge IN OUTBOUND ${handle} ${this.collection}
+		FILTER edge.${latest}
+		RETURN edge
+		`).toArray();
 	}
 	
 	/**
@@ -710,7 +706,6 @@ class TimeTravelEdgeCollection extends GenericTimeCollection {
 	 * @param handle The id of the edge
 	 * @returns {Array} The edges
 	 */
-	// TODO: Make sure these only return non expired edges?
 	outEdges(handle) {
 		/**
 		 * Section that validates parameters
@@ -721,12 +716,11 @@ class TimeTravelEdgeCollection extends GenericTimeCollection {
 		/**
 		 * Begin of actual method
 		 */
-		if (this.exists(handle)) {
-			let document = this.document(handle);
-			return this.collection.outEdges(document._key);
-		} else {
-			throw new Error('[TimeTravel] outEdges received a handle that could not be found');
-		}
+		return this.db._query(aqlQuery`
+		FOR edge IN INBOUND ${handle} ${this.collection}
+		FILTER edge.${latest}
+		RETURN edge
+		`).toArray();
 	}
 	
 	/**
