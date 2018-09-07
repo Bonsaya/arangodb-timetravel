@@ -41,6 +41,14 @@ class TimeTravel {
 	}
 	
 	/**
+	 * Returns the maxTime
+	 * @returns {number} The maxTime
+	 */
+	maxTime() {
+		return TimeTravelInfo.maxTime;
+	}
+	
+	/**
 	 * Initializes the settings collection of the timetravel framework
 	 * @param {Object} settings The settings of the timetravel framework
 	 * @returns {ArangoCollection} The arango timetravel settings collection

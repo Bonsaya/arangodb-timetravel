@@ -662,7 +662,7 @@ class TimeTravelEdgeCollection extends GenericTimeCollection {
 	 * @param handle The id of the edges
 	 * @returns {Array} The edges
 	 */
-	edges(handle) {
+	edges(handle, dateOfInterest = TimeTravelInfo.maxTime) {
 		/**
 		 * Section that validates parameters
 		 */
@@ -674,7 +674,7 @@ class TimeTravelEdgeCollection extends GenericTimeCollection {
 		 */
 		return this.db._query(aqlQuery`
 		FOR vertex, edge IN ANY ${handle} ${this.collection}
-		FILTER edge.${latest}
+		FILTER edge.expiresAt == ${dateOfInterest}
 		RETURN edge
 		`).toArray();
 	}
@@ -684,7 +684,7 @@ class TimeTravelEdgeCollection extends GenericTimeCollection {
 	 * @param handle The id of the edge
 	 * @returns {Array} The edges
 	 */
-	inEdges(handle) {
+	inEdges(handle, dateOfInterest = TimeTravelInfo.maxTime) {
 		/**
 		 * Section that validates parameters
 		 */
@@ -696,7 +696,7 @@ class TimeTravelEdgeCollection extends GenericTimeCollection {
 		 */
 		return this.db._query(aqlQuery`
 		FOR vertex, edge IN INBOUND ${handle} ${this.collection}
-		FILTER edge.${latest}
+		FILTER edge.expiresAt == ${dateOfInterest}
 		RETURN edge
 		`).toArray();
 	}
@@ -706,7 +706,7 @@ class TimeTravelEdgeCollection extends GenericTimeCollection {
 	 * @param handle The id of the edge
 	 * @returns {Array} The edges
 	 */
-	outEdges(handle) {
+	outEdges(handle, dateOfInterest = TimeTravelInfo.maxTime) {
 		/**
 		 * Section that validates parameters
 		 */
@@ -718,7 +718,7 @@ class TimeTravelEdgeCollection extends GenericTimeCollection {
 		 */
 		return this.db._query(aqlQuery`
 		FOR vertex, edge IN OUTBOUND ${handle} ${this.collection}
-		FILTER edge.${latest}
+		FILTER edge.expiresAt == ${dateOfInterest}
 		RETURN edge
 		`).toArray();
 	}
@@ -728,7 +728,7 @@ class TimeTravelEdgeCollection extends GenericTimeCollection {
 	 * @param handle The id of the edges
 	 * @returns {Array} The vertices
 	 */
-	vertices(handle) {
+	vertices(handle, dateOfInterest = TimeTravelInfo.maxTime) {
 		/**
 		 * Section that validates parameters
 		 */
@@ -740,7 +740,7 @@ class TimeTravelEdgeCollection extends GenericTimeCollection {
 		 */
 		return this.db._query(aqlQuery`
 		FOR vertex, edge IN ANY ${handle} ${this.collection}
-		FILTER edge.${latest}
+		FILTER edge.expiresAt == ${dateOfInterest}
 		RETURN vertex
 		`).toArray();
 	}
@@ -750,7 +750,7 @@ class TimeTravelEdgeCollection extends GenericTimeCollection {
 	 * @param handle The id of the edge
 	 * @returns {Array} The vertices
 	 */
-	inVertices(handle) {
+	inVertices(handle, dateOfInterest = TimeTravelInfo.maxTime) {
 		/**
 		 * Section that validates parameters
 		 */
@@ -762,7 +762,7 @@ class TimeTravelEdgeCollection extends GenericTimeCollection {
 		 */
 		return this.db._query(aqlQuery`
 		FOR vertex, edge IN INBOUND ${handle} ${this.collection}
-		FILTER edge.${latest}
+		FILTER edge.expiresAt == ${dateOfInterest}
 		RETURN vertex
 		`).toArray();
 	}
@@ -772,7 +772,7 @@ class TimeTravelEdgeCollection extends GenericTimeCollection {
 	 * @param handle The id of the edge
 	 * @returns {Array} The vertices
 	 */
-	outEdges(handle) {
+	outVertices(handle, dateOfInterest = TimeTravelInfo.maxTime) {
 		/**
 		 * Section that validates parameters
 		 */
@@ -784,7 +784,7 @@ class TimeTravelEdgeCollection extends GenericTimeCollection {
 		 */
 		return this.db._query(aqlQuery`
 		FOR vertex, edge IN OUTBOUND ${handle} ${this.collection}
-		FILTER edge.${latest}
+		FILTER edge.expiresAt == ${dateOfInterest}
 		RETURN vertex
 		`).toArray();
 	}
@@ -794,7 +794,7 @@ class TimeTravelEdgeCollection extends GenericTimeCollection {
 	 * @param handle The id of the edges
 	 * @returns {Array} The vertices and edges
 	 */
-	joints(handle) {
+	joints(handle, dateOfInterest = TimeTravelInfo.maxTime) {
 		/**
 		 * Section that validates parameters
 		 */
@@ -806,7 +806,7 @@ class TimeTravelEdgeCollection extends GenericTimeCollection {
 		 */
 		return this.db._query(aqlQuery`
 		FOR vertex, edge IN ANY ${handle} ${this.collection}
-		FILTER edge.${latest}
+		FILTER edge.expiresAt == ${dateOfInterest}
 		RETURN {'vertex': vertex, 'edge': edge }
 		`).toArray();
 	}
@@ -816,7 +816,7 @@ class TimeTravelEdgeCollection extends GenericTimeCollection {
 	 * @param handle The id of the edge
 	 * @returns {Array} The vertices and edges
 	 */
-	inJoints(handle) {
+	inJoints(handle, dateOfInterest = TimeTravelInfo.maxTime) {
 		/**
 		 * Section that validates parameters
 		 */
@@ -828,7 +828,7 @@ class TimeTravelEdgeCollection extends GenericTimeCollection {
 		 */
 		return this.db._query(aqlQuery`
 		FOR vertex, edge IN INBOUND ${handle} ${this.collection}
-		FILTER edge.${latest}
+		FILTER edge.expiresAt == ${dateOfInterest}
 		RETURN {'vertex': vertex, 'edge': edge }
 		`).toArray();
 	}
@@ -838,7 +838,7 @@ class TimeTravelEdgeCollection extends GenericTimeCollection {
 	 * @param handle The id of the edge
 	 * @returns {Array} The vertices and edges
 	 */
-	outJoints(handle) {
+	outJoints(handle, dateOfInterest = TimeTravelInfo.maxTime) {
 		/**
 		 * Section that validates parameters
 		 */
@@ -850,7 +850,7 @@ class TimeTravelEdgeCollection extends GenericTimeCollection {
 		 */
 		return this.db._query(aqlQuery`
 		FOR vertex, edge IN OUTBOUND ${handle} ${this.collection}
-		FILTER edge.${latest}
+		FILTER edge.expiresAt == ${dateOfInterest}
 		RETURN {'vertex': vertex, 'edge': edge }
 		`).toArray();
 	}
