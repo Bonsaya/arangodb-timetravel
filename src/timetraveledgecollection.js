@@ -660,9 +660,141 @@ class TimeTravelEdgeCollection extends GenericTimeCollection {
 	/**
 	 * Returns all edges of the handle
 	 * @param handle The id of the edges
-	 * @returns {Array} The vertices and edges
+	 * @returns {Array} The edges
 	 */
 	edges(handle) {
+		/**
+		 * Section that validates parameters
+		 */
+		if (typeof handle !== 'string') {
+			throw new Error('[TimeTravel] edges received non-string as first parameter (handle)');
+		}
+		/**
+		 * Begin of actual method
+		 */
+		return this.db._query(aqlQuery`
+		FOR vertex, edge IN ANY ${handle} ${this.collection}
+		FILTER edge.${latest}
+		RETURN edge
+		`).toArray();
+	}
+	
+	/**
+	 * Returns all inbound edges of the handle
+	 * @param handle The id of the edge
+	 * @returns {Array} The edges
+	 */
+	inEdges(handle) {
+		/**
+		 * Section that validates parameters
+		 */
+		if (typeof handle !== 'string') {
+			throw new Error('[TimeTravel] inEdges received non-string as first parameter (handle)');
+		}
+		/**
+		 * Begin of actual method
+		 */
+		return this.db._query(aqlQuery`
+		FOR vertex, edge IN INBOUND ${handle} ${this.collection}
+		FILTER edge.${latest}
+		RETURN edge
+		`).toArray();
+	}
+	
+	/**
+	 * Returns all outbound edges of the handle
+	 * @param handle The id of the edge
+	 * @returns {Array} The edges
+	 */
+	outEdges(handle) {
+		/**
+		 * Section that validates parameters
+		 */
+		if (typeof handle !== 'string') {
+			throw new Error('[TimeTravel] outEdges received non-string as first parameter (handle)');
+		}
+		/**
+		 * Begin of actual method
+		 */
+		return this.db._query(aqlQuery`
+		FOR vertex, edge IN OUTBOUND ${handle} ${this.collection}
+		FILTER edge.${latest}
+		RETURN edge
+		`).toArray();
+	}
+	
+	/**
+	 * Returns all vertices of the handle
+	 * @param handle The id of the edges
+	 * @returns {Array} The vertices
+	 */
+	vertices(handle) {
+		/**
+		 * Section that validates parameters
+		 */
+		if (typeof handle !== 'string') {
+			throw new Error('[TimeTravel] edges received non-string as first parameter (handle)');
+		}
+		/**
+		 * Begin of actual method
+		 */
+		return this.db._query(aqlQuery`
+		FOR vertex, edge IN ANY ${handle} ${this.collection}
+		FILTER edge.${latest}
+		RETURN vertex
+		`).toArray();
+	}
+	
+	/**
+	 * Returns all inbound vertices of the handle
+	 * @param handle The id of the edge
+	 * @returns {Array} The vertices
+	 */
+	inVertices(handle) {
+		/**
+		 * Section that validates parameters
+		 */
+		if (typeof handle !== 'string') {
+			throw new Error('[TimeTravel] inEdges received non-string as first parameter (handle)');
+		}
+		/**
+		 * Begin of actual method
+		 */
+		return this.db._query(aqlQuery`
+		FOR vertex, edge IN INBOUND ${handle} ${this.collection}
+		FILTER edge.${latest}
+		RETURN vertex
+		`).toArray();
+	}
+	
+	/**
+	 * Returns all outbound vertices of the handle
+	 * @param handle The id of the edge
+	 * @returns {Array} The vertices
+	 */
+	outEdges(handle) {
+		/**
+		 * Section that validates parameters
+		 */
+		if (typeof handle !== 'string') {
+			throw new Error('[TimeTravel] outEdges received non-string as first parameter (handle)');
+		}
+		/**
+		 * Begin of actual method
+		 */
+		return this.db._query(aqlQuery`
+		FOR vertex, edge IN OUTBOUND ${handle} ${this.collection}
+		FILTER edge.${latest}
+		RETURN vertex
+		`).toArray();
+	}
+	
+	/**
+	 * Returns all edges of the handle
+	 * @param handle The id of the edges
+	 * @returns {Array} The vertices and edges
+	 */
+	joints(handle) {
 		/**
 		 * Section that validates parameters
 		 */
@@ -684,7 +816,7 @@ class TimeTravelEdgeCollection extends GenericTimeCollection {
 	 * @param handle The id of the edge
 	 * @returns {Array} The vertices and edges
 	 */
-	inEdges(handle) {
+	inJoints(handle) {
 		/**
 		 * Section that validates parameters
 		 */
@@ -695,7 +827,7 @@ class TimeTravelEdgeCollection extends GenericTimeCollection {
 		 * Begin of actual method
 		 */
 		return this.db._query(aqlQuery`
-		FOR vertex, edge IN OUTBOUND ${handle} ${this.collection}
+		FOR vertex, edge IN INBOUND ${handle} ${this.collection}
 		FILTER edge.${latest}
 		RETURN {'vertex': vertex, 'edge': edge }
 		`).toArray();
@@ -706,7 +838,7 @@ class TimeTravelEdgeCollection extends GenericTimeCollection {
 	 * @param handle The id of the edge
 	 * @returns {Array} The vertices and edges
 	 */
-	outEdges(handle) {
+	outJoints(handle) {
 		/**
 		 * Section that validates parameters
 		 */
@@ -717,7 +849,7 @@ class TimeTravelEdgeCollection extends GenericTimeCollection {
 		 * Begin of actual method
 		 */
 		return this.db._query(aqlQuery`
-		FOR vertex, edge IN INBOUND ${handle} ${this.collection}
+		FOR vertex, edge IN OUTBOUND ${handle} ${this.collection}
 		FILTER edge.${latest}
 		RETURN {'vertex': vertex, 'edge': edge }
 		`).toArray();
