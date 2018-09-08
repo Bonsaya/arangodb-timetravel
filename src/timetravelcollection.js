@@ -753,8 +753,8 @@ class TimeTravelCollection extends GenericTimeCollection {
 		/**
 		 * Section that validates parameters
 		 */
-		if (!(dateOfInterest instanceof Date && !isNaN(dateOfInterest))) {
-			throw new Error('[TimeTravel] documentsByDate received non-date as first parameter (dateOfInterest)');
+		if (typeof dateOfInterest !== 'number') {
+			throw new Error('[TimeTravel] documentsByDate received non-number as first parameter (dateOfInterest)');
 		}
 		if (typeof excludeCurrent !== typeof true) {
 			throw new Error('[TimeTravel] documentsByDate received non-boolean as second parameter (excludeCurrent)');
