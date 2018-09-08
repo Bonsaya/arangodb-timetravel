@@ -849,12 +849,21 @@ class TimeTravelCollection extends GenericTimeCollection {
 		 */
 		let edgeCollection = this.db._collection(this.name + this.settings.edgeAppendix);
 		try {
-			return this.db._query(aqlQuery`
-				FOR vertex, edge IN OUTBOUND ${this.name + '/' + handle
-			+ this.settings.proxy.inboundAppendix} ${edgeCollection}
-				FILTER vertex.expiresAt == ${dateOfInterest}
-				RETURN vertex
-			`).next();
+			if (dateOfInterest === TimeTravelInfo.maxTime) {
+				return this.db._query(aqlQuery`
+					FOR vertex, edge IN OUTBOUND ${this.name + '/' + handle
+				+ this.settings.proxy.inboundAppendix} ${edgeCollection}
+					FILTER vertex.${latest}
+					RETURN vertex
+				`).next();
+			} else {
+				return this.db._query(aqlQuery`
+					FOR vertex, edge IN OUTBOUND ${this.name + '/' + handle
+				+ this.settings.proxy.inboundAppendix} ${edgeCollection}
+					FILTER vertex.createdAt <= ${dateOfInterest} && vertex.expiresAt > ${dateOfInterest}
+					RETURN vertex
+				`).next();
+			}
 		} catch (e) {
 			throw new Error('[TimeTravel] document received handle that could not be found.');
 		}

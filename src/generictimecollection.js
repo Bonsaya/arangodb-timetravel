@@ -113,11 +113,19 @@ class GenericTimeCollection {
 		 * Begin of actual method
 		 */
 		try {
-			return this.db._query(aqlQuery`
-				FOR vertex IN ${this.collection}
-				FILTER vertex.id==${handle} && vertex.expiresAt == ${dateOfInterest}
-				RETURN vertex
-			`).next();
+			if (dateOfInterest === TimeTravelInfo.maxTime) {
+				return this.db._query(aqlQuery`
+					FOR vertex IN ${this.collection}
+					FILTER vertex.id==${handle} && vertex.${latest}
+					RETURN vertex
+				`).next();
+			} else {
+				return this.db._query(aqlQuery`
+					FOR vertex IN ${this.collection}
+					FILTER vertex.id==${handle} && vertex.createdAt <= ${dateOfInterest} && vertex.expiresAt > ${dateOfInterest}
+					RETURN vertex
+				`).next();
+			}
 		} catch (e) {
 			return {};
 		}
