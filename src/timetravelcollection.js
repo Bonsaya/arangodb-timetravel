@@ -745,7 +745,7 @@ class TimeTravelCollection extends GenericTimeCollection {
 	/**
 	 * Returns all logical vertices in the state that they were on the date of interest
 	 * @param {String} handle The id of the documents of interest
-	 * @param {Date} dateOfInterest The date of interest
+	 * @param {Number} dateOfInterest The date of interest
 	 * @param {boolean} excludeCurrent Whether to prefer createdAt or expiresAt
 	 * @returns {Array} The documents that were valid during the date of interest
 	 */
@@ -792,8 +792,8 @@ class TimeTravelCollection extends GenericTimeCollection {
 	/**
 	 * Returns all documents that were valid within a certain date range
 	 * @param {String} handle The id of the documents of interest
-	 * @param {Date} dateRangeMin The minimum date to be valid at
-	 * @param {Date} dateRangeMax The maximum date to be valid at
+	 * @param {Number} dateRangeMin The minimum date to be valid at
+	 * @param {Number} dateRangeMax The maximum date to be valid at
 	 * @returns {Array} The documents that were valid given the timeframe
 	 */
 	documentsByDateRange(handle, dateRangeMin, dateRangeMax) {
@@ -803,11 +803,11 @@ class TimeTravelCollection extends GenericTimeCollection {
 		if (typeof handle !== 'string') {
 			throw new Error('[TimeTravel] documentsByDateRange received non-string as first parameter (handle)');
 		}
-		if (!(dateRangeMin instanceof Date && !isNaN(dateRangeMin))) {
-			throw new Error('[TimeTravel] documentsByDateRange received non-date as second parameter (dateRangeMin)');
+		if (typeof dateRangeMin !== 'number') {
+			throw new Error('[TimeTravel] documentsByDateRange received non-number as second parameter (dateRangeMin)');
 		}
-		if (!(dateRangeMax instanceof Date && !isNaN(dateRangeMax))) {
-			throw new Error('[TimeTravel] documentsByDateRange received non-date as third parameter (dateRangeMax)');
+		if (typeof dateRangeMax !== 'number') {
+			throw new Error('[TimeTravel] documentsByDateRange received non-number as third parameter (dateRangeMax)');
 		}
 		if (dateRangeMin >= dateRangeMax) {
 			throw new Error('[TimeTravel] documentsByDateRange received a minimum date that exceeds or equals the maximum date (dateRangeMin >= dateRangeMax)');
