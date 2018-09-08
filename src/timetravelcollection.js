@@ -774,14 +774,14 @@ class TimeTravelCollection extends GenericTimeCollection {
 			// If not, we populate the documents with all documents that were valid until the dateOfInterest but not beyond
 			documents = this.db._query(aqlQuery`
 				FOR vertex IN OUTBOUND ${inboundProxyKey} ${edgeCollection}
-				FILTER vertex.id==${handle} && vertex.createdAt < ${dateOfInterest} && vertex.expiresAt >= ${dateOfInterest}
+				FILTER vertex.createdAt < ${dateOfInterest} && vertex.expiresAt >= ${dateOfInterest}
 				RETURN vertex
 			`).toArray();
 		} else {
 			// Otherwise we populate the documents with all documents, even still valid ones beyond the date of interest
 			documents = this.db._query(aqlQuery`
 				FOR vertex IN OUTBOUND ${inboundProxyKey} ${edgeCollection}
-				FILTER vertex.id==${handle} && vertex.createdAt <= ${dateOfInterest} && vertex.expiresAt > ${dateOfInterest}
+				FILTER vertex.createdAt <= ${dateOfInterest} && vertex.expiresAt > ${dateOfInterest}
 				RETURN vertex
 			`).toArray();
 		}
