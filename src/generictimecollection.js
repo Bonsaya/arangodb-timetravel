@@ -100,7 +100,7 @@ class GenericTimeCollection {
 	 * Returns a single timetravel document matched by the handle
 	 * @param {String} handle The handle to match
 	 * @param {number} dateOfInterest The date we're interested in as a timestamp
-	 * @returns {Object) The document that matched the handle
+	 * @returns {Object} The document that matched the handle
 	 */
 	document(handle, dateOfInterest = TimeTravelInfo.maxTime) {
 		/**
@@ -109,23 +109,22 @@ class GenericTimeCollection {
 		if (typeof handle !== 'string') {
 			throw new Error('[TimeTravel] document received non-string as first parameter (handle)');
 		}
+		if (typeof dateOfInterest !== 'number') {
+			throw new Error('[TimeTravel] document received non-number as second parameter (dateOfInterest)');
+		}
 		/**
 		 * Begin of actual method
 		 */
+		if (dateOfInterest >= TimeTravelInfo.maxTime) {
+			// In order for the query to always work, we must ensure that dateOfInterest never surpasses expiresAt
+			dateOfInterest = TimeTravelInfo.maxTime - 1;
+		}
 		try {
-			if (dateOfInterest === TimeTravelInfo.maxTime) {
-				return this.db._query(aqlQuery`
-					FOR vertex IN ${this.collection}
-					FILTER vertex.id==${handle} && vertex.${latest}
-					RETURN vertex
-				`).next();
-			} else {
-				return this.db._query(aqlQuery`
-					FOR vertex IN ${this.collection}
-					FILTER vertex.id==${handle} && vertex.createdAt <= ${dateOfInterest} && vertex.expiresAt > ${dateOfInterest}
-					RETURN vertex
-				`).next();
-			}
+			return this.db._query(aqlQuery`
+				FOR vertex IN ${this.collection}
+				FILTER vertex.id==${handle} && vertex.createdAt <= ${dateOfInterest} && vertex.expiresAt > ${dateOfInterest}
+				RETURN vertex
+			`).next();
 		} catch (e) {
 			return {};
 		}

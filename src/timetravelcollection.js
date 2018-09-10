@@ -753,16 +753,23 @@ class TimeTravelCollection extends GenericTimeCollection {
 		/**
 		 * Section that validates parameters
 		 */
+		if (typeof handle !== 'string') {
+			throw new Error('{TimeTravel] documentsByDate received non-string as first parameter (handle)');
+		}
 		if (typeof dateOfInterest !== 'number') {
-			throw new Error('[TimeTravel] documentsByDate received non-number as first parameter (dateOfInterest)');
+			throw new Error('[TimeTravel] documentsByDate received non-number as second parameter (dateOfInterest)');
 		}
 		if (typeof excludeCurrent !== typeof true) {
-			throw new Error('[TimeTravel] documentsByDate received non-boolean as second parameter (excludeCurrent)');
+			throw new Error('[TimeTravel] documentsByDate received non-boolean as third parameter (excludeCurrent)');
 		}
 		/**
 		 * Begin of actual method
 		 */
-			// Open the edge collection
+		if (dateOfInterest >= TimeTravelInfo.maxTime) {
+			// In order for the query to always work, we must ensure that dateOfInterest never surpasses expiresAt
+			dateOfInterest = TimeTravelInfo.maxTime - 1;
+		}
+		// Open the edge collection
 		let edgeCollection = this.db._collection(this.name + this.settings.edgeAppendix);
 		// Generate the Inbound Proxy Key
 		let inboundProxyKey = this.name + '/' + handle
@@ -844,26 +851,24 @@ class TimeTravelCollection extends GenericTimeCollection {
 		if (typeof handle !== 'string') {
 			throw new Error('[TimeTravel] document received non-string as first parameter (handle)');
 		}
+		if (typeof dateOfInterest !== 'number') {
+			throw new Error('[TimeTravel] document received non-number as second parameter (dateOfInterest)');
+		}
 		/**
 		 * Begin of actual method
 		 */
+		if (dateOfInterest >= TimeTravelInfo.maxTime) {
+			// In order for the query to always work, we must ensure that dateOfInterest never surpasses expiresAt
+			dateOfInterest = TimeTravelInfo.maxTime - 1;
+		}
 		let edgeCollection = this.db._collection(this.name + this.settings.edgeAppendix);
 		try {
-			if (dateOfInterest === TimeTravelInfo.maxTime) {
-				return this.db._query(aqlQuery`
-					FOR vertex, edge IN OUTBOUND ${this.name + '/' + handle
-				+ this.settings.proxy.inboundAppendix} ${edgeCollection}
-					FILTER vertex.${latest}
-					RETURN vertex
-				`).next();
-			} else {
-				return this.db._query(aqlQuery`
-					FOR vertex, edge IN OUTBOUND ${this.name + '/' + handle
-				+ this.settings.proxy.inboundAppendix} ${edgeCollection}
-					FILTER vertex.createdAt <= ${dateOfInterest} && vertex.expiresAt > ${dateOfInterest}
-					RETURN vertex
-				`).next();
-			}
+			return this.db._query(aqlQuery`
+				FOR vertex, edge IN OUTBOUND ${this.name + '/' + handle
+			+ this.settings.proxy.inboundAppendix} ${edgeCollection}
+				FILTER vertex.createdAt <= ${dateOfInterest} && vertex.expiresAt > ${dateOfInterest}
+				RETURN vertex
+			`).next();
 		} catch (e) {
 			throw new Error('[TimeTravel] document received handle that could not be found.');
 		}
@@ -881,6 +886,9 @@ class TimeTravelCollection extends GenericTimeCollection {
 		 */
 		if (handles.constructor !== Array) {
 			throw new Error('[TimeTravel] documents received non-array as first parameter (handles)');
+		}
+		if (typeof dateOfInterest !== 'number') {
+			throw new Error('[TimeTravel] documents received non-number as second parameter (dateOfInterest)');
 		}
 		/**
 		 * Begin of actual method

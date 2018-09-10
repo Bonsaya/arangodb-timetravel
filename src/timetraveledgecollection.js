@@ -660,6 +660,7 @@ class TimeTravelEdgeCollection extends GenericTimeCollection {
 	/**
 	 * Returns all edges of the handle
 	 * @param handle The id of the edges
+	 * @param dateOfInterest The date of interest
 	 * @returns {Array} The edges
 	 */
 	edges(handle, dateOfInterest = TimeTravelInfo.maxTime) {
@@ -669,19 +670,27 @@ class TimeTravelEdgeCollection extends GenericTimeCollection {
 		if (typeof handle !== 'string') {
 			throw new Error('[TimeTravel] edges received non-string as first parameter (handle)');
 		}
+		if (typeof dateOfInterest !== 'number') {
+			throw new Error('[TimeTravel] edges received non-number as second parameter (dateOfInterest)');
+		}
 		/**
 		 * Begin of actual method
 		 */
+		if (dateOfInterest >= TimeTravelInfo.maxTime) {
+			// In order for the query to always work, we must ensure that dateOfInterest never surpasses expiresAt
+			dateOfInterest = TimeTravelInfo.maxTime - 1;
+		}
 		return this.db._query(aqlQuery`
-		FOR vertex, edge IN ANY ${handle} ${this.collection}
-		FILTER edge.expiresAt == ${dateOfInterest}
-		RETURN edge
-		`).toArray();
+			FOR vertex, edge IN ANY ${handle} ${this.collection}
+			FILTER edge.expiresAt == ${dateOfInterest}
+			RETURN edge
+			`).toArray();
 	}
 	
 	/**
 	 * Returns all inbound edges of the handle
 	 * @param handle The id of the edge
+	 * @param dateOfInterest The date of interest
 	 * @returns {Array} The edges
 	 */
 	inEdges(handle, dateOfInterest = TimeTravelInfo.maxTime) {
@@ -691,19 +700,27 @@ class TimeTravelEdgeCollection extends GenericTimeCollection {
 		if (typeof handle !== 'string') {
 			throw new Error('[TimeTravel] inEdges received non-string as first parameter (handle)');
 		}
+		if (typeof dateOfInterest !== 'number') {
+			throw new Error('[TimeTravel] inEdges received non-number as second parameter (dateOfInterest)');
+		}
 		/**
 		 * Begin of actual method
 		 */
+		if (dateOfInterest >= TimeTravelInfo.maxTime) {
+			// In order for the query to always work, we must ensure that dateOfInterest never surpasses expiresAt
+			dateOfInterest = TimeTravelInfo.maxTime - 1;
+		}
 		return this.db._query(aqlQuery`
-		FOR vertex, edge IN INBOUND ${handle} ${this.collection}
-		FILTER edge.expiresAt == ${dateOfInterest}
-		RETURN edge
-		`).toArray();
+			FOR vertex, edge IN INBOUND ${handle} ${this.collection}
+			FILTER edge.expiresAt == ${dateOfInterest}
+			RETURN edge
+			`).toArray();
 	}
 	
 	/**
 	 * Returns all outbound edges of the handle
 	 * @param handle The id of the edge
+	 * @param dateOfInterest The date of interest
 	 * @returns {Array} The edges
 	 */
 	outEdges(handle, dateOfInterest = TimeTravelInfo.maxTime) {
@@ -713,19 +730,27 @@ class TimeTravelEdgeCollection extends GenericTimeCollection {
 		if (typeof handle !== 'string') {
 			throw new Error('[TimeTravel] outEdges received non-string as first parameter (handle)');
 		}
+		if (typeof dateOfInterest !== 'number') {
+			throw new Error('[TimeTravel] outEdges received non-number as second parameter (dateOfInterest)');
+		}
 		/**
 		 * Begin of actual method
 		 */
+		if (dateOfInterest >= TimeTravelInfo.maxTime) {
+			// In order for the query to always work, we must ensure that dateOfInterest never surpasses expiresAt
+			dateOfInterest = TimeTravelInfo.maxTime - 1;
+		}
 		return this.db._query(aqlQuery`
-		FOR vertex, edge IN OUTBOUND ${handle} ${this.collection}
-		FILTER edge.expiresAt == ${dateOfInterest}
-		RETURN edge
-		`).toArray();
+			FOR vertex, edge IN OUTBOUND ${handle} ${this.collection}
+			FILTER edge.expiresAt == ${dateOfInterest}
+			RETURN edge
+			`).toArray();
 	}
 	
 	/**
 	 * Returns all vertices of the handle
 	 * @param handle The id of the edges
+	 * @param dateOfInterest The date of interest
 	 * @returns {Array} The vertices
 	 */
 	vertices(handle, dateOfInterest = TimeTravelInfo.maxTime) {
@@ -733,21 +758,29 @@ class TimeTravelEdgeCollection extends GenericTimeCollection {
 		 * Section that validates parameters
 		 */
 		if (typeof handle !== 'string') {
-			throw new Error('[TimeTravel] edges received non-string as first parameter (handle)');
+			throw new Error('[TimeTravel] vertices received non-string as first parameter (handle)');
+		}
+		if (typeof dateOfInterest !== 'number') {
+			throw new Error('[TimeTravel] vertices received non-number as second parameter (dateOfInterest)');
 		}
 		/**
 		 * Begin of actual method
 		 */
+		if (dateOfInterest >= TimeTravelInfo.maxTime) {
+			// In order for the query to always work, we must ensure that dateOfInterest never surpasses expiresAt
+			dateOfInterest = TimeTravelInfo.maxTime - 1;
+		}
 		return this.db._query(aqlQuery`
-		FOR vertex, edge IN ANY ${handle} ${this.collection}
-		FILTER edge.expiresAt == ${dateOfInterest}
-		RETURN vertex
-		`).toArray();
+			FOR vertex, edge IN ANY ${handle} ${this.collection}
+			FILTER edge.expiresAt == ${dateOfInterest}
+			RETURN vertex
+			`).toArray();
 	}
 	
 	/**
 	 * Returns all inbound vertices of the handle
 	 * @param handle The id of the edge
+	 * @param dateOfInterest The date of interest
 	 * @returns {Array} The vertices
 	 */
 	inVertices(handle, dateOfInterest = TimeTravelInfo.maxTime) {
@@ -755,21 +788,29 @@ class TimeTravelEdgeCollection extends GenericTimeCollection {
 		 * Section that validates parameters
 		 */
 		if (typeof handle !== 'string') {
-			throw new Error('[TimeTravel] inEdges received non-string as first parameter (handle)');
+			throw new Error('[TimeTravel] inVertices received non-string as first parameter (handle)');
+		}
+		if (typeof dateOfInterest !== 'number') {
+			throw new Error('[TimeTravel] inVertices received non-number as second parameter (dateOfInterest)');
 		}
 		/**
 		 * Begin of actual method
 		 */
+		if (dateOfInterest >= TimeTravelInfo.maxTime) {
+			// In order for the query to always work, we must ensure that dateOfInterest never surpasses expiresAt
+			dateOfInterest = TimeTravelInfo.maxTime - 1;
+		}
 		return this.db._query(aqlQuery`
-		FOR vertex, edge IN INBOUND ${handle} ${this.collection}
-		FILTER edge.expiresAt == ${dateOfInterest}
-		RETURN vertex
-		`).toArray();
+			FOR vertex, edge IN INBOUND ${handle} ${this.collection}
+			FILTER edge.expiresAt == ${dateOfInterest}
+			RETURN vertex
+			`).toArray();
 	}
 	
 	/**
 	 * Returns all outbound vertices of the handle
 	 * @param handle The id of the edge
+	 * @param dateOfInterest The date of interest
 	 * @returns {Array} The vertices
 	 */
 	outVertices(handle, dateOfInterest = TimeTravelInfo.maxTime) {
@@ -777,21 +818,29 @@ class TimeTravelEdgeCollection extends GenericTimeCollection {
 		 * Section that validates parameters
 		 */
 		if (typeof handle !== 'string') {
-			throw new Error('[TimeTravel] outEdges received non-string as first parameter (handle)');
+			throw new Error('[TimeTravel] outVertices received non-string as first parameter (handle)');
+		}
+		if (typeof dateOfInterest !== 'number') {
+			throw new Error('[TimeTravel] outVertices received non-number as second parameter (dateOfInterest)');
 		}
 		/**
 		 * Begin of actual method
 		 */
+		if (dateOfInterest >= TimeTravelInfo.maxTime) {
+			// In order for the query to always work, we must ensure that dateOfInterest never surpasses expiresAt
+			dateOfInterest = TimeTravelInfo.maxTime - 1;
+		}
 		return this.db._query(aqlQuery`
-		FOR vertex, edge IN OUTBOUND ${handle} ${this.collection}
-		FILTER edge.expiresAt == ${dateOfInterest}
-		RETURN vertex
-		`).toArray();
+			FOR vertex, edge IN OUTBOUND ${handle} ${this.collection}
+			FILTER edge.expiresAt == ${dateOfInterest}
+			RETURN vertex
+			`).toArray();
 	}
 	
 	/**
 	 * Returns all edges of the handle
 	 * @param handle The id of the edges
+	 * @param dateOfInterest The date of interest
 	 * @returns {Array} The vertices and edges
 	 */
 	joints(handle, dateOfInterest = TimeTravelInfo.maxTime) {
@@ -799,21 +848,29 @@ class TimeTravelEdgeCollection extends GenericTimeCollection {
 		 * Section that validates parameters
 		 */
 		if (typeof handle !== 'string') {
-			throw new Error('[TimeTravel] edges received non-string as first parameter (handle)');
+			throw new Error('[TimeTravel] joints received non-string as first parameter (handle)');
+		}
+		if (typeof dateOfInterest !== 'number') {
+			throw new Error('[TimeTravel] joints received non-number as second parameter (dateOfInterest)');
 		}
 		/**
 		 * Begin of actual method
 		 */
+		if (dateOfInterest >= TimeTravelInfo.maxTime) {
+			// In order for the query to always work, we must ensure that dateOfInterest never surpasses expiresAt
+			dateOfInterest = TimeTravelInfo.maxTime - 1;
+		}
 		return this.db._query(aqlQuery`
-		FOR vertex, edge IN ANY ${handle} ${this.collection}
-		FILTER edge.expiresAt == ${dateOfInterest}
-		RETURN {'vertex': vertex, 'edge': edge }
-		`).toArray();
+			FOR vertex, edge IN ANY ${handle} ${this.collection}
+			FILTER edge.expiresAt == ${dateOfInterest}
+			RETURN {'vertex': vertex, 'edge': edge }
+			`).toArray();
 	}
 	
 	/**
 	 * Returns all inbound edges of the handle
 	 * @param handle The id of the edge
+	 * @param dateOfInterest The date of interest
 	 * @returns {Array} The vertices and edges
 	 */
 	inJoints(handle, dateOfInterest = TimeTravelInfo.maxTime) {
@@ -821,21 +878,29 @@ class TimeTravelEdgeCollection extends GenericTimeCollection {
 		 * Section that validates parameters
 		 */
 		if (typeof handle !== 'string') {
-			throw new Error('[TimeTravel] inEdges received non-string as first parameter (handle)');
+			throw new Error('[TimeTravel] inJoints received non-string as first parameter (handle)');
+		}
+		if (typeof dateOfInterest !== 'number') {
+			throw new Error('[TimeTravel] inJoints received non-number as second parameter (dateOfInterest)');
 		}
 		/**
 		 * Begin of actual method
 		 */
+		if (dateOfInterest >= TimeTravelInfo.maxTime) {
+			// In order for the query to always work, we must ensure that dateOfInterest never surpasses expiresAt
+			dateOfInterest = TimeTravelInfo.maxTime - 1;
+		}
 		return this.db._query(aqlQuery`
-		FOR vertex, edge IN INBOUND ${handle} ${this.collection}
-		FILTER edge.expiresAt == ${dateOfInterest}
-		RETURN {'vertex': vertex, 'edge': edge }
-		`).toArray();
+			FOR vertex, edge IN INBOUND ${handle} ${this.collection}
+			FILTER edge.expiresAt == ${dateOfInterest}
+			RETURN {'vertex': vertex, 'edge': edge }
+			`).toArray();
 	}
 	
 	/**
 	 * Returns all outbound edges of the handle
 	 * @param handle The id of the edge
+	 * @param dateOfInterest The date of interest
 	 * @returns {Array} The vertices and edges
 	 */
 	outJoints(handle, dateOfInterest = TimeTravelInfo.maxTime) {
@@ -843,16 +908,23 @@ class TimeTravelEdgeCollection extends GenericTimeCollection {
 		 * Section that validates parameters
 		 */
 		if (typeof handle !== 'string') {
-			throw new Error('[TimeTravel] outEdges received non-string as first parameter (handle)');
+			throw new Error('[TimeTravel] outJoints received non-string as first parameter (handle)');
+		}
+		if (typeof dateOfInterest !== 'number') {
+			throw new Error('[TimeTravel] outJoints received non-number as second parameter (dateOfInterest)');
 		}
 		/**
 		 * Begin of actual method
 		 */
+		if (dateOfInterest >= TimeTravelInfo.maxTime) {
+			// In order for the query to always work, we must ensure that dateOfInterest never surpasses expiresAt
+			dateOfInterest = TimeTravelInfo.maxTime - 1;
+		}
 		return this.db._query(aqlQuery`
-		FOR vertex, edge IN OUTBOUND ${handle} ${this.collection}
-		FILTER edge.expiresAt == ${dateOfInterest}
-		RETURN {'vertex': vertex, 'edge': edge }
-		`).toArray();
+			FOR vertex, edge IN OUTBOUND ${handle} ${this.collection}
+			FILTER edge.expiresAt == ${dateOfInterest}
+			RETURN {'vertex': vertex, 'edge': edge }
+			`).toArray();
 	}
 	
 	/**
@@ -883,7 +955,7 @@ class TimeTravelEdgeCollection extends GenericTimeCollection {
 	 * @returns {string} The latest condition
 	 */
 	latest() {
-		return 'expiresAt == 8640000000000000';
+		return latest.toAQL();
 	}
 	
 	/**
