@@ -1,5 +1,5 @@
 {
-	"name": "arangojs-revisions",
+	"name": "arangodb-timetravel",
 	"version": "1.0.0",
 	"license": "MIT",
 	"description": "A time-sliced revision history of tracked collections allowing permanent time travel in ArangoDB",
@@ -10,7 +10,11 @@
 		"time",
 		"history",
 		"slicing",
-		"graph"
+		"graph",
+		"timetravel",
+		"travel",
+		"time-sliced",
+		"sliced"
 	],
 	"bugs": {
 		"email": "support@kevinsekin.de"
@@ -20,10 +24,21 @@
 		"email": "business@kevinsekin.de",
 		"url": "https://kevinsekin.de"
 	},
+	"contributors": [
+		{
+			"name": "Arne Winter",
+			"email": "admin@arnewinter.com",
+			"url": "https://arnewinter.com"
+		},
+		{
+			"name": "Bonsaya",
+			"email": "support@bonsaya.de",
+			"url": "https://bonsaya.de"
+		}
+	],
 	"main": "index.js",
 	"files": [
 		"src/*",
 		"src/**/*"
-	],
-	"dependencies": {}
+	]
 }
