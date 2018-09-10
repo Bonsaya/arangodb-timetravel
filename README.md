@@ -124,6 +124,8 @@ Because it is impossible to predict the scope of all necessary functionality, in
 
 A detailed documentation will be coming shortly! For now, please take a look at the source code. It is minimal and heavily documented on purpose and should make it easy! Remember, all of the functions match <a href="https://docs.arangodb.com/devel/Manual/DataModeling/Documents/DocumentMethods.html">ArangoDB's functionality</a>.
 
+You may also look at the following <a href="https://www.arangodb.com/2018/07/time-traveling-with-graph-databases/">article</a> by Dan from ArangoDB detailing the theory behind this implementation.
+
 ### Contribution
 
 As you can imagine, developing all of this took a lot of time. At the time of release, I, Kevin Sekin, am the sole developer of this framework. However my company <a href="https://bonsaya.com" target="_blank">Bonsaya&#8482;</a> will maintain this framework with **Arne Winter** our Lead of Research and Development at the helm of it all.
