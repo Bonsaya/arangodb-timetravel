@@ -4,6 +4,7 @@
 	"license": "MIT",
 	"description": "A time-sliced revision history of tracked collections allowing permanent time travel in ArangoDB",
 	"keywords": [
+		"arango",
 		"arangodb",
 		"arangojs",
 		"revision",
@@ -14,7 +15,8 @@
 		"timetravel",
 		"travel",
 		"time-sliced",
-		"sliced"
+		"sliced",
+		"snapshot"
 	],
 	"bugs": {
 		"email": "support@kevinsekin.de"
