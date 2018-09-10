@@ -1,8 +1,6 @@
 ## ArangoDB Timetravel
-<div align="center">
-    ![ArangoDB Timetravel](https://source.kevinsekin.de/easy-essen/arangojs-revisions/raw/branch/develop/img.png)
-</div>
 
+![ArangoDB Timetravel](https://source.kevinsekin.de/easy-essen/arangojs-revisions/raw/branch/develop/img.png)
 
 ### Introduction
 
