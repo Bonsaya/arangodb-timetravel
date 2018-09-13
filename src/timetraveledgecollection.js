@@ -753,15 +753,15 @@ class TimeTravelEdgeCollection extends GenericTimeCollection {
 	 * @param dateOfInterest The date of interest
 	 * @returns {Array} The vertices
 	 */
-	vertices(handle, dateOfInterest = TimeTravelInfo.maxTime) {
+	neighbours(handle, dateOfInterest = TimeTravelInfo.maxTime) {
 		/**
 		 * Section that validates parameters
 		 */
 		if (typeof handle !== 'string') {
-			throw new Error('[TimeTravel] vertices received non-string as first parameter (handle)');
+			throw new Error('[TimeTravel] neighbours received non-string as first parameter (handle)');
 		}
 		if (typeof dateOfInterest !== 'number') {
-			throw new Error('[TimeTravel] vertices received non-number as second parameter (dateOfInterest)');
+			throw new Error('[TimeTravel] neighbours received non-number as second parameter (dateOfInterest)');
 		}
 		/**
 		 * Begin of actual method
@@ -783,15 +783,15 @@ class TimeTravelEdgeCollection extends GenericTimeCollection {
 	 * @param dateOfInterest The date of interest
 	 * @returns {Array} The vertices
 	 */
-	inVertices(handle, dateOfInterest = TimeTravelInfo.maxTime) {
+	inNeighbours(handle, dateOfInterest = TimeTravelInfo.maxTime) {
 		/**
 		 * Section that validates parameters
 		 */
 		if (typeof handle !== 'string') {
-			throw new Error('[TimeTravel] inVertices received non-string as first parameter (handle)');
+			throw new Error('[TimeTravel] inNeighbours received non-string as first parameter (handle)');
 		}
 		if (typeof dateOfInterest !== 'number') {
-			throw new Error('[TimeTravel] inVertices received non-number as second parameter (dateOfInterest)');
+			throw new Error('[TimeTravel] inNeighbours received non-number as second parameter (dateOfInterest)');
 		}
 		/**
 		 * Begin of actual method
@@ -813,15 +813,15 @@ class TimeTravelEdgeCollection extends GenericTimeCollection {
 	 * @param dateOfInterest The date of interest
 	 * @returns {Array} The vertices
 	 */
-	outVertices(handle, dateOfInterest = TimeTravelInfo.maxTime) {
+	outNeighbours(handle, dateOfInterest = TimeTravelInfo.maxTime) {
 		/**
 		 * Section that validates parameters
 		 */
 		if (typeof handle !== 'string') {
-			throw new Error('[TimeTravel] outVertices received non-string as first parameter (handle)');
+			throw new Error('[TimeTravel] outNeighbours received non-string as first parameter (handle)');
 		}
 		if (typeof dateOfInterest !== 'number') {
-			throw new Error('[TimeTravel] outVertices received non-number as second parameter (dateOfInterest)');
+			throw new Error('[TimeTravel] outNeighbours received non-number as second parameter (dateOfInterest)');
 		}
 		/**
 		 * Begin of actual method
@@ -956,24 +956,6 @@ class TimeTravelEdgeCollection extends GenericTimeCollection {
 	 */
 	latest() {
 		return latest.toAQL();
-	}
-	
-	/**
-	 * Returns the inboundKey for a document handle
-	 * @param {String} handle The document handle
-	 * @returns {String} The inboundKey for the document handle
-	 */
-	inboundKey(handle) {
-		return this.name + '/' + handle + this.settings.proxy.inboundAppendix;
-	}
-	
-	/**
-	 * Returns the outboundKey for a document handle
-	 * @param {String} handle The document handle
-	 * @returns {String} The outboundKey for the document handle
-	 */
-	outboundKey(handle) {
-		return this.name + '/' + handle + this.settings.proxy.outboundAppendix;
 	}
 	
 	/**
