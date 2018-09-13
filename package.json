@@ -1,5 +1,5 @@
 {
-	"name": "arangodb-timetravel",
+	"name": "@bonsaya/arangodb-timetravel",
 	"version": "1.0.0",
 	"license": "MIT",
 	"description": "A time-sliced revision history of tracked collections allowing permanent time travel in ArangoDB",
