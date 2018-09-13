@@ -1,3 +1,5 @@
+![ArangoDB Timetravel](https://source.kevinsekin.de/easy-essen/arangojs-revisions/raw/branch/develop/img.png)
+
 ## ArangoDB Timetravel
 
 ### Introduction
