@@ -1,4 +1,4 @@
-![ArangoDB Timetravel](https://github.com/Bonsaya/arangodb-timetravel/blob/master/img.png)
+![ArangoDB Timetravel](https://raw.githubusercontent.com/Bonsaya/arangodb-timetravel/master/img.png)
 
 ## ArangoDB Timetravel
 
