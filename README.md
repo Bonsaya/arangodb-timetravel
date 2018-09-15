@@ -12,6 +12,10 @@ Not a fan of a text explaining how powerful a system may be for you or simply wa
 
 > *Please keep in mind that ArangoDB Timetravel only works inside Foxx currently(but it should be easily ported to arangojs).
 
+### Documentation
+
+The in-depth and beautiful documentation of this framework that is much better than this readme can be found here: <a href="https://developers.bonsaya.com" target="_blank">Documentation</a>.
+
 ### Example
 
 ##### Airplane Maintenance
@@ -72,7 +76,7 @@ const settings = {
 	}
 };
 // Import the timetravel framework from us!
-const timetravel = require("arangodb-timetravel")(db, settings);
+const timetravel = require("@bonsaya/arangodb-timetravel")(db, settings);
 ```
 
 and start creating!
