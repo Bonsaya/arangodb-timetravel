@@ -974,12 +974,18 @@ class TimeTravelCollection extends GenericTimeCollection {
 	
 	/**
 	 * Returns the arango edge collection so you can use it in AQL
-	 * @returns {String} Returns the arangoDB edge collection
+	 * @returns {ArangoCollection} Returns the arangoDB edge collection
 	 */
-	edges() {
-		// Return the [ArangoCollection ID] as defined in js/common/modules/@arangodb/arango-collection-common.js
-		// For use in aqlQueries!
-		return this.db._collection(this.name + this.settings.edgeAppendix).toString();
+	edgeCollection() {
+		return this.db._collection(this.name + this.settings.edgeAppendix);
+	}
+	
+	/**
+	 * Returns the arango edge collection name so you can use it in AQL
+	 * @returns {String} Returns the arangoDB edge collection name
+	 */
+	edgeCollectionName() {
+		return this.name + this.settings.edgeAppendix;
 	}
 	
 	/**
@@ -987,8 +993,14 @@ class TimeTravelCollection extends GenericTimeCollection {
 	 * @returns {String} Returns the arangoDB collection
 	 */
 	toString() {
-		// Return the [ArangoCollection ID] as defined in js/common/modules/@arangodb/arango-collection-common.js
-		// For use in aqlQueries!
+		return this.name;
+	}
+	
+	/**
+	 * Returns the arango collection so you can use it in AQL
+	 * @returns {String} Returns the arangoDB collection
+	 */
+	toAQL() {
 		return this.collection.toString();
 	}
 }
