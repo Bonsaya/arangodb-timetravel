@@ -455,7 +455,7 @@ class TimeTravelCollection extends GenericTimeCollection {
 		/**
 		 * Section that validates parameters
 		 */
-		if (Array.isArray(handles)) {
+		if (!Array.isArray(handles)) {
 			throw new Error('[TimeTravel] removeByKeys received non-array as first parameter (handles)');
 		}
 		if (options !== Object(options)) {
@@ -506,7 +506,7 @@ class TimeTravelCollection extends GenericTimeCollection {
 		/**
 		 * Section that validates parameters
 		 */
-		if (Array.isArray(handles)) {
+		if (!Array.isArray(handles)) {
 			throw new Error('[TimeTravel] replaceByKeys received non-array as first parameter (handles)');
 		}
 		if (object !== Object(object)) {
@@ -566,7 +566,7 @@ class TimeTravelCollection extends GenericTimeCollection {
 		/**
 		 * Section that validates parameters
 		 */
-		if (Array.isArray(handles)) {
+		if (!Array.isArray(handles)) {
 			throw new Error('[TimeTravel] updateByKeys received non-array as first parameter (handles)');
 		}
 		if (object !== Object(object)) {
@@ -884,7 +884,7 @@ class TimeTravelCollection extends GenericTimeCollection {
 		/**
 		 * Section that validates parameters
 		 */
-		if (Array.isArray(handles)) {
+		if (!Array.isArray(handles)) {
 			throw new Error('[TimeTravel] documents received non-array as first parameter (handles)');
 		}
 		if (typeof dateOfInterest !== 'number') {
