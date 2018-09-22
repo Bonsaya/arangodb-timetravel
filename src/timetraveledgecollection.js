@@ -963,8 +963,14 @@ class TimeTravelEdgeCollection extends GenericTimeCollection {
 	 * @returns {String} Returns the arangoDB collection
 	 */
 	toString() {
-		// Return the [ArangoCollection ID] as defined in js/common/modules/@arangodb/arango-collection-common.js
-		// For use in aqlQueries!
+		return this.name;
+	}
+	
+	/**
+	 * Returns the arango collection so you can use it in AQL
+	 * @returns {String} Returns the arangoDB collection
+	 */
+	toAQL() {
 		return this.collection.toString();
 	}
 }
