@@ -231,7 +231,7 @@ class TimeTravelEdgeCollection extends GenericTimeCollection {
 		/**
 		 * Section that validates parameters
 		 */
-		if (handles.constructor !== Array) {
+		if (Array.isArray(handles)) {
 			throw new Error('[TimeTravel] replaceByKeys received non-array as first parameter (handles)');
 		}
 		if (object !== Object(object)) {
@@ -376,7 +376,7 @@ class TimeTravelEdgeCollection extends GenericTimeCollection {
 		/**
 		 * Section that validates parameters
 		 */
-		if (handles.constructor !== Array) {
+		if (Array.isArray(handles)) {
 			throw new Error('[TimeTravel] updateByKeys received non-array as first parameter (handles)');
 		}
 		if (object !== Object(object)) {
@@ -492,7 +492,7 @@ class TimeTravelEdgeCollection extends GenericTimeCollection {
 		/**
 		 * Section that validates parameters
 		 */
-		if (handles.constructor !== Array) {
+		if (Array.isArray(handles)) {
 			throw new Error('[TimeTravel] removeByKeys received non-array as first parameter (handles)');
 		}
 		if (options !== Object(options)) {
@@ -680,11 +680,12 @@ class TimeTravelEdgeCollection extends GenericTimeCollection {
 			// In order for the query to always work, we must ensure that dateOfInterest never surpasses expiresAt
 			dateOfInterest = TimeTravelInfo.maxTime - 1;
 		}
-		return this.db._query(aqlQuery`
+		const result = this.db._query(aqlQuery`
 			FOR vertex, edge IN ANY ${handle} ${this.collection}
-			FILTER edge.expiresAt == ${dateOfInterest}
+			FILTER edge.createdAt <= ${dateOfInterest} && edge.expiresAt > ${dateOfInterest}
 			RETURN edge
 			`).toArray();
+		return this.resolveProxies(result);
 	}
 	
 	/**
@@ -710,11 +711,12 @@ class TimeTravelEdgeCollection extends GenericTimeCollection {
 			// In order for the query to always work, we must ensure that dateOfInterest never surpasses expiresAt
 			dateOfInterest = TimeTravelInfo.maxTime - 1;
 		}
-		return this.db._query(aqlQuery`
+		const result = this.db._query(aqlQuery`
 			FOR vertex, edge IN INBOUND ${handle} ${this.collection}
-			FILTER edge.expiresAt == ${dateOfInterest}
+			FILTER edge.createdAt <= ${dateOfInterest} && edge.expiresAt > ${dateOfInterest}
 			RETURN edge
 			`).toArray();
+		return this.resolveProxies(result);
 	}
 	
 	/**
@@ -740,11 +742,12 @@ class TimeTravelEdgeCollection extends GenericTimeCollection {
 			// In order for the query to always work, we must ensure that dateOfInterest never surpasses expiresAt
 			dateOfInterest = TimeTravelInfo.maxTime - 1;
 		}
-		return this.db._query(aqlQuery`
+		const result = this.db._query(aqlQuery`
 			FOR vertex, edge IN OUTBOUND ${handle} ${this.collection}
-			FILTER edge.expiresAt == ${dateOfInterest}
+			FILTER edge.createdAt <= ${dateOfInterest} && edge.expiresAt > ${dateOfInterest}
 			RETURN edge
 			`).toArray();
+		return this.resolveProxies(result);
 	}
 	
 	/**
@@ -770,11 +773,12 @@ class TimeTravelEdgeCollection extends GenericTimeCollection {
 			// In order for the query to always work, we must ensure that dateOfInterest never surpasses expiresAt
 			dateOfInterest = TimeTravelInfo.maxTime - 1;
 		}
-		return this.db._query(aqlQuery`
+		const result = this.db._query(aqlQuery`
 			FOR vertex, edge IN ANY ${handle} ${this.collection}
-			FILTER edge.expiresAt == ${dateOfInterest}
+			FILTER edge.createdAt <= ${dateOfInterest} && edge.expiresAt > ${dateOfInterest}
 			RETURN vertex
 			`).toArray();
+		return this.resolveProxies(result);
 	}
 	
 	/**
@@ -800,11 +804,12 @@ class TimeTravelEdgeCollection extends GenericTimeCollection {
 			// In order for the query to always work, we must ensure that dateOfInterest never surpasses expiresAt
 			dateOfInterest = TimeTravelInfo.maxTime - 1;
 		}
-		return this.db._query(aqlQuery`
+		const result = this.db._query(aqlQuery`
 			FOR vertex, edge IN INBOUND ${handle} ${this.collection}
-			FILTER edge.expiresAt == ${dateOfInterest}
+			FILTER edge.createdAt <= ${dateOfInterest} && edge.expiresAt > ${dateOfInterest}
 			RETURN vertex
 			`).toArray();
+		return this.resolveProxies(result);
 	}
 	
 	/**
@@ -830,11 +835,12 @@ class TimeTravelEdgeCollection extends GenericTimeCollection {
 			// In order for the query to always work, we must ensure that dateOfInterest never surpasses expiresAt
 			dateOfInterest = TimeTravelInfo.maxTime - 1;
 		}
-		return this.db._query(aqlQuery`
+		const result = this.db._query(aqlQuery`
 			FOR vertex, edge IN OUTBOUND ${handle} ${this.collection}
-			FILTER edge.expiresAt == ${dateOfInterest}
+			FILTER edge.createdAt <= ${dateOfInterest} && edge.expiresAt > ${dateOfInterest}
 			RETURN vertex
 			`).toArray();
+		return this.resolveProxies(result);
 	}
 	
 	/**
@@ -860,11 +866,12 @@ class TimeTravelEdgeCollection extends GenericTimeCollection {
 			// In order for the query to always work, we must ensure that dateOfInterest never surpasses expiresAt
 			dateOfInterest = TimeTravelInfo.maxTime - 1;
 		}
-		return this.db._query(aqlQuery`
+		const result = this.db._query(aqlQuery`
 			FOR vertex, edge IN ANY ${handle} ${this.collection}
-			FILTER edge.expiresAt == ${dateOfInterest}
+			FILTER edge.createdAt <= ${dateOfInterest} && edge.expiresAt > ${dateOfInterest}
 			RETURN {'vertex': vertex, 'edge': edge }
 			`).toArray();
+		return this.resolveProxies(result);
 	}
 	
 	/**
@@ -890,11 +897,12 @@ class TimeTravelEdgeCollection extends GenericTimeCollection {
 			// In order for the query to always work, we must ensure that dateOfInterest never surpasses expiresAt
 			dateOfInterest = TimeTravelInfo.maxTime - 1;
 		}
-		return this.db._query(aqlQuery`
+		const result = this.db._query(aqlQuery`
 			FOR vertex, edge IN INBOUND ${handle} ${this.collection}
-			FILTER edge.expiresAt == ${dateOfInterest}
+			FILTER edge.createdAt <= ${dateOfInterest} && edge.expiresAt > ${dateOfInterest}
 			RETURN {'vertex': vertex, 'edge': edge }
 			`).toArray();
+		return this.resolveProxies(result);
 	}
 	
 	/**
@@ -920,11 +928,12 @@ class TimeTravelEdgeCollection extends GenericTimeCollection {
 			// In order for the query to always work, we must ensure that dateOfInterest never surpasses expiresAt
 			dateOfInterest = TimeTravelInfo.maxTime - 1;
 		}
-		return this.db._query(aqlQuery`
+		const result = this.db._query(aqlQuery`
 			FOR vertex, edge IN OUTBOUND ${handle} ${this.collection}
-			FILTER edge.expiresAt == ${dateOfInterest}
+			FILTER edge.createdAt <= ${dateOfInterest} && edge.expiresAt > ${dateOfInterest}
 			RETURN {'vertex': vertex, 'edge': edge }
 			`).toArray();
+		return this.resolveProxies(result);
 	}
 	
 	/**
@@ -933,6 +942,15 @@ class TimeTravelEdgeCollection extends GenericTimeCollection {
 	 * @return {String|Boolean} The plain document handle or false on failure
 	 */
 	plainKey(handle) {
+		/**
+		 * Section that validates parameters
+		 */
+		if (typeof handle !== 'string') {
+			throw new Error('[TimeTravel] plainKey received non-string as first parameter (handle)');
+		}
+		/**
+		 * Begin of actual method
+		 */
 		// Establish splitPosition variable to use for the index
 		let splitPosition = -1;
 		// Check if the inboundAppendix is in the handle
@@ -948,6 +966,60 @@ class TimeTravelEdgeCollection extends GenericTimeCollection {
 			// We return false for failure
 			return false;
 		}
+	}
+	
+	/**
+	 * Takes inbound or outbound proxies(full documents, or at least with _id) and transforms them to their real documents
+	 * @param {Array} resultSet The inbound or outbound proxy documents
+	 * @param {Number} dateOfInterest The date of interest as a timestamp
+	 * @returns {Array} The real documents
+	 */
+	resolveProxies(resultSet, dateOfInterest = TimeTravelInfo.maxTime) {
+		/**
+		 * Section that validates parameters
+		 */
+		if (Array.isArray(resultSet)) {
+			throw new Error('[TimeTravel] resolveProxies received non-array as first parameter (resultSet)');
+		}
+		if (typeof dateOfInterest !== 'number') {
+			throw new Error('[TimeTravel] resolveProxies received non-number as second parameter (dateOfInterest)');
+		}
+		/**
+		 * Begin of actual method
+		 */
+		// First, we extract the proxies from the result set
+		let proxies = {};
+		// We iterate over the result set
+		resultSet.forEach((proxy) => {
+			// And extract the proxy name and collection
+			const [collectionName, proxyKey] = proxy._id.split('/');
+			// If we dont have an array for the collection yet, we create it
+			if (proxies[collectionName] === undefined) proxies[collectionName] = [];
+			// And push the plain key into the respective collection
+			proxies[collectionName].push(this.plainKey(proxyKey));
+		});
+		if (dateOfInterest >= TimeTravelInfo.maxTime) {
+			// In order for the query to always work, we must ensure that dateOfInterest never surpasses expiresAt
+			dateOfInterest = TimeTravelInfo.maxTime - 1;
+		}
+		// We establish the resolved documents
+		let resolvedDocuments = [];
+		// Then we iterate over the proxies
+		Object.keys(proxies).forEach((collectionName) => {
+			const collection = this.db._collection(collectionName);
+			// Then we iterate over each plain key for that collection
+			proxies[collectionName].forEach((handle) => {
+				// And we concatenate the resulting documents into the resolved documents
+				resolvedDocuments = resolvedDocuments.concat(
+					this.db._query(aqlQuery`
+					FOR v IN ${collection}
+					FILTER v.id==${handle} && v.createdAt <= ${dateOfInterest} && v.expiresAt > ${dateOfInterest}
+					RETURN v`).toArray()
+				);
+			});
+		});
+		// And finally, we return the resolved documents
+		return resolvedDocuments;
 	}
 	
 	/**
