@@ -231,7 +231,7 @@ class TimeTravelEdgeCollection extends GenericTimeCollection {
 		/**
 		 * Section that validates parameters
 		 */
-		if (Array.isArray(handles)) {
+		if (!Array.isArray(handles)) {
 			throw new Error('[TimeTravel] replaceByKeys received non-array as first parameter (handles)');
 		}
 		if (object !== Object(object)) {
@@ -376,7 +376,7 @@ class TimeTravelEdgeCollection extends GenericTimeCollection {
 		/**
 		 * Section that validates parameters
 		 */
-		if (Array.isArray(handles)) {
+		if (!Array.isArray(handles)) {
 			throw new Error('[TimeTravel] updateByKeys received non-array as first parameter (handles)');
 		}
 		if (object !== Object(object)) {
@@ -492,7 +492,7 @@ class TimeTravelEdgeCollection extends GenericTimeCollection {
 		/**
 		 * Section that validates parameters
 		 */
-		if (Array.isArray(handles)) {
+		if (!Array.isArray(handles)) {
 			throw new Error('[TimeTravel] removeByKeys received non-array as first parameter (handles)');
 		}
 		if (options !== Object(options)) {
@@ -978,7 +978,7 @@ class TimeTravelEdgeCollection extends GenericTimeCollection {
 		/**
 		 * Section that validates parameters
 		 */
-		if (Array.isArray(resultSet)) {
+		if (!Array.isArray(resultSet)) {
 			throw new Error('[TimeTravel] resolveProxies received non-array as first parameter (resultSet)');
 		}
 		if (typeof dateOfInterest !== 'number') {
