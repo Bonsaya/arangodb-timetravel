@@ -987,23 +987,29 @@ class TimeTravelEdgeCollection extends GenericTimeCollection {
 		/**
 		 * Begin of actual method
 		 */
+		// We establish the resolved documents
+		let resolvedDocuments = [];
 		// First, we extract the proxies from the result set
 		let proxies = {};
 		// We iterate over the result set
 		resultSet.forEach((proxy) => {
-			// And extract the proxy name and collection
-			const [collectionName, proxyKey] = proxy._id.split('/');
-			// If we dont have an array for the collection yet, we create it
-			if (proxies[collectionName] === undefined) proxies[collectionName] = [];
-			// And push the plain key into the respective collection
-			proxies[collectionName].push(this.plainKey(proxyKey));
+			if (proxy._key.indexOf(this.settings.proxy.inboundAppendix) > -1 ||
+				proxy._key.indexOf(this.settings.proxy.outboundAppendix) > -1) {
+				// And extract the proxy name and collection
+				const [collectionName, proxyKey] = proxy._id.split('/');
+				// If we dont have an array for the collection yet, we create it
+				if (proxies[collectionName] === undefined) proxies[collectionName] = [];
+				// And push the plain key into the respective collection
+				proxies[collectionName].push(this.plainKey(proxyKey));
+			} else {
+				// Not a proxy, so we push it to the resolved documents immediately
+				resolvedDocuments.push(proxy);
+			}
 		});
 		if (dateOfInterest >= TimeTravelInfo.maxTime) {
 			// In order for the query to always work, we must ensure that dateOfInterest never surpasses expiresAt
 			dateOfInterest = TimeTravelInfo.maxTime - 1;
 		}
-		// We establish the resolved documents
-		let resolvedDocuments = [];
 		// Then we iterate over the proxies
 		Object.keys(proxies).forEach((collectionName) => {
 			const collection = this.db._collection(collectionName);
