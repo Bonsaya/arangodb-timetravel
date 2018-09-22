@@ -148,7 +148,7 @@ class GenericTimeCollection {
 		 */
 		let documents = [];
 		handles.forEach((handle) => {
-			documents.push(this.document(handle), dateOfInterest);
+			documents.push(this.document(handle, dateOfInterest));
 		});
 		return documents;
 	}
