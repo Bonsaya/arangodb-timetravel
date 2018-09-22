@@ -455,7 +455,7 @@ class TimeTravelCollection extends GenericTimeCollection {
 		/**
 		 * Section that validates parameters
 		 */
-		if (handles.constructor !== Array) {
+		if (Array.isArray(handles)) {
 			throw new Error('[TimeTravel] removeByKeys received non-array as first parameter (handles)');
 		}
 		if (options !== Object(options)) {
@@ -506,7 +506,7 @@ class TimeTravelCollection extends GenericTimeCollection {
 		/**
 		 * Section that validates parameters
 		 */
-		if (handles.constructor !== Array) {
+		if (Array.isArray(handles)) {
 			throw new Error('[TimeTravel] replaceByKeys received non-array as first parameter (handles)');
 		}
 		if (object !== Object(object)) {
@@ -566,7 +566,7 @@ class TimeTravelCollection extends GenericTimeCollection {
 		/**
 		 * Section that validates parameters
 		 */
-		if (handles.constructor !== Array) {
+		if (Array.isArray(handles)) {
 			throw new Error('[TimeTravel] updateByKeys received non-array as first parameter (handles)');
 		}
 		if (object !== Object(object)) {
@@ -884,7 +884,7 @@ class TimeTravelCollection extends GenericTimeCollection {
 		/**
 		 * Section that validates parameters
 		 */
-		if (handles.constructor !== Array) {
+		if (Array.isArray(handles)) {
 			throw new Error('[TimeTravel] documents received non-array as first parameter (handles)');
 		}
 		if (typeof dateOfInterest !== 'number') {
@@ -898,7 +898,7 @@ class TimeTravelCollection extends GenericTimeCollection {
 		// forEach is synchronous and causes locking!
 		handles.forEach((handle) => {
 			// And fetch them one by one to have one source of origin for the function
-			documents.push(this.document(handle), dateOfInterest);
+			documents.push(this.document(handle, dateOfInterest));
 		});
 		// Before returning the resulting array
 		return documents;
@@ -929,6 +929,15 @@ class TimeTravelCollection extends GenericTimeCollection {
 	 * @return {String|Boolean} The plain document handle or false on failure
 	 */
 	plainKey(handle) {
+		/**
+		 * Section that validates parameters
+		 */
+		if (typeof handle !== 'string') {
+			throw new Error('[TimeTravel] plainKey received non-string as first parameter (handle)');
+		}
+		/**
+		 * Begin of actual method
+		 */
 		// Establish splitPosition variable to use for the index
 		let splitPosition = -1;
 		// Check if the inboundAppendix is in the handle
@@ -960,6 +969,15 @@ class TimeTravelCollection extends GenericTimeCollection {
 	 * @returns {String} The inboundKey for the document handle
 	 */
 	inboundKey(handle) {
+		/**
+		 * Section that validates parameters
+		 */
+		if (typeof handle !== 'string') {
+			throw new Error('[TimeTravel] inboundKey received non-string as first parameter (handle)');
+		}
+		/**
+		 * Begin of actual method
+		 */
 		return this.name + '/' + handle + this.settings.proxy.inboundAppendix;
 	}
 	
@@ -969,6 +987,15 @@ class TimeTravelCollection extends GenericTimeCollection {
 	 * @returns {String} The outboundKey for the document handle
 	 */
 	outboundKey(handle) {
+		/**
+		 * Section that validates parameters
+		 */
+		if (typeof handle !== 'string') {
+			throw new Error('[TimeTravel] outboundKey received non-string as first parameter (handle)');
+		}
+		/**
+		 * Begin of actual method
+		 */
 		return this.name + '/' + handle + this.settings.proxy.outboundAppendix;
 	}
 	
