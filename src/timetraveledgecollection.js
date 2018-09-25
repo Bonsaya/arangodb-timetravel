@@ -680,12 +680,11 @@ class TimeTravelEdgeCollection extends GenericTimeCollection {
 			// In order for the query to always work, we must ensure that dateOfInterest never surpasses expiresAt
 			dateOfInterest = TimeTravelInfo.maxTime - 1;
 		}
-		const result = this.db._query(aqlQuery`
+		return this.db._query(aqlQuery`
 			FOR vertex, edge IN ANY ${handle} ${this.collection}
 			FILTER edge.createdAt <= ${dateOfInterest} && edge.expiresAt > ${dateOfInterest}
 			RETURN edge
 			`).toArray();
-		return this.resolveProxies(result);
 	}
 	
 	/**
@@ -711,12 +710,11 @@ class TimeTravelEdgeCollection extends GenericTimeCollection {
 			// In order for the query to always work, we must ensure that dateOfInterest never surpasses expiresAt
 			dateOfInterest = TimeTravelInfo.maxTime - 1;
 		}
-		const result = this.db._query(aqlQuery`
+		return this.db._query(aqlQuery`
 			FOR vertex, edge IN INBOUND ${handle} ${this.collection}
 			FILTER edge.createdAt <= ${dateOfInterest} && edge.expiresAt > ${dateOfInterest}
 			RETURN edge
 			`).toArray();
-		return this.resolveProxies(result);
 	}
 	
 	/**
@@ -742,21 +740,21 @@ class TimeTravelEdgeCollection extends GenericTimeCollection {
 			// In order for the query to always work, we must ensure that dateOfInterest never surpasses expiresAt
 			dateOfInterest = TimeTravelInfo.maxTime - 1;
 		}
-		const result = this.db._query(aqlQuery`
+		return this.db._query(aqlQuery`
 			FOR vertex, edge IN OUTBOUND ${handle} ${this.collection}
 			FILTER edge.createdAt <= ${dateOfInterest} && edge.expiresAt > ${dateOfInterest}
 			RETURN edge
 			`).toArray();
-		return this.resolveProxies(result);
 	}
 	
 	/**
 	 * Returns all vertices of the handle
 	 * @param handle The id of the edges
 	 * @param dateOfInterest The date of interest
+	 * @param proxyDateOfInterest The date of interest
 	 * @returns {Array} The vertices
 	 */
-	neighbours(handle, dateOfInterest = TimeTravelInfo.maxTime) {
+	neighbours(handle, dateOfInterest = TimeTravelInfo.maxTime, proxyDateOfInterest = TimeTravelInfo.maxTime) {
 		/**
 		 * Section that validates parameters
 		 */
@@ -778,16 +776,17 @@ class TimeTravelEdgeCollection extends GenericTimeCollection {
 			FILTER edge.createdAt <= ${dateOfInterest} && edge.expiresAt > ${dateOfInterest}
 			RETURN vertex
 			`).toArray();
-		return this.resolveProxies(result);
+		return this.resolveProxies(result, proxyDateOfInterest);
 	}
 	
 	/**
 	 * Returns all inbound vertices of the handle
 	 * @param handle The id of the edge
 	 * @param dateOfInterest The date of interest
+	 * @param proxyDateOfInterest The date of interest
 	 * @returns {Array} The vertices
 	 */
-	inNeighbours(handle, dateOfInterest = TimeTravelInfo.maxTime) {
+	inNeighbours(handle, dateOfInterest = TimeTravelInfo.maxTime, proxyDateOfInterest = TimeTravelInfo.maxTime) {
 		/**
 		 * Section that validates parameters
 		 */
@@ -809,16 +808,17 @@ class TimeTravelEdgeCollection extends GenericTimeCollection {
 			FILTER edge.createdAt <= ${dateOfInterest} && edge.expiresAt > ${dateOfInterest}
 			RETURN vertex
 			`).toArray();
-		return this.resolveProxies(result);
+		return this.resolveProxies(result, proxyDateOfInterest);
 	}
 	
 	/**
 	 * Returns all outbound vertices of the handle
 	 * @param handle The id of the edge
 	 * @param dateOfInterest The date of interest
+	 * @param proxyDateOfInterest The date of interest
 	 * @returns {Array} The vertices
 	 */
-	outNeighbours(handle, dateOfInterest = TimeTravelInfo.maxTime) {
+	outNeighbours(handle, dateOfInterest = TimeTravelInfo.maxTime, proxyDateOfInterest = TimeTravelInfo.maxTime) {
 		/**
 		 * Section that validates parameters
 		 */
@@ -840,16 +840,17 @@ class TimeTravelEdgeCollection extends GenericTimeCollection {
 			FILTER edge.createdAt <= ${dateOfInterest} && edge.expiresAt > ${dateOfInterest}
 			RETURN vertex
 			`).toArray();
-		return this.resolveProxies(result);
+		return this.resolveProxies(result, proxyDateOfInterest);
 	}
 	
 	/**
 	 * Returns all edges of the handle
 	 * @param handle The id of the edges
 	 * @param dateOfInterest The date of interest
+	 * @param proxyDateOfInterest The date of interest
 	 * @returns {Array} The vertices and edges
 	 */
-	joints(handle, dateOfInterest = TimeTravelInfo.maxTime) {
+	joints(handle, dateOfInterest = TimeTravelInfo.maxTime, proxyDateOfInterest = TimeTravelInfo.maxTime) {
 		/**
 		 * Section that validates parameters
 		 */
@@ -866,21 +867,26 @@ class TimeTravelEdgeCollection extends GenericTimeCollection {
 			// In order for the query to always work, we must ensure that dateOfInterest never surpasses expiresAt
 			dateOfInterest = TimeTravelInfo.maxTime - 1;
 		}
-		const result = this.db._query(aqlQuery`
+		let result = this.db._query(aqlQuery`
 			FOR vertex, edge IN ANY ${handle} ${this.collection}
 			FILTER edge.createdAt <= ${dateOfInterest} && edge.expiresAt > ${dateOfInterest}
 			RETURN {'vertex': vertex, 'edge': edge }
 			`).toArray();
-		return this.resolveProxies(result);
+		// Resolve the proxies one by one
+		result.forEach((_, index) => {
+			result[index]['vertex'] = this.resolveProxies([result[index]['vertex']], proxyDateOfInterest)[0];
+		});
+		return result;
 	}
 	
 	/**
 	 * Returns all inbound edges of the handle
 	 * @param handle The id of the edge
 	 * @param dateOfInterest The date of interest
+	 * @param proxyDateOfInterest The date of interest
 	 * @returns {Array} The vertices and edges
 	 */
-	inJoints(handle, dateOfInterest = TimeTravelInfo.maxTime) {
+	inJoints(handle, dateOfInterest = TimeTravelInfo.maxTime, proxyDateOfInterest = TimeTravelInfo.maxTime) {
 		/**
 		 * Section that validates parameters
 		 */
@@ -897,21 +903,26 @@ class TimeTravelEdgeCollection extends GenericTimeCollection {
 			// In order for the query to always work, we must ensure that dateOfInterest never surpasses expiresAt
 			dateOfInterest = TimeTravelInfo.maxTime - 1;
 		}
-		const result = this.db._query(aqlQuery`
+		let result = this.db._query(aqlQuery`
 			FOR vertex, edge IN INBOUND ${handle} ${this.collection}
 			FILTER edge.createdAt <= ${dateOfInterest} && edge.expiresAt > ${dateOfInterest}
 			RETURN {'vertex': vertex, 'edge': edge }
 			`).toArray();
-		return this.resolveProxies(result);
+        // Resolve the proxies one by one
+        result.forEach((_, index) => {
+            result[index]['vertex'] = this.resolveProxies([result[index]['vertex']], proxyDateOfInterest)[0];
+        });
+        return result;
 	}
 	
 	/**
 	 * Returns all outbound edges of the handle
 	 * @param handle The id of the edge
 	 * @param dateOfInterest The date of interest
+	 * @param proxyDateOfInterest The date of interest
 	 * @returns {Array} The vertices and edges
 	 */
-	outJoints(handle, dateOfInterest = TimeTravelInfo.maxTime) {
+	outJoints(handle, dateOfInterest = TimeTravelInfo.maxTime, proxyDateOfInterest = TimeTravelInfo.maxTime) {
 		/**
 		 * Section that validates parameters
 		 */
@@ -928,12 +939,16 @@ class TimeTravelEdgeCollection extends GenericTimeCollection {
 			// In order for the query to always work, we must ensure that dateOfInterest never surpasses expiresAt
 			dateOfInterest = TimeTravelInfo.maxTime - 1;
 		}
-		const result = this.db._query(aqlQuery`
+		let result = this.db._query(aqlQuery`
 			FOR vertex, edge IN OUTBOUND ${handle} ${this.collection}
 			FILTER edge.createdAt <= ${dateOfInterest} && edge.expiresAt > ${dateOfInterest}
 			RETURN {'vertex': vertex, 'edge': edge }
 			`).toArray();
-		return this.resolveProxies(result);
+        // Resolve the proxies one by one
+        result.forEach((_, index) => {
+            result[index]['vertex'] = this.resolveProxies([result[index]['vertex']], proxyDateOfInterest)[0];
+        });
+        return result;
 	}
 	
 	/**
