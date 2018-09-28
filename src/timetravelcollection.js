@@ -441,8 +441,6 @@ class TimeTravelCollection extends GenericTimeCollection {
 					settings: this.settings
 				}
 			});
-		} else {
-			throw new Error('[TimeTravel] remove received a handle that does not exist!');
 		}
 	}
 	
