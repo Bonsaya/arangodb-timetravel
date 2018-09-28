@@ -477,9 +477,6 @@ class TimeTravelEdgeCollection extends GenericTimeCollection {
 					options: options
 				}
 			});
-		} else {
-			// Cannot remove what doesn't exist!
-			throw new Error('[TimeTravel] Attempted to remove an edge that does not exist!');
 		}
 	}
 	
