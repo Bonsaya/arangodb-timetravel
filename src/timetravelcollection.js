@@ -87,12 +87,14 @@ class TimeTravelCollection extends GenericTimeCollection {
 					let inboundProxy = documentCollection.insert({
 						_key: inboundProxyKey,
 						createdAt: dateNow,
-						expiresAt: maxTime
+						expiresAt: maxTime,
+						timeTravelProxy: true
 					}, options);
 					let outboundProxy = documentCollection.insert({
 						_key: outboundProxyKey,
 						createdAt: dateNow,
-						expiresAt: maxTime
+						expiresAt: maxTime,
+						timeTravelProxy: true
 					}, options);
 					// And now we need to tie them together with the first document
 					// By inserting the edges from the inbound proxy to the document and from the document to the outbound proxy
@@ -204,14 +206,16 @@ class TimeTravelCollection extends GenericTimeCollection {
 						_from: inboundProxyKey,
 						_to: newDocument._id,
 						createdAt: dateNow,
-						expiresAt: maxTime
+						expiresAt: maxTime,
+                        timeTravelProxy: true
 					}, options);
 					// Outbound
 					edgeCollection.insert({
 						_from: newDocument._id,
 						_to: outboundProxyKey,
 						createdAt: dateNow,
-						expiresAt: maxTime
+						expiresAt: maxTime,
+                        timeTravelProxy: true
 					}, options);
 				},
 				params: {
@@ -324,14 +328,16 @@ class TimeTravelCollection extends GenericTimeCollection {
 						_from: inboundProxyKey,
 						_to: newDocument._id,
 						createdAt: dateNow,
-						expiresAt: maxTime
+						expiresAt: maxTime,
+                        timeTravelProxy: true
 					}, options);
 					// Outbound
 					edgeCollection.insert({
 						_from: newDocument._id,
 						_to: outboundProxyKey,
 						createdAt: dateNow,
-						expiresAt: maxTime
+						expiresAt: maxTime,
+                        timeTravelProxy: true
 					}, options);
 				},
 				params: {

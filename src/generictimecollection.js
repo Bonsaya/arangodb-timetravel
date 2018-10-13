@@ -29,7 +29,11 @@ class GenericTimeCollection {
 	 * @returns The documents inside the collection as a cursor
 	 */
 	all() {
-		return this.collection.all()
+		return this.db._query(aqlQuery`
+		FOR v IN ${this.collection}
+		FILTER v.timeTravelProxy != true
+		RETURN v
+		`);
 	}
 	
 	/**
