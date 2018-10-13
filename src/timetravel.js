@@ -72,7 +72,7 @@ class TimeTravel {
 						timeTravelProxy: true
 					} IN ${documentCollection}
 			`;
-			db._query(upgradeQuery);
+			this.db._query(upgradeQuery);
 		});
 		this.settingsCollection().update('__settings__', {version: 'v1.1.0'});
 	}
