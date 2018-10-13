@@ -21,6 +21,8 @@ class TimeTravel {
 		this.db = db;
 		this.collectionInfo = this.initializeSettings(settings).document('__collections__');
 		this.settings = settings;
+		// Let us always migrate to the newest version if need be
+		this.migrate();
 	}
 	
 	/**
@@ -46,6 +48,33 @@ class TimeTravel {
 	 */
 	maxTime() {
 		return TimeTravelInfo.maxTime;
+	}
+
+    /**
+	 * Migrates to the latest timeTravel version
+     */
+    migrate() {
+		const settings = this.settingsCollection().document('__settings__');
+		if (settings.version === 'v1.0.0') {
+			this.migrate_v1_0_0_to_v1_1_0();
+		}
+	}
+
+    /**
+	 * Migrates version 1.0.0 to 1.1.0
+     */
+    migrate_v1_0_0_to_v1_1_0() {
+		this.collectionInfo.collections.document.forEach((documentCollection) => {
+			const upgradeQuery = `
+				LET proxies = (FOR doc IN ${documentCollection} FILTER doc._key LIKE '%${this.settings.proxy.inboundAppendix}%' OR doc._key LIKE '%${this.settings.proxy.outboundAppendix}%' RETURN doc)
+				FOR proxy in proxies
+					UPDATE proxy WITH {
+						timeTravelProxy: true
+					} IN ${documentCollection}
+			`;
+			db._query(upgradeQuery);
+		});
+		this.settingsCollection().update('__settings__', {version: 'v1.1.0'});
 	}
 	
 	/**
