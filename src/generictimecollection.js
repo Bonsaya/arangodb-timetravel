@@ -31,7 +31,7 @@ class GenericTimeCollection {
 	all() {
 		return this.db._query(aqlQuery`
 		FOR v IN ${this.collection}
-		FILTER v.timeTravelProxy != true
+		FILTER v.timeTravelProxy != true && v.${latest}
 		RETURN v
 		`);
 	}
