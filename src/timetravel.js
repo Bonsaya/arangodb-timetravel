@@ -65,12 +65,13 @@ class TimeTravel {
      */
     migrate_v1_0_0_to_v1_1_0() {
 		this.collectionInfo.collections.document.forEach((documentCollection) => {
+			const collectionName = module.context.collectionName(documentCollection) + this.settings.presentAppendix;
 			const upgradeQuery = `
-				LET proxies = (FOR doc IN ${documentCollection} FILTER doc._key LIKE '%${this.settings.proxy.inboundAppendix}%' OR doc._key LIKE '%${this.settings.proxy.outboundAppendix}%' RETURN doc)
+				LET proxies = (FOR doc IN ${collectionName} FILTER doc._key LIKE '%${this.settings.proxy.inboundAppendix}%' OR doc._key LIKE '%${this.settings.proxy.outboundAppendix}%' RETURN doc)
 				FOR proxy in proxies
 					UPDATE proxy WITH {
 						timeTravelProxy: true
-					} IN ${documentCollection}
+					} IN ${collectionName}
 			`;
 			this.db._query(upgradeQuery);
 		});
