@@ -90,9 +90,9 @@ class TimeTravel {
 		if (typeof settings.presentAppendix !== 'string') {
 			throw new Error('[TimeTravel] Please provide a presentAppendix in settings.');
 		}
-		if (typeof settings.pastAppendix !== 'string') {
+		/*if (typeof settings.pastAppendix !== 'string') {
 			throw new Error('[TimeTravel] Please provide a pastAppendix in settings.');
-		}
+		}*/
 		if (typeof settings.edgeAppendix !== 'string') {
 			throw new Error('[TimeTravel] Please provide a edgeAppendix in settings.');
 		}
@@ -114,7 +114,7 @@ class TimeTravel {
 				version: TimeTravelInfo.version,
 				settings: {
 					presentAppendix: settings.presentAppendix,
-					pastAppendix: settings.pastAppendix,
+					//pastAppendix: settings.pastAppendix,
 					edgeAppendix: settings.edgeAppendix,
 					proxy: {
 						outboundAppendix: settings.proxy.outboundAppendix,
@@ -137,9 +137,9 @@ class TimeTravel {
 			if (settingsObj.presentAppendix !== settings.presentAppendix) {
 				throw new Error(`{TimeTravel] presentAppendix settings do not match. You provided ${settings.presentAppendix} but previously established timetravel with ${settingsObj.presentAppendix}`);
 			}
-			if (settingsObj.pastAppendix !== settings.pastAppendix) {
+			/*if (settingsObj.pastAppendix !== settings.pastAppendix) {
 				throw new Error(`{TimeTravel] pastAppendix settings do not match. You provided ${settings.pastAppendix} but previously established timetravel with ${settingsObj.pastAppendix}`);
-			}
+			}*/
 			if (settingsObj.edgeAppendix !== settings.edgeAppendix) {
 				throw new Error(`{TimeTravel] edgeAppendix settings do not match. You provided ${settings.edgeAppendix} but previously established timetravel with ${settingsObj.edgeAppendix}`);
 			}
@@ -161,16 +161,16 @@ class TimeTravel {
 	createDocumentCollection(name) {
 		// Establish all the names of the document and edge collections necessary
 		const collectionName = this.prefixedCollectionName(name + this.settings.presentAppendix);
-		const outdatedCollectionName = this.prefixedCollectionName(name + this.settings.pastAppendix);
+		//const outdatedCollectionName = this.prefixedCollectionName(name + this.settings.pastAppendix);
 		const edgeCollectionName = this.prefixedCollectionName(name + this.settings.presentAppendix
 			+ this.settings.edgeAppendix);
-		const outdatedEdgeCollectionName = this.prefixedCollectionName(name + this.settings.pastAppendix
-			+ this.settings.edgeAppendix);
+		//const outdatedEdgeCollectionName = this.prefixedCollectionName(name + this.settings.pastAppendix
+		//	+ this.settings.edgeAppendix);
 		// Ensure they do not exist so that we don't run into any conflicts!
 		if (this.db._collection(collectionName) ||
-			this.db._collection(edgeCollectionName) ||
+			this.db._collection(edgeCollectionName)/* ||
 			this.db._collection(outdatedCollectionName) ||
-			this.db._collection(outdatedEdgeCollectionName)) {
+			this.db._collection(outdatedEdgeCollectionName)*/) {
 			throw new Error('[TimeTravel] The document collection already exists');
 		} else {
 			// Insert the new collections as timetravel collections inside the settings
@@ -179,8 +179,8 @@ class TimeTravel {
 			// Create the collections necessary for the timetravel
 			let collectionPresent = this.db._createDocumentCollection(collectionName);
 			let edgeCollectionPresent = this.db._createEdgeCollection(edgeCollectionName);
-			let collectionPast = this.db._createDocumentCollection(outdatedCollectionName);
-			let edgeCollectionPast = this.db._createEdgeCollection(outdatedEdgeCollectionName);
+			/*let collectionPast = this.db._createDocumentCollection(outdatedCollectionName);
+			let edgeCollectionPast = this.db._createEdgeCollection(outdatedEdgeCollectionName);*/
 			// Add the skiplists
 			collectionPresent.ensureIndex({type: "skiplist", fields: ['id', 'expiresAt', 'createdAt'], unique: false});
 			edgeCollectionPresent.ensureIndex({
@@ -188,8 +188,8 @@ class TimeTravel {
 				fields: ['id', 'expiresAt', 'createdAt'],
 				unique: false
 			});
-			collectionPast.ensureIndex({type: "skiplist", fields: ['id', 'expiresAt', 'createdAt'], unique: false});
-			edgeCollectionPast.ensureIndex({type: "skiplist", fields: ['id', 'expiresAt', 'createdAt'], unique: false});
+			/*collectionPast.ensureIndex({type: "skiplist", fields: ['id', 'expiresAt', 'createdAt'], unique: false});
+			edgeCollectionPast.ensureIndex({type: "skiplist", fields: ['id', 'expiresAt', 'createdAt'], unique: false});*/
 			return new TimeTravelCollection(this.db, collectionName, this.settings);
 		}
 	}
@@ -201,9 +201,9 @@ class TimeTravel {
 	 */
 	createEdgeCollection(name) {
 		const edgeCollectionName = this.prefixedCollectionName(name + this.settings.presentAppendix);
-		const outdatedEdgeCollectionName = this.prefixedCollectionName(name + this.settings.pastAppendix);
-		if (this.db._collection(edgeCollectionName) ||
-			this.db._collection(outdatedEdgeCollectionName)) {
+		//const outdatedEdgeCollectionName = this.prefixedCollectionName(name + this.settings.pastAppendix);
+		if (this.db._collection(edgeCollectionName)/* ||
+			this.db._collection(outdatedEdgeCollectionName)*/) {
 			throw new Error('[TimeTravel] The edge collection already exists');
 		} else {
 			// Insert the new collections as timetravel collections inside the settings
@@ -211,14 +211,14 @@ class TimeTravel {
 			this.settingsCollection().update('__collections__', this.collectionInfo, {mergeObjects: false});
 			// Create the edge collections
 			let edgeCollectionPresent = this.db._createEdgeCollection(edgeCollectionName);
-			let edgeCollectionPast = this.db._createEdgeCollection(outdatedEdgeCollectionName);
+			//let edgeCollectionPast = this.db._createEdgeCollection(outdatedEdgeCollectionName);
 			// Create the skiplists
 			edgeCollectionPresent.ensureIndex({
 				type: "skiplist",
 				fields: ['id', 'expiresAt', 'createdAt'],
 				unique: false
 			});
-			edgeCollectionPast.ensureIndex({type: "skiplist", fields: ['id', 'expiresAt', 'createdAt'], unique: false});
+			//edgeCollectionPast.ensureIndex({type: "skiplist", fields: ['id', 'expiresAt', 'createdAt'], unique: false});
 			return new TimeTravelEdgeCollection(this.db, edgeCollectionName, this.settings);
 		}
 	}
